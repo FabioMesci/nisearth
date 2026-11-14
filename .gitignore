@@ -1,0 +1,9 @@
+.venv/
+data/raw/
+data/work/
+__pycache__/
+node_modules/
+web/dist/
+.DS_Store
+.env
+.playwright-mcp/

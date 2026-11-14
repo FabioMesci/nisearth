@@ -1,0 +1,206 @@
+{
+ "id": "niebla",
+ "title": "Incendio de Niebla (Huelva)",
+ "kind": "fire",
+ "event": "2026-08-06",
+ "mock": false,
+ "bbox": [
+  -6.8,
+  37.36,
+  -6.2,
+  37.68
+ ],
+ "center": [
+  -6.5,
+  37.519999999999996
+ ],
+ "coordinates": [
+  [
+   -6.8,
+   37.68
+  ],
+  [
+   -6.2,
+   37.68
+  ],
+  [
+   -6.2,
+   37.36
+  ],
+  [
+   -6.8,
+   37.36
+  ]
+ ],
+ "pair": {
+  "before": "2026-07-21",
+  "after": "2026-08-26"
+ },
+ "frames": [
+  {
+   "date": "2026-06-27",
+   "track": 23,
+   "hh": "hh_20260627.png",
+   "hv": "hv_20260627.png",
+   "rgb": "rgb_20260627.png"
+  },
+  {
+   "date": "2026-07-09",
+   "track": 23,
+   "hh": "hh_20260709.png",
+   "hv": "hv_20260709.png",
+   "rgb": "rgb_20260709.png"
+  },
+  {
+   "date": "2026-07-21",
+   "track": 23,
+   "hh": "hh_20260721.png",
+   "hv": "hv_20260721.png",
+   "rgb": "rgb_20260721.png"
+  },
+  {
+   "date": "2026-08-14",
+   "track": 23,
+   "hh": "hh_20260814.png",
+   "hv": "hv_20260814.png",
+   "rgb": "rgb_20260814.png"
+  },
+  {
+   "date": "2026-08-26",
+   "track": 23,
+   "hh": "hh_20260826.png",
+   "hv": "hv_20260826.png",
+   "rgb": "rgb_20260826.png"
+  },
+  {
+   "date": "2026-09-07",
+   "track": 23,
+   "hh": "hh_20260907.png",
+   "hv": "hv_20260907.png",
+   "rgb": "rgb_20260907.png"
+  },
+  {
+   "date": "2026-09-19",
+   "track": 23,
+   "hh": "hh_20260919.png",
+   "hv": "hv_20260919.png",
+   "rgb": "rgb_20260919.png"
+  },
+  {
+   "date": "2026-10-01",
+   "track": 23,
+   "hh": "hh_20261001.png",
+   "hv": "hv_20261001.png",
+   "rgb": "rgb_20261001.png"
+  },
+  {
+   "date": "2026-10-13",
+   "track": 23,
+   "hh": "hh_20261013.png",
+   "hv": "hv_20261013.png",
+   "rgb": "rgb_20261013.png"
+  },
+  {
+   "date": "2026-10-25",
+   "track": 23,
+   "hh": "hh_20261025.png",
+   "hv": "hv_20261025.png",
+   "rgb": "rgb_20261025.png"
+  },
+  {
+   "date": "2026-11-06",
+   "track": 23,
+   "hh": "hh_20261106.png",
+   "hv": "hv_20261106.png",
+   "rgb": "rgb_20261106.png"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.png"
+ },
+ "series": {
+  "dates": [
+   "2026-06-27",
+   "2026-07-09",
+   "2026-07-21",
+   "2026-08-14",
+   "2026-08-26",
+   "2026-09-07",
+   "2026-09-19",
+   "2026-10-01",
+   "2026-10-13",
+   "2026-10-25",
+   "2026-11-06"
+  ],
+  "hh": [
+   -8.94,
+   -9.1,
+   -9.1,
+   -9.17,
+   -9.35,
+   -6.47,
+   -9.69,
+   -9.44,
+   -9.92,
+   -9.94,
+   -10.05
+  ],
+  "hv": [
+   -14.28,
+   -14.43,
+   -14.4,
+   -15.53,
+   -15.59,
+   -12.56,
+   -16.56,
+   -16.78,
+   -17.33,
+   -17.48,
+   -17.68
+  ]
+ },
+ "metrics": [
+  {
+   "id": "area",
+   "label": "Superficie quemada (radar)",
+   "value": 32097,
+   "unit": "ha"
+  },
+  {
+   "id": "hvdrop",
+   "label": "Caída media de HV",
+   "value": -1.3,
+   "unit": "dB"
+  },
+  {
+   "id": "effis",
+   "label": "De lo detectado, dentro del perímetro EFFIS",
+   "value": 89,
+   "unit": "%"
+  },
+  {
+   "id": "rail",
+   "label": "Distancia de la vía férrea a la zona quemada",
+   "value": 0.7,
+   "unit": "km"
+  },
+  {
+   "id": "roads",
+   "label": "Carreteras en zona quemada confirmada",
+   "value": 39.0,
+   "unit": "km"
+  }
+ ],
+ "overlays": {
+  "rail": "rail_affected.geojson",
+  "roads": "roads_affected.geojson",
+  "effis": "effis.geojson"
+ },
+ "stats": {
+  "rule": "dHV<-0.6 & dHH>-1.2 (media 15x15)",
+  "effis_recall": 65,
+  "effis_precision": 89,
+  "rail_lines": []
+ }
+}

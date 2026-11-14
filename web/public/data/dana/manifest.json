@@ -1,0 +1,172 @@
+{
+ "id": "dana",
+ "title": "DANA Adam — La Safor (Valencia)",
+ "kind": "flood",
+ "event": "2026-10-19",
+ "mock": false,
+ "bbox": [
+  -0.3,
+  38.82,
+  0.02,
+  39.08
+ ],
+ "center": [
+  -0.13999999999999999,
+  38.95
+ ],
+ "coordinates": [
+  [
+   -0.3,
+   39.08
+  ],
+  [
+   0.02,
+   39.08
+  ],
+  [
+   0.02,
+   38.82
+  ],
+  [
+   -0.3,
+   38.82
+  ]
+ ],
+ "pair": {
+  "before": "2026-10-11",
+  "after": "2026-10-23"
+ },
+ "frames": [
+  {
+   "date": "2026-06-25",
+   "track": 167,
+   "hh": "hh_20260625.png",
+   "hv": "hv_20260625.png",
+   "rgb": "rgb_20260625.png"
+  },
+  {
+   "date": "2026-07-07",
+   "track": 167,
+   "hh": "hh_20260707.png",
+   "hv": "hv_20260707.png",
+   "rgb": "rgb_20260707.png"
+  },
+  {
+   "date": "2026-07-19",
+   "track": 167,
+   "hh": "hh_20260719.png",
+   "hv": "hv_20260719.png",
+   "rgb": "rgb_20260719.png"
+  },
+  {
+   "date": "2026-08-24",
+   "track": 167,
+   "hh": "hh_20260824.png",
+   "hv": "hv_20260824.png",
+   "rgb": "rgb_20260824.png"
+  },
+  {
+   "date": "2026-09-05",
+   "track": 167,
+   "hh": "hh_20260905.png",
+   "hv": "hv_20260905.png",
+   "rgb": "rgb_20260905.png"
+  },
+  {
+   "date": "2026-09-17",
+   "track": 167,
+   "hh": "hh_20260917.png",
+   "hv": "hv_20260917.png",
+   "rgb": "rgb_20260917.png"
+  },
+  {
+   "date": "2026-09-29",
+   "track": 167,
+   "hh": "hh_20260929.png",
+   "hv": "hv_20260929.png",
+   "rgb": "rgb_20260929.png"
+  },
+  {
+   "date": "2026-10-11",
+   "track": 167,
+   "hh": "hh_20261011.png",
+   "hv": "hv_20261011.png",
+   "rgb": "rgb_20261011.png"
+  },
+  {
+   "date": "2026-10-23",
+   "track": 167,
+   "hh": "hh_20261023.png",
+   "hv": "hv_20261023.png",
+   "rgb": "rgb_20261023.png"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.png"
+ },
+ "series": {
+  "dates": [
+   "2026-06-25",
+   "2026-07-07",
+   "2026-07-19",
+   "2026-08-24",
+   "2026-09-05",
+   "2026-09-17",
+   "2026-09-29",
+   "2026-10-11",
+   "2026-10-23"
+  ],
+  "hh": [
+   -10.31,
+   -9.44,
+   -8.86,
+   -7.92,
+   -7.85,
+   -8.24,
+   -8.38,
+   -8.92,
+   -15.05
+  ],
+  "hv": [
+   -17.84,
+   -17.81,
+   -17.5,
+   -17.27,
+   -17.06,
+   -17.4,
+   -17.85,
+   -18.12,
+   -21.59
+  ]
+ },
+ "metrics": [
+  {
+   "id": "area",
+   "label": "Agua nueva detectada",
+   "value": 1.7,
+   "unit": "km²"
+  },
+  {
+   "id": "rail",
+   "label": "Vía férrea en zona inundada",
+   "value": 0.0,
+   "unit": "km"
+  },
+  {
+   "id": "roads",
+   "label": "Carreteras en zona inundada",
+   "value": 0.1,
+   "unit": "km"
+  }
+ ],
+ "overlays": {
+  "rail": "rail_affected.geojson",
+  "roads": "roads_affected.geojson"
+ },
+ "stats": {
+  "otsu_threshold_db": -12.16,
+  "permanent_water_km2": 221.1,
+  "rail_lines": []
+ }
+}

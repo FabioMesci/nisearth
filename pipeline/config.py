@@ -31,7 +31,8 @@ CASES = {
         "event": "2026-08-06",  # inicio; estabilizado ~15 ago
         "pair": ("2026-07-21", "2026-08-26"),
         "track": 23,
-        "s1_pair": ("2026-07-21", "2026-08-26"),  # Sentinel-1 pasada 52 desc: mismas fechas que NISAR
+        "s1_pair": ("2026-07-21", "2026-08-26"),  # Sentinel-1: mismas fechas que NISAR
+        "s1_track": 147,  # pasada 147 asc: cubre el 100 % del perímetro EFFIS (la 52 solo el 54 %)
     },
 }
 

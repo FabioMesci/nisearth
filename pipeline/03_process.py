@@ -36,6 +36,17 @@ from config import CASES, WEB_DATA, WORK
 
 
 # ---------------------------------------------------------------- utilidades
+MAX_W = 2000  # ancho máximo de las imágenes web
+
+
+def save_web(arr_rgba: np.ndarray, path: Path):
+    """Guarda en WebP con pérdida (el speckle del radar comprime muy mal en PNG)."""
+    im = Image.fromarray(arr_rgba.astype("uint8"), "RGBA")
+    if im.width > MAX_W:
+        im = im.resize((MAX_W, round(im.height * MAX_W / im.width)), Image.Resampling.BOX)
+    im.save(path.with_suffix(".webp"), "WEBP", quality=80, method=5)
+
+
 def lee_filter(db: np.ndarray, size: int = 5) -> np.ndarray:
     """Filtro de Lee sobre potencia lineal (reduce el speckle conservando bordes)."""
     lin = np.where(np.isfinite(db), 10 ** (db / 10), np.nan)
@@ -57,7 +68,7 @@ def gray_png(db, path, lo, hi):
     g = np.clip((db - lo) / (hi - lo), 0, 1)
     a = np.where(np.isfinite(db), 255, 0).astype("uint8")
     g8 = (np.nan_to_num(g) * 255).astype("uint8")
-    Image.fromarray(np.dstack([g8, g8, g8, a]), "RGBA").save(path, optimize=True)
+    save_web(np.dstack([g8, g8, g8, a]), path)
 
 
 def rgb_png(hh, hv, path, lims):
@@ -66,7 +77,7 @@ def rgb_png(hh, hv, path, lims):
     chans = [np.clip((c - lo) / (hi - lo), 0, 1) for c, (lo, hi) in zip((hh, hv, ratio), lims)]
     a = np.where(np.isfinite(hh), 255, 0).astype("uint8")
     rgb = [(np.nan_to_num(c) * 255).astype("uint8") for c in chans]
-    Image.fromarray(np.dstack([*rgb, a]), "RGBA").save(path, optimize=True)
+    save_web(np.dstack([*rgb, a]), path)
 
 
 def diverging_png(delta, path, span=6.0):
@@ -77,13 +88,22 @@ def diverging_png(delta, path, span=6.0):
     b = np.where(t < 0, 255, 255 * (1 - t))
     alpha = np.clip(np.abs(t) * 1.6, 0, 1) * 235
     alpha[~np.isfinite(delta)] = 0
-    Image.fromarray(np.dstack([r, g, b, alpha]).astype("uint8"), "RGBA").save(path, optimize=True)
+    save_web(np.dstack([r, g, b, alpha]), path)
 
 
 def mask_png(mask, path, color):
     rgba = np.zeros((*mask.shape, 4), "uint8")
     rgba[mask] = (*color, 210)
-    Image.fromarray(rgba, "RGBA").save(path, optimize=True)
+    im = Image.fromarray(rgba, "RGBA")
+    if im.width > MAX_W:
+        im = im.resize((MAX_W, round(im.height * MAX_W / im.width)), Image.Resampling.NEAREST)
+    im.save(path, optimize=True)
+
+
+def stretch(vals):
+    """Rango de color centrado en la mediana: los tonos medios quedan en gris medio."""
+    lo, med = np.percentile(vals, [2, 50])
+    return (float(lo), float(2 * med - lo))
 
 
 def smooth(x, k):
@@ -169,12 +189,11 @@ def main():
     # ---- exportación para la web
     out = WEB_DATA / cid
     out.mkdir(parents=True, exist_ok=True)
-    for old in out.glob("*.png"):
+    for old in [*out.glob("*.png"), *out.glob("*.webp")]:
         old.unlink()
     all_hh = np.concatenate([stack[d][0][np.isfinite(stack[d][0])] for d in dates])
     all_hv = np.concatenate([stack[d][1][np.isfinite(stack[d][1])] for d in dates])
-    hh_lim = tuple(np.percentile(all_hh, [2, 98]))
-    hv_lim = tuple(np.percentile(all_hv, [2, 98]))
+    hh_lim, hv_lim = stretch(all_hh), stretch(all_hv)
     ratio_lim = (2.0, 12.0)
 
     frames, s_hh, s_hv = [], [], []
@@ -184,7 +203,7 @@ def main():
         gray_png(hh, out / f"hh_{tag}.png", *hh_lim)
         gray_png(hv, out / f"hv_{tag}.png", *hv_lim)
         rgb_png(hh, hv, out / f"rgb_{tag}.png", (hh_lim, hv_lim, ratio_lim))
-        frames.append({"date": d, "track": case["track"], "hh": f"hh_{tag}.png", "hv": f"hv_{tag}.png", "rgb": f"rgb_{tag}.png"})
+        frames.append({"date": d, "track": case["track"], "hh": f"hh_{tag}.webp", "hv": f"hv_{tag}.webp", "rgb": f"rgb_{tag}.webp"})
         s_hh.append(round(mean_db(hh, mask) or np.nan, 2))
         s_hv.append(round(mean_db(hv, mask) or np.nan, 2))
     diverging_png(delta, out / "change.png")
@@ -217,15 +236,24 @@ def main():
         "coordinates": [[lon0, lat1], [lon1, lat1], [lon1, lat0], [lon0, lat0]],
         "pair": {"before": before, "after": after},
         "frames": frames,
-        "layers": {"mask": "mask.png", "change": "change.png"},
+        "layers": {"mask": "mask.png", "change": "change.webp"},
         "series": {"dates": dates, "hh": s_hh, "hv": s_hv},
         "metrics": metrics + keep,
         "overlays": prev.get("overlays", {}) if not prev.get("mock") else {},
         "stats": extra,
     }
+    # conservar lo que añaden otros pasos (04_context, 05_external: firms, daily, …)
+    if not prev.get("mock"):
+        for k, v in prev.items():
+            manifest.setdefault(k, v)
+
     # ---- Sentinel-1 (banda C), si existe: mismas rejilla y escalas de color propias
     s1_dir = src / "s1"
     s1_files = sorted(s1_dir.glob("*_s1p*.tif")) if s1_dir.exists() else []
+    if s1_files and case.get("s1_pair"):
+        # solo la pasada del par: misma geometría en toda la serie
+        trk = case.get("s1_track") or next((f.stem.split("_s1p")[1] for f in s1_files if f.stem.startswith(case["s1_pair"][1].replace("-", ""))), None)
+        s1_files = [f for f in s1_files if f.stem.endswith(f"_s1p{trk}")]
     if s1_files and case.get("s1_pair"):
         s1 = {}
         for f in s1_files:
@@ -234,7 +262,7 @@ def main():
                 s1[f"{d[:4]}-{d[4:6]}-{d[6:]}"] = (lee_filter(ds.read(1)), lee_filter(ds.read(2)), f.stem.split("_s1p")[1])
         vv_all = np.concatenate([v[0][np.isfinite(v[0])] for v in s1.values()])
         vh_all = np.concatenate([v[1][np.isfinite(v[1])] for v in s1.values()])
-        vv_lim, vh_lim = tuple(np.percentile(vv_all, [2, 98])), tuple(np.percentile(vh_all, [2, 98]))
+        vv_lim, vh_lim = stretch(vv_all), stretch(vh_all)
         s1_frames = []
         for d in sorted(s1):
             vv, vh, trk = s1[d]
@@ -242,14 +270,14 @@ def main():
             gray_png(vv, out / f"s1vv_{tag}.png", *vv_lim)
             gray_png(vh, out / f"s1vh_{tag}.png", *vh_lim)
             rgb_png(vv, vh, out / f"s1rgb_{tag}.png", (vv_lim, vh_lim, (2.0, 12.0)))
-            s1_frames.append({"date": d, "track": int(trk), "hh": f"s1vv_{tag}.png", "hv": f"s1vh_{tag}.png", "rgb": f"s1rgb_{tag}.png",
+            s1_frames.append({"date": d, "track": int(trk), "hh": f"s1vv_{tag}.webp", "hv": f"s1vh_{tag}.webp", "rgb": f"s1rgb_{tag}.webp",
                               "mean_hh": round(mean_db(vv, mask) or np.nan, 2), "mean_hv": round(mean_db(vh, mask) or np.nan, 2)})
         b1, a1 = case["s1_pair"]
         if b1 in s1 and a1 in s1:
             d_vh = s1[a1][1] - s1[b1][1]
             d_vv = s1[a1][0] - s1[b1][0]
             diverging_png(d_vv if case["kind"] == "flood" else d_vh, out / "s1_change.png")
-            manifest["s1"] = {"pair": {"before": b1, "after": a1}, "frames": s1_frames, "change": "s1_change.png",
+            manifest["s1"] = {"pair": {"before": b1, "after": a1}, "frames": s1_frames, "change": "s1_change.webp",
                               "delta_in_mask": {"vv": round(float(np.nanmean(d_vv[mask])), 2), "vh": round(float(np.nanmean(d_vh[mask])), 2)}}
             print(f"[s1] {len(s1_frames)} fechas; en la máscara ΔVV {manifest['s1']['delta_in_mask']['vv']} dB, ΔVH {manifest['s1']['delta_in_mask']['vh']} dB")
         manifest["nisar_delta_in_mask"] = {"hh": round(float(np.nanmean(d_hh[mask])), 2), "hv": round(float(np.nanmean(d_hv[mask])), 2)}

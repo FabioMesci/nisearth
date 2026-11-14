@@ -1,15 +1,5 @@
 [
  {
-  "id": "niebla",
-  "title": "Incendio de Niebla (Huelva)",
-  "kind": "fire",
-  "center": [
-   -6.5,
-   37.519999999999996
-  ],
-  "event": "2026-08-06"
- },
- {
   "id": "dana",
   "title": "DANA Adam — La Safor (Valencia)",
   "kind": "flood",
@@ -18,5 +8,15 @@
    38.95
   ],
   "event": "2026-10-19"
+ },
+ {
+  "id": "niebla",
+  "title": "Incendio de Niebla (Huelva)",
+  "kind": "fire",
+  "center": [
+   -6.5,
+   37.519999999999996
+  ],
+  "event": "2026-08-06"
  }
 ]

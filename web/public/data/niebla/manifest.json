@@ -40,84 +40,84 @@
   {
    "date": "2026-06-27",
    "track": 23,
-   "hh": "hh_20260627.png",
-   "hv": "hv_20260627.png",
-   "rgb": "rgb_20260627.png"
+   "hh": "hh_20260627.webp",
+   "hv": "hv_20260627.webp",
+   "rgb": "rgb_20260627.webp"
   },
   {
    "date": "2026-07-09",
    "track": 23,
-   "hh": "hh_20260709.png",
-   "hv": "hv_20260709.png",
-   "rgb": "rgb_20260709.png"
+   "hh": "hh_20260709.webp",
+   "hv": "hv_20260709.webp",
+   "rgb": "rgb_20260709.webp"
   },
   {
    "date": "2026-07-21",
    "track": 23,
-   "hh": "hh_20260721.png",
-   "hv": "hv_20260721.png",
-   "rgb": "rgb_20260721.png"
+   "hh": "hh_20260721.webp",
+   "hv": "hv_20260721.webp",
+   "rgb": "rgb_20260721.webp"
   },
   {
    "date": "2026-08-14",
    "track": 23,
-   "hh": "hh_20260814.png",
-   "hv": "hv_20260814.png",
-   "rgb": "rgb_20260814.png"
+   "hh": "hh_20260814.webp",
+   "hv": "hv_20260814.webp",
+   "rgb": "rgb_20260814.webp"
   },
   {
    "date": "2026-08-26",
    "track": 23,
-   "hh": "hh_20260826.png",
-   "hv": "hv_20260826.png",
-   "rgb": "rgb_20260826.png"
+   "hh": "hh_20260826.webp",
+   "hv": "hv_20260826.webp",
+   "rgb": "rgb_20260826.webp"
   },
   {
    "date": "2026-09-07",
    "track": 23,
-   "hh": "hh_20260907.png",
-   "hv": "hv_20260907.png",
-   "rgb": "rgb_20260907.png"
+   "hh": "hh_20260907.webp",
+   "hv": "hv_20260907.webp",
+   "rgb": "rgb_20260907.webp"
   },
   {
    "date": "2026-09-19",
    "track": 23,
-   "hh": "hh_20260919.png",
-   "hv": "hv_20260919.png",
-   "rgb": "rgb_20260919.png"
+   "hh": "hh_20260919.webp",
+   "hv": "hv_20260919.webp",
+   "rgb": "rgb_20260919.webp"
   },
   {
    "date": "2026-10-01",
    "track": 23,
-   "hh": "hh_20261001.png",
-   "hv": "hv_20261001.png",
-   "rgb": "rgb_20261001.png"
+   "hh": "hh_20261001.webp",
+   "hv": "hv_20261001.webp",
+   "rgb": "rgb_20261001.webp"
   },
   {
    "date": "2026-10-13",
    "track": 23,
-   "hh": "hh_20261013.png",
-   "hv": "hv_20261013.png",
-   "rgb": "rgb_20261013.png"
+   "hh": "hh_20261013.webp",
+   "hv": "hv_20261013.webp",
+   "rgb": "rgb_20261013.webp"
   },
   {
    "date": "2026-10-25",
    "track": 23,
-   "hh": "hh_20261025.png",
-   "hv": "hv_20261025.png",
-   "rgb": "rgb_20261025.png"
+   "hh": "hh_20261025.webp",
+   "hv": "hv_20261025.webp",
+   "rgb": "rgb_20261025.webp"
   },
   {
    "date": "2026-11-06",
    "track": 23,
-   "hh": "hh_20261106.png",
-   "hv": "hv_20261106.png",
-   "rgb": "rgb_20261106.png"
+   "hh": "hh_20261106.webp",
+   "hv": "hv_20261106.webp",
+   "rgb": "rgb_20261106.webp"
   }
  ],
  "layers": {
   "mask": "mask.png",
-  "change": "change.png"
+  "change": "change.webp"
  },
  "series": {
   "dates": [
@@ -190,17 +190,96 @@
    "label": "Carreteras en zona quemada confirmada",
    "value": 39.0,
    "unit": "km"
+  },
+  {
+   "id": "firms_in",
+   "label": "Focos FIRMS dentro de la zona quemada (radar)",
+   "value": 94,
+   "unit": "%"
   }
  ],
  "overlays": {
   "rail": "rail_affected.geojson",
   "roads": "roads_affected.geojson",
-  "effis": "effis.geojson"
+  "effis": "effis.geojson",
+  "firms": "firms.geojson"
  },
  "stats": {
   "rule": "dHV<-0.6 & dHH>-1.2 (media 15x15)",
   "effis_recall": 65,
   "effis_precision": 89,
   "rail_lines": []
+ },
+ "s1": {
+  "pair": {
+   "before": "2026-07-21",
+   "after": "2026-08-26"
+  },
+  "frames": [
+   {
+    "date": "2026-07-21",
+    "track": 147,
+    "hh": "s1vv_20260721_p147.webp",
+    "hv": "s1vh_20260721_p147.webp",
+    "rgb": "s1rgb_20260721_p147.webp",
+    "mean_hh": -8.55,
+    "mean_hv": -14.26
+   },
+   {
+    "date": "2026-08-26",
+    "track": 147,
+    "hh": "s1vv_20260826_p147.webp",
+    "hv": "s1vh_20260826_p147.webp",
+    "rgb": "s1rgb_20260826_p147.webp",
+    "mean_hh": -8.96,
+    "mean_hv": -15.89
+   }
+  ],
+  "change": "s1_change.webp",
+  "delta_in_mask": {
+   "vv": -0.48,
+   "vh": -1.73
+  }
+ },
+ "nisar_delta_in_mask": {
+  "hh": -0.39,
+  "hv": -1.29
+ },
+ "firms": {
+  "from": "2026-08-05",
+  "to": "2026-08-15",
+  "count": 5718,
+  "in_mask_pct": 94
+ },
+ "daily": {
+  "kind": "firms",
+  "dates": [
+   "2026-08-05",
+   "2026-08-06",
+   "2026-08-07",
+   "2026-08-08",
+   "2026-08-09",
+   "2026-08-10",
+   "2026-08-11",
+   "2026-08-12",
+   "2026-08-13",
+   "2026-08-14",
+   "2026-08-15"
+  ],
+  "values": [
+   1,
+   13,
+   154,
+   680,
+   771,
+   939,
+   966,
+   1275,
+   625,
+   289,
+   5
+  ],
+  "unit": "focos",
+  "source": "NASA FIRMS VIIRS 375 m"
  }
 }

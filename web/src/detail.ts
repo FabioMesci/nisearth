@@ -11,6 +11,9 @@ import { t, fmtDay } from './i18n'
 export type Pol = 'hh' | 'hv' | 'rgb'
 export type ViewMode = 'compare' | 'timeline' | 'change'
 
+/** Risk classes, very low to very high */
+export const RISK_COLORS = ['#5b6b86', '#f2d96b', '#f5a03b', '#e4572e', '#a3123b']
+
 const ESRI_IMAGERY = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 const ESRI_LABELS =
   'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
@@ -43,6 +46,8 @@ export class DetailView {
   showRef = true
   showInfra = true
   showFirms = true
+  showRisk = false
+  private popup?: maplibregl.Popup
   sarOpacity = 0.9
   onFrame?: (f: Frame, i: number) => void
 
@@ -68,6 +73,29 @@ export class DetailView {
     this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     this.map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left')
     this.map.on('move', () => this.placeHandle())
+    this.map.on('click', 'risk', (e) => {
+      const p = e.features?.[0]?.properties
+      if (!p) return
+      const names = t('riskClasses')
+      const bar = (label: string, v: number) => `<div class="rp-row"><span>${label}</span><i><b style="width:${Math.round(v * 100)}%"></b></i><em>${(+v).toFixed(2)}</em></div>`
+      this.popup?.remove()
+      this.popup = new maplibregl.Popup({ className: 'risk-popup', maxWidth: '260px' })
+        .setLngLat(e.lngLat)
+        .setHTML(
+          `<div class="rp-head"><i style="background:${RISK_COLORS[p.cls]}"></i><b>${names[p.cls]}</b><span>${(+p.risk).toFixed(2)}</span></div>
+          ${p.place ? `<div class="rp-place">${t('riskNear')(p.place)}</div>` : ''}
+          ${bar(t('riskH'), p.hazard)}${bar(t('riskE'), p.exposure)}${bar(t('riskV'), p.vulnerability)}
+          <dl><dt>${t('riskCellPop')}</dt><dd>${Math.round(p.population)}</dd>
+          <dt>${t('riskCellRoads')}</dt><dd>${(+p.roads_km + +p.rail_km).toFixed(1)} km</dd>
+          <dt>${t('riskCellHosp')}</dt><dd>${p.hospital_km} km</dd>
+          <dt>${t('riskCellAge')}</dt><dd>${Math.round(p.dependent_age_pct)} %</dd>
+          <dt>${t('riskCellSlope')}</dt><dd>${p.slope_deg}°</dd>
+          <dt>${t('riskCellStab')}</dt><dd>${Math.round(p.stability * 100)} %</dd></dl>`,
+        )
+        .addTo(this.map)
+    })
+    this.map.on('mouseenter', 'risk', () => (this.map.getCanvas().style.cursor = 'pointer'))
+    this.map.on('mouseleave', 'risk', () => (this.map.getCanvas().style.cursor = ''))
     this.initHandleDrag()
   }
 
@@ -89,8 +117,8 @@ export class DetailView {
     this.sensor = 'L'
     this.frameIdx = Math.max(0, m.frames.findIndex((f) => f.date === m.pair.after))
 
-    for (const id of ['sar', 'mask', 'labels-top', 'rail', 'rail-glow', 'roads', 'effis', 'firms']) if (this.map.getLayer(id)) this.map.removeLayer(id)
-    for (const id of ['sar', 'mask', 'rail', 'roads', 'effis', 'firms']) if (this.map.getSource(id)) this.map.removeSource(id)
+    for (const id of ['sar', 'mask', 'labels-top', 'rail', 'rail-glow', 'roads', 'effis', 'firms', 'risk']) if (this.map.getLayer(id)) this.map.removeLayer(id)
+    for (const id of ['sar', 'mask', 'rail', 'roads', 'effis', 'firms', 'risk']) if (this.map.getSource(id)) this.map.removeSource(id)
 
     const first = await this.img(this.layerOf(this.frameFor('after')))
     this.canvas.width = first.naturalWidth
@@ -102,6 +130,15 @@ export class DetailView {
     if (m.layers.mask) {
       this.map.addSource('mask', { type: 'image', url: `${this.base}/${m.layers.mask}`, coordinates: m.coordinates })
       this.map.addLayer({ id: 'mask', type: 'raster', source: 'mask', layout: { visibility: this.showMask ? 'visible' : 'none' }, paint: { 'raster-opacity': 0.85 } })
+    }
+    this.popup?.remove()
+    if (m.overlays.risk) {
+      // risk index per ~500 m cell (hazard x exposure x vulnerability), coloured by class
+      this.map.addSource('risk', { type: 'geojson', data: `${this.base}/${m.overlays.risk}` })
+      this.map.addLayer({
+        id: 'risk', type: 'fill', source: 'risk', layout: { visibility: this.showRisk ? 'visible' : 'none' },
+        paint: { 'fill-color': ['match', ['get', 'cls'], 0, RISK_COLORS[0], 1, RISK_COLORS[1], 2, RISK_COLORS[2], 3, RISK_COLORS[3], RISK_COLORS[4]], 'fill-opacity': 0.62, 'fill-outline-color': 'rgba(7,9,13,0.35)' },
+      })
     }
     const ref = m.overlays.effis ?? m.overlays.ems
     if (ref) {
@@ -212,6 +249,11 @@ export class DetailView {
   setInfra(on: boolean) {
     this.showInfra = on
     for (const id of ['roads', 'rail', 'rail-glow']) if (this.map.getLayer(id)) this.map.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none')
+  }
+  setRisk(on: boolean) {
+    this.showRisk = on
+    if (!on) this.popup?.remove()
+    if (this.map.getLayer('risk')) this.map.setLayoutProperty('risk', 'visibility', on ? 'visible' : 'none')
   }
   setFirms(on: boolean) {
     this.showFirms = on

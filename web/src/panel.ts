@@ -1,5 +1,5 @@
 import { Chart, LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler } from 'chart.js'
-import type { DetailView, ViewMode, Pol } from './detail'
+import { RISK_COLORS, type DetailView, type ViewMode, type Pol } from './detail'
 import type { Manifest } from './types'
 import { CONTENT, KIND_META } from './content'
 import { t, locale, metricLabel, fmtDay } from './i18n'
@@ -41,6 +41,7 @@ export class Panel {
       v.showMask = false
       v.sensor = 'L'
       v.showFirms = false
+      v.showRisk = false
     }
 
     this.el.style.setProperty('--accent', meta.color)
@@ -76,6 +77,7 @@ export class Panel {
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${t('infra')}</span></label>` : ''}
           ${m.overlays.effis || m.overlays.ems ? `<label class="toggle"><input type="checkbox" id="chk-ref" ${v.showRef ? 'checked' : ''} /> <span>${m.overlays.ems ? t('ems') : t('effis')}</span></label>` : ''}
           ${m.overlays.firms ? `<label class="toggle"><input type="checkbox" id="chk-firms" ${v.showFirms ? 'checked' : ''} /> <span>${t('firms')}</span></label>` : ''}
+          ${m.overlays.risk ? `<label class="toggle"><input type="checkbox" id="chk-risk" ${v.showRisk ? 'checked' : ''} /> <span>${t('riskToggle')}</span></label>` : ''}
         </div>
         <div class="timeline" id="timeline">
           <button id="play" class="btn icon" aria-label="Reproducir">${ICON.play}</button>
@@ -89,6 +91,8 @@ export class Panel {
       <section class="metrics">
         ${m.metrics.map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${x.unit}</small></b><span>${metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
       </section>
+
+      ${m.risk ? riskCard(m) : ''}
 
       ${m.landcover ? landcoverCard(m) : ''}
 
@@ -120,6 +124,8 @@ export class Panel {
     this.bind(m)
     // el mapa crea sus capas antes de que el panel fije los valores por defecto: sincronizarlas
     v.setFirms(v.showFirms)
+    v.setRisk(v.showRisk)
+    this.el.querySelectorAll<HTMLInputElement>('#chk-risk, #chk-risk2').forEach((c) => (c.checked = v.showRisk))
     v.setMask(v.showMask)
     this.sync()
     this.drawChart(m)
@@ -155,6 +161,12 @@ export class Panel {
     $<HTMLInputElement>('#chk-mask').onchange = (e) => v.setMask((e.target as HTMLInputElement).checked)
     this.el.querySelector<HTMLInputElement>('#chk-infra')?.addEventListener('change', (e) => v.setInfra((e.target as HTMLInputElement).checked))
     this.el.querySelector<HTMLInputElement>('#chk-firms')?.addEventListener('change', (e) => v.setFirms((e.target as HTMLInputElement).checked))
+    for (const id of ['#chk-risk', '#chk-risk2'])
+      this.el.querySelector<HTMLInputElement>(id)?.addEventListener('change', (e) => {
+        const on = (e.target as HTMLInputElement).checked
+        v.setRisk(on)
+        this.el.querySelectorAll<HTMLInputElement>('#chk-risk, #chk-risk2').forEach((c) => (c.checked = on))
+      })
     this.el.querySelector<HTMLInputElement>('#chk-ref')?.addEventListener('change', (e) => v.setRef((e.target as HTMLInputElement).checked))
     $<HTMLInputElement>('#opacity').oninput = (e) => v.setOpacity(+(e.target as HTMLInputElement).value)
     $<HTMLInputElement>('#frame').oninput = (e) => {
@@ -310,6 +322,51 @@ export class Panel {
       ],
     })
   }
+}
+
+/** Risk index summary: classes, the three factors, hotspots, cascade, robustness and downloads */
+function riskCard(m: Manifest) {
+  const r = m.risk!
+  const fmt = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: 0 })
+  const names = t('riskClasses')
+  const drv = t('riskDriverNames')
+  const top = (o: Record<string, number>) => Object.entries(o).sort((a, b) => b[1] - a[1])[0][0]
+  const total = r.classes.reduce((s, c) => s + c.area_ha, 0) || 1
+  const rows = r.classes.map((c, i) => ({ ...c, i })).filter((c) => c.cells > 0)
+  const bar = (label: string, v: number) => `<div class="rp-row"><span>${label}</span><i><b style="width:${Math.round(v * 100)}%"></b></i><em>${v.toFixed(2)}</em></div>`
+  const seen = new Set<string>()
+  const hot = r.hotspots.filter((h) => !seen.has(h.place) && seen.add(h.place)).slice(0, 3)
+  const idx = (name: string) => r.classes.findIndex((c) => c.cls === name)
+  const cascade = r.cascade.type === 'post_fire_runoff'
+    ? t('riskCascadeFire')(fmt(r.cascade.burned_steep_ha ?? 0), r.cascade.roads_km.toLocaleString(locale()))
+    : t('riskCascadeFlood')(fmt(r.cascade.rain_mm ?? 0), r.cascade.roads_km.toLocaleString(locale()), r.cascade.rail_km.toLocaleString(locale()))
+  return `<section class="sec risk">
+    <div class="label">${t('riskTitle')}</div>
+    <p class="risk-lead"><b>${fmt(r.pop_high)}</b> ${t('riskPop')(fmt(r.pop_high_range[0]), fmt(r.pop_high_range[1]))}</p>
+    <div class="lc-bar" role="img" aria-label="${rows.map((c) => `${names[c.i]} ${fmt(c.area_ha)} ha`).join(', ')}">
+      ${rows.map((c) => `<i style="flex:${Math.max(c.area_ha / total, 0.01)};background:${RISK_COLORS[c.i]}" title="${names[c.i]}: ${fmt(c.area_ha)} ha"></i>`).join('')}
+    </div>
+    <div class="lc-legend">
+      ${rows.map((c) => `<span><i style="background:${RISK_COLORS[c.i]}"></i>${names[c.i]}<b>${fmt(c.area_ha)} ha · ${fmt(c.population)} ${t('riskPeople')}</b></span>`).join('')}
+    </div>
+    <label class="toggle risk-toggle"><input type="checkbox" id="chk-risk2" /> <span>${t('riskShow')}</span></label>
+    <div class="risk-factors">
+      <p class="hint">${t('riskMean')}</p>
+      ${bar(t('riskH'), r.components.hazard)}${bar(t('riskE'), r.components.exposure)}${bar(t('riskV'), r.components.vulnerability)}
+      <p class="hint">${t('riskDrivers')(drv[top(r.drivers.exposure)], drv[top(r.drivers.vulnerability)])}</p>
+    </div>
+    <div class="risk-hot">
+      <p class="hint">${t('riskHot')}</p>
+      ${hot.map((h) => `<div><span>${t('riskNear')(h.place)}</span><b style="color:${RISK_COLORS[idx(h.class)]}">${names[idx(h.class)]} · ${h.risk.toFixed(2)}</b></div>`).join('')}
+    </div>
+    <p class="hint">${cascade}</p>
+    <p class="hint">${t('riskStable')(r.stability.mean_pct, r.stability.runs, r.stability.spread_pct)}</p>
+    <div class="risk-dl">
+      <a class="btn ghost" href="/data/${m.id}/${r.files.csv}" download="${m.id}_risk.csv">CSV</a>
+      <a class="btn ghost" href="/data/${m.id}/${r.files.geojson}" download="${m.id}_risk.geojson">GeoJSON</a>
+    </div>
+    <p class="hint src-inline">${t('riskMethod')(r.cell_m[0], r.cell_m[1])}</p>
+  </section>`
 }
 
 const LC_COLORS: Record<string, string> = {

@@ -28,6 +28,7 @@ pipeline/            Procesado de datos (Python)
   04_context.py      Cruce con OpenStreetMap (vías, carreteras) y validación con EFFIS / Copernicus EMS
   05_external.py     NASA FIRMS, lluvia Open-Meteo y panel de vigilancia
   06_exposure.py     Cobertura del suelo (ESA WorldCover) y población (WorldPop) bajo cada máscara
+  07_risk.py         Risk index per grid cell (hazard x exposure x vulnerability), cascades, CSV/GeoJSON export
   make_mock.py       Datos de prueba con el mismo formato (para desarrollar la web sin datos)
 web/                 Aplicación (Vite + TypeScript + globe.gl + MapLibre + Chart.js)
   public/data/       Salida del pipeline (lo único que necesita la web)
@@ -51,6 +52,11 @@ cd pipeline
 ../.venv/bin/python s1_hyp3.py fetch
 ../.venv/bin/python 03_process.py niebla && ../.venv/bin/python 04_context.py niebla && ../.venv/bin/python 06_exposure.py niebla
 ../.venv/bin/python 03_process.py dana   && ../.venv/bin/python 04_context.py dana   && ../.venv/bin/python 06_exposure.py dana
+```
+
+Risk index (see [docs/EVENTS_AND_RISK.md](docs/EVENTS_AND_RISK.md)):
+```bash
+../.venv/bin/python 07_risk.py niebla && ../.venv/bin/python 07_risk.py dana
 ```
 
 ### 3. Web

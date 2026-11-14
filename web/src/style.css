@@ -359,3 +359,32 @@ body.in-detail #lang { right: 436px; }
 .hz .tag { margin: 6px 0 8px; color: var(--text-2); font-size: 13px; }
 .hz dt { font: 600 10px var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--c); margin-top: 8px; }
 .hz dd { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+
+/* ---------- risk index ---------- */
+.risk-lead { margin: 0 0 12px; font-size: 13.5px; color: var(--text-2); line-height: 1.5; }
+.risk-lead b { font: 500 28px/1 var(--sans); letter-spacing: -0.03em; color: var(--text); margin-right: 4px; font-variant-numeric: tabular-nums; }
+.risk-toggle { margin: 4px 0 14px; }
+.risk-factors, .risk-hot { margin-bottom: 12px; }
+.risk-factors .hint, .risk-hot .hint { margin-bottom: 6px; }
+.risk-factors .rp-row + .hint { margin-top: 8px; }
+.rp-row { display: grid; grid-template-columns: 92px 1fr 34px; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-2); margin: 4px 0; }
+.rp-row i { display: block; height: 6px; border-radius: 3px; background: var(--raise-2); overflow: hidden; }
+.rp-row i b { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.rp-row em { font: 500 11px var(--mono); font-style: normal; color: var(--text); text-align: right; }
+.risk-hot div { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--text-2); padding: 3px 0; }
+.risk-hot b { font: 500 11.5px var(--mono); white-space: nowrap; }
+.risk .hint + .hint { margin-top: 6px; }
+.risk-dl { display: flex; gap: 8px; margin: 12px 0 10px; }
+.risk-dl .btn { text-decoration: none; color: var(--text); flex: 1; }
+.risk-popup .maplibregl-popup-content { background: var(--surface-solid); color: var(--text); border: 1px solid var(--line-2); border-radius: var(--r-md); padding: 12px 14px; font: 12.5px/1.4 var(--sans); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); }
+.risk-popup .maplibregl-popup-tip { border-top-color: var(--surface-solid) !important; border-bottom-color: var(--surface-solid) !important; }
+.risk-popup .maplibregl-popup-close-button { color: var(--muted); font-size: 16px; padding: 2px 7px; }
+.rp-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; padding-right: 14px; }
+.rp-head i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.rp-head b { flex: 1; font-size: 14px; }
+.rp-head span { font: 500 12px var(--mono); }
+.rp-place { color: var(--muted); margin-bottom: 6px; }
+.risk-popup .rp-row { grid-template-columns: 84px 1fr 30px; }
+.risk-popup dl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line); }
+.risk-popup dt { color: var(--muted); }
+.risk-popup dd { margin: 0; font: 500 11.5px var(--mono); text-align: right; }

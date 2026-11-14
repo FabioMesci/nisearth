@@ -37,7 +37,9 @@ export interface Manifest {
   layers: { mask?: string; change?: string }
   series: { dates: string[]; hh: number[]; hv: number[] }
   metrics: Metric[]
-  overlays: { rail?: string; roads?: string; effis?: string; ems?: string; firms?: string }
+  overlays: { rail?: string; roads?: string; effis?: string; ems?: string; firms?: string; risk?: string }
+  /** Risk index per grid cell (pipeline/07_risk.py) */
+  risk?: RiskSummary
   /** Serie diaria externa: lluvia (Open-Meteo) o nº de focos (FIRMS) */
   daily?: { kind: 'rain' | 'firms'; dates: string[]; values: number[]; unit: string; source: string; place?: string }
   firms?: { from: string; to: string; count: number; in_mask_pct: number }
@@ -49,6 +51,27 @@ export interface Manifest {
   landcover?: { source: string; inside: LandRow[]; outside_ref?: LandRow[] }
   /** Población expuesta (WorldPop) */
   exposure?: { source: string; pop_inside: number; pop_1km?: number }
+}
+
+export interface RiskSummary {
+  generated: string
+  model: string
+  cell_m: [number, number]
+  cells: number
+  classes: { cls: string; cells: number; area_ha: number; population: number }[]
+  pop_high: number
+  pop_high_range: [number, number]
+  pop_expected: number
+  roads_high_km: number
+  rail_high_km: number
+  critical_high: number
+  components: { hazard: number; exposure: number; vulnerability: number }
+  drivers: { exposure: Record<string, number>; vulnerability: Record<string, number> }
+  hotspots: { place: string; lon: number; lat: number; risk: number; class: string; population: number }[]
+  cascade: { type: 'post_fire_runoff' | 'rain_slope_failure'; cells: number; roads_km: number; rail_km: number; burned_steep_ha?: number; rain_mm?: number }
+  stability: { runs: number; spread_pct: number; stable_high_pct: number | null; mean_pct: number }
+  sources: string[]
+  files: { geojson: string; csv: string }
 }
 
 export interface LandRow {

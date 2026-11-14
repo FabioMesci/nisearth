@@ -214,7 +214,8 @@
   "rail": "rail_affected.geojson",
   "roads": "roads_affected.geojson",
   "effis": "effis.geojson",
-  "firms": "firms.geojson"
+  "firms": "firms.geojson",
+  "risk": "risk.geojson"
  },
  "stats": {
   "rule": "dHV<-0.6 & dHH>-1.2 (media 15x15)",
@@ -375,5 +376,186 @@
   "source": "WorldPop 2020 (100 m)",
   "pop_inside": 86,
   "pop_1km": 721
+ },
+ "risk": {
+  "generated": "2026-11-14",
+  "model": "risk = (hazard x exposure x vulnerability)^(1/3), INFORM-style geometric mean, 0-1 per cell",
+  "cell_m": [
+   441,
+   553
+  ],
+  "cells": 3677,
+  "classes": [
+   {
+    "cls": "very_low",
+    "cells": 1252,
+    "area_ha": 30557,
+    "population": 947
+   },
+   {
+    "cls": "low",
+    "cells": 788,
+    "area_ha": 19232,
+    "population": 11250
+   },
+   {
+    "cls": "medium",
+    "cells": 1628,
+    "area_ha": 39733,
+    "population": 18268
+   },
+   {
+    "cls": "high",
+    "cells": 9,
+    "area_ha": 220,
+    "population": 197
+   },
+   {
+    "cls": "very_high",
+    "cells": 0,
+    "area_ha": 0,
+    "population": 0
+   }
+  ],
+  "pop_high": 197,
+  "pop_high_range": [
+   190,
+   2853
+  ],
+  "pop_expected": 282,
+  "roads_high_km": 1.8,
+  "rail_high_km": 0.0,
+  "critical_high": 0,
+  "components": {
+   "hazard": 0.63,
+   "exposure": 0.16,
+   "vulnerability": 0.73
+  },
+  "drivers": {
+   "exposure": {
+    "population": 0.03,
+    "built": 0.02,
+    "infrastructure": 0.04,
+    "critical": 0.01,
+    "land": 0.92
+   },
+   "vulnerability": {
+    "physical": 0.91,
+    "social": 0.49,
+    "coping": 0.73
+   }
+  },
+  "dependent_age_pct": 24.5,
+  "hotspots": [
+   {
+    "place": "Valverde del Camino",
+    "lon": -6.6425,
+    "lat": 37.5275,
+    "risk": 0.593,
+    "class": "high",
+    "hazard": 0.808,
+    "exposure": 0.35,
+    "vulnerability": 0.738,
+    "population": 33.3
+   },
+   {
+    "place": "Villarrasa",
+    "lon": -6.5725,
+    "lat": 37.4725,
+    "risk": 0.565,
+    "class": "high",
+    "hazard": 0.869,
+    "exposure": 0.273,
+    "vulnerability": 0.758,
+    "population": 6.8
+   },
+   {
+    "place": "Villarrasa",
+    "lon": -6.6375,
+    "lat": 37.4625,
+    "risk": 0.564,
+    "class": "high",
+    "hazard": 0.626,
+    "exposure": 0.356,
+    "vulnerability": 0.806,
+    "population": 12.0
+   },
+   {
+    "place": "Valverde del Camino",
+    "lon": -6.6775,
+    "lat": 37.4975,
+    "risk": 0.554,
+    "class": "high",
+    "hazard": 0.528,
+    "exposure": 0.428,
+    "vulnerability": 0.755,
+    "population": 45.2
+   },
+   {
+    "place": "Berrocal",
+    "lon": -6.4875,
+    "lat": 37.5525,
+    "risk": 0.549,
+    "class": "high",
+    "hazard": 0.747,
+    "exposure": 0.315,
+    "vulnerability": 0.701,
+    "population": 36.9
+   }
+  ],
+  "cascade": {
+   "type": "post_fire_runoff",
+   "burned_steep_ha": 14576,
+   "steep_deg": 15,
+   "cells": 835,
+   "roads_km": 11.2,
+   "rail_km": 0.0
+  },
+  "stability": {
+   "runs": 300,
+   "spread_pct": 25,
+   "stable_high_pct": 100,
+   "mean_pct": 94
+  },
+  "weights": {
+   "hazard": {
+    "w_ref_only": 0.7,
+    "w_radar_only": 0.5,
+    "edge_m": 1000,
+    "w_edge": 0.25,
+    "intensity_floor": 0.6
+   },
+   "exposure": {
+    "population": 0.4,
+    "built": 0.15,
+    "infrastructure": 0.15,
+    "critical": 0.15,
+    "land": 0.15
+   },
+   "vulnerability": {
+    "physical": 0.4,
+    "social": 0.3,
+    "coping": 0.3
+   },
+   "class_edges": [
+    0.2,
+    0.35,
+    0.5,
+    0.65
+   ]
+  },
+  "sources": [
+   "NISAR L2 GCOV change mask (this pipeline)",
+   "EFFIS burnt-area perimeters / Copernicus EMS Rapid Mapping",
+   "NASA FIRMS VIIRS 375 m fire radiative power",
+   "WorldPop 2020 population (100 m) and age structure (1 km)",
+   "ESA WorldCover 2021 (10 m)",
+   "OpenStreetMap roads, railways, hospitals, schools, fire stations (ODbL)",
+   "Copernicus DEM GLO-30"
+  ],
+  "files": {
+   "geojson": "risk.geojson",
+   "csv": "risk.csv"
+  }
  }
 }

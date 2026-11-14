@@ -11,6 +11,9 @@ export interface CaseIndexItem {
 export interface Frame {
   date: string
   track: number
+  /** InSAR: fecha de la primera pasada del par y sentido (A/D) */
+  ref?: string
+  dir?: string
   hh: string
   hv: string
   rgb?: string
@@ -37,7 +40,11 @@ export interface Manifest {
   layers: { mask?: string; change?: string }
   series: { dates: string[]; hh: number[]; hv: number[] }
   metrics: Metric[]
-  overlays: { rail?: string; roads?: string; effis?: string; ems?: string; firms?: string; risk?: string }
+  overlays: { rail?: string; roads?: string; effis?: string; ems?: string; firms?: string; risk?: string; events?: string; ref?: string }
+  /** Interferometría (pipeline/08_insar.py): frames hh = desplazamiento, hv = franjas, rgb = coherencia */
+  insar?: InsarInfo
+  /** Texto de la referencia externa (validación) para el pie de fuentes */
+  refLabel?: string
   /** Risk index per grid cell (pipeline/07_risk.py) */
   risk?: RiskSummary
   /** Serie diaria externa: lluvia (Open-Meteo) o nº de focos (FIRMS) */
@@ -51,6 +58,24 @@ export interface Manifest {
   landcover?: { source: string; inside: LandRow[]; outside_ref?: LandRow[] }
   /** Población expuesta (WorldPop) */
   exposure?: { source: string; pop_inside: number; pop_1km?: number }
+}
+
+export interface InsarInfo {
+  mode: 'pairs' | 'chain'
+  product: string
+  wavelength_cm: number
+  vmax_cm: number
+  fringe_cm: number
+  hotspot: [number, number]
+  noise_cm: number
+  rate_cm_yr?: number | null
+  /** point = disco alrededor del punto; region = zona (colada, vía) menos un anillo de 1 km */
+  series?: 'point' | 'region'
+  threshold_cm: number
+  days: number
+  start: string
+  end: string
+  pairs: { track: number; dir: string; ref: string; sec: string }[]
 }
 
 export interface RiskSummary {

@@ -2,7 +2,7 @@ import { Chart, LineController, LineElement, PointElement, BarController, BarEle
 import { RISK_COLORS, type DetailView, type ViewMode, type Pol } from './detail'
 import type { Manifest } from './types'
 import { CONTENT, KIND_META } from './content'
-import { t, locale, metricLabel, fmtDay, fmtDec } from './i18n'
+import { t, lang, locale, metricLabel, fmtDay, fmtDec } from './i18n'
 import { ICON } from './icons'
 
 Chart.register(LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler)
@@ -63,11 +63,12 @@ export class Panel {
             <button data-v="hv" title="${t('titleHV')}">HV</button>
             ${m.frames[0]?.rgb ? `<button data-v="rgb" title="${t('titleRGB')}">RGB</button>` : ''}
           </div>
-          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.kind === 'flood' ? t('maskWater') : t('maskBurn')}</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.kind === 'flood' ? t('maskWater') : t('maskBurn')}</span></label>
         </div>
         <div class="row toggles">
-          ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${t('infra')}</span></label>` : ''}
+          ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${m.insar ? t('railOsm') : t('infra')}</span></label>` : ''}
           ${m.overlays.effis || m.overlays.ems ? `<label class="toggle"><input type="checkbox" id="chk-ref" ${v.showRef ? 'checked' : ''} /> <span>${m.overlays.ems ? t('ems') : t('effis')}</span></label>` : ''}
+          ${m.overlays.events ? `<label class="toggle"><input type="checkbox" id="chk-events" ${v.showEvents ? 'checked' : ''} /> <span>${t('quakes')}</span></label>` : ''}
           ${m.overlays.firms ? `<label class="toggle"><input type="checkbox" id="chk-firms" ${v.showFirms ? 'checked' : ''} /> <span>${t('firms')}</span></label>` : ''}
           ${m.overlays.risk ? `<label class="toggle"><input type="checkbox" id="chk-risk" ${v.showRisk ? 'checked' : ''} /> <span>${t('riskToggle')}</span></label>` : ''}
         </div>
@@ -76,12 +77,13 @@ export class Panel {
           <input type="range" id="frame" min="0" max="${v.frames.length - 1}" step="1" />
           <span id="frame-date" class="mono"></span>
         </div>
+        <div class="legend-scale" id="legend-scale"></div>
         <label class="opacity"><span>${t('opacity')}</span><input type="range" id="opacity" min="0" max="1" step="0.05" value="${v.sarOpacity}" /></label>
         <p class="hint" id="mode-hint"></p>
       </section>
 
       <section class="metrics">
-        ${m.metrics.map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${x.unit}</small></b><span>${metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
+        ${m.metrics.map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${lang === 'en' ? ({ 'cm/año': 'cm/yr', 'hab.': 'people' } as Record<string, string>)[x.unit] ?? x.unit : x.unit}</small></b><span>${metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
       </section>
 
       ${m.risk ? riskCard(m) : ''}
@@ -89,7 +91,7 @@ export class Panel {
       ${m.landcover ? landcoverCard(m) : ''}
 
       <section class="sec">
-        <div class="label">${t('chart')}</div>
+        <div class="label">${m.insar ? t('chartInsar')(m.insar.mode === 'pairs') : t('chart')}</div>
         <div class="chart-box"><canvas id="chart"></canvas></div>
       </section>
 
@@ -110,7 +112,7 @@ export class Panel {
       </section>
 
       <footer class="src">
-        ${t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
+        ${m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
       </footer>
     `
     this.bind(m)
@@ -149,6 +151,7 @@ export class Panel {
     }
     $<HTMLInputElement>('#chk-mask').onchange = (e) => v.setMask((e.target as HTMLInputElement).checked)
     this.el.querySelector<HTMLInputElement>('#chk-infra')?.addEventListener('change', (e) => v.setInfra((e.target as HTMLInputElement).checked))
+    this.el.querySelector<HTMLInputElement>('#chk-events')?.addEventListener('change', (e) => v.setEvents((e.target as HTMLInputElement).checked))
     this.el.querySelector<HTMLInputElement>('#chk-firms')?.addEventListener('change', (e) => v.setFirms((e.target as HTMLInputElement).checked))
     for (const id of ['#chk-risk', '#chk-risk2'])
       this.el.querySelector<HTMLInputElement>(id)?.addEventListener('change', (e) => {
@@ -167,9 +170,11 @@ export class Panel {
     v.onFrame = (f, i) => {
       $<HTMLInputElement>('#frame').value = String(i)
       const ev = new Date(f.date) > new Date(m.event)
-      $('#frame-date').innerHTML = `${fmtDate(f.date)} <em class="${ev ? 'post' : 'pre'}">${ev ? t('post') : t('pre')}</em>`
+      if (m.insar && v.sensor === 'L') $('#frame-date').textContent = t('pairLbl')(fmtDay(m.insar.mode === 'chain' ? m.insar.start : f.ref ?? f.date), fmtDay(f.date), f.track, f.dir ?? '')
+      else $('#frame-date').innerHTML = `${fmtDate(f.date)} <em class="${ev ? 'post' : 'pre'}">${ev ? t('post') : t('pre')}</em>`
       // la serie del gráfico es de NISAR: marcar la fecha, no el índice (en banda C las fechas son otras)
-      const j = m.series.dates.indexOf(f.date)
+      const k = m.series.dates.indexOf(f.date)
+      const j = k >= 0 && m.insar?.mode === 'chain' ? k + 1 : k
       this.chart?.setActiveElements(j >= 0 ? [{ datasetIndex: 0, index: j }] : [])
       this.chart?.update('none')
     }
@@ -193,13 +198,35 @@ export class Panel {
   private sync() {
     const v = this.view
     this.el.querySelectorAll<HTMLButtonElement>('#seg-mode button').forEach((b) => b.classList.toggle('on', b.dataset.v === v.mode))
+    const ins = this.m?.insar && v.sensor === 'L' ? this.m.insar : undefined
     this.el.querySelectorAll<HTMLButtonElement>('#seg-pol button').forEach((b) => {
       b.classList.toggle('on', b.dataset.v === v.pol)
-      if (b.dataset.v !== 'rgb') b.textContent = v.sensor === 'C' ? (b.dataset.v === 'hh' ? 'VV' : 'VH') : b.dataset.v!.toUpperCase()
+      const k = b.dataset.v as 'hh' | 'hv' | 'rgb'
+      if (ins) {
+        b.textContent = t(({ hh: 'polDisp', hv: 'polFringe', rgb: 'polCoh' } as const)[k])
+        b.title = t(({ hh: 'titleDisp', hv: 'titleFringe', rgb: 'titleCoh' } as const)[k])
+      } else if (k !== 'rgb') {
+        b.textContent = v.sensor === 'C' ? (k === 'hh' ? 'VV' : 'VH') : k.toUpperCase()
+        b.title = k === 'hh' ? t('titleHH') : t('titleHV')
+      } else {
+        b.textContent = 'RGB'
+        b.title = t('titleRGB')
+      }
     })
+    const lg = this.el.querySelector<HTMLElement>('#legend-scale')
+    if (lg) {
+      const show = ins ? (v.mode === 'change' ? 'hh' : v.pol) : null
+      const n = (x: number) => fmtDec(x, 1)
+      lg.innerHTML = !ins || !show ? ''
+        : show === 'hh' ? `<div class="ls-bar disp"></div><div class="ls-ticks"><span>−${n(ins.vmax_cm)} cm</span><span>0</span><span>+${n(ins.vmax_cm)} cm</span></div><div class="ls-ticks sub"><span>${t('legendAway')}</span><span>${t('legendToward')}</span></div>`
+        : show === 'hv' ? `<div class="ls-bar fringe"></div><p class="hint">${t('legendFringe')(n(ins.fringe_cm))}</p>`
+        : `<div class="ls-bar coh"></div><div class="ls-ticks"><span>0</span><span>${t('legendCoh')}</span><span>1</span></div>`
+    }
     this.el.querySelectorAll<HTMLButtonElement>('#seg-sensor button').forEach((b) => b.classList.toggle('on', b.dataset.v === v.sensor))
     this.el.querySelector<HTMLElement>('#seg-pol')!.classList.toggle('disabled', v.mode === 'change')
-    const hints: Record<ViewMode, string> = { compare: t('hintCompare'), timeline: t('hintTimeline'), change: t('hintChange') }
+    const hints: Record<ViewMode, string> = ins
+      ? { compare: t('hintCompareI'), timeline: t('hintTimelineI'), change: t('hintChangeI') }
+      : { compare: t('hintCompare'), timeline: t('hintTimeline'), change: t('hintChange') }
     this.el.querySelector('#mode-hint')!.textContent = hints[v.mode]
     if (v.mode !== 'timeline') this.el.querySelector('#frame-date')!.textContent = ''
   }
@@ -262,6 +289,38 @@ export class Panel {
   private drawChart(m: Manifest) {
     this.chart?.destroy()
     const accent = KIND_META[m.kind].color
+    if (m.insar) {
+      const ctx0 = this.el.querySelector<HTMLCanvasElement>('#chart')!
+      const pairs = m.insar.mode === 'pairs'
+      const labels = pairs ? m.frames.map((f) => `${f.track}${f.dir === 'A' ? '↑' : '↓'} ${fmtDay(f.ref ?? f.date)}–${fmtDay(f.date)}`) : [fmtDay(m.insar.start), ...m.series.dates.map((d) => fmtDay(d))]
+      const data = pairs ? m.series.hh : [0, ...m.series.hh]
+      const noise = m.insar.noise_cm
+      this.chart = new Chart(ctx0, {
+        type: pairs ? 'bar' : 'line',
+        data: { labels, datasets: [{ label: 'cm', data, borderColor: accent, backgroundColor: pairs ? accent : 'transparent', tension: 0.25, pointRadius: 2.5, borderWidth: 2, maxBarThickness: 36, borderRadius: 2 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, animation: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { tooltip: { callbacks: { label: (c) => `${fmtDec(c.parsed.y ?? 0, 2)} cm` } } },
+          scales: {
+            x: { ticks: { color: '#8b93a7', font: { size: 10, family: 'Geist Mono' }, maxRotation: 0, autoSkipPadding: 10 }, grid: { color: 'rgba(255,255,255,0.04)' } },
+            y: { suggestedMin: -Math.max(2, noise * 2), suggestedMax: Math.max(2, noise * 2) * (pairs ? 1 : 0.3), ticks: { color: '#8b93a7', font: { size: 10, family: 'Geist Mono' } }, grid: { color: 'rgba(255,255,255,0.06)' } },
+          },
+        },
+        plugins: [{
+          id: 'noise',
+          beforeDraw: (ch) => {
+            // banda gris: ±1 desviación típica del ruido de fondo; lo que queda dentro no se distingue del ruido
+            const g = ch.ctx, y = ch.scales.y, a = ch.chartArea
+            g.save()
+            g.fillStyle = 'rgba(148,163,184,0.12)'
+            g.fillRect(a.left, y.getPixelForValue(noise), a.right - a.left, y.getPixelForValue(-noise) - y.getPixelForValue(noise))
+            g.restore()
+          },
+        }],
+      })
+      return
+    }
     const ctx = this.el.querySelector<HTMLCanvasElement>('#chart')!
     this.chart = new Chart(ctx, {
       type: 'line',

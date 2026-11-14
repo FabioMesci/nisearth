@@ -226,11 +226,13 @@ async function main() {
                 <dt>${t('hazProducts')}</dt><dd>${h.products}</dd>
                 <dt>${t('hazWho')}</dt><dd>${h.who}</dd>
               </dl>
+              ${h.caseId && cases.some((c) => c.id === h.caseId) ? `<button class="btn ghost hz-open" data-case="${h.caseId}">${t('hazOpen')(CONTENT[h.caseId]?.place ?? '')}</button>` : ''}
             </article>`,
           ).join('')}
         </div>
       </div>`
     $('hz-close').onclick = closeHazards
+    hz.querySelectorAll<HTMLButtonElement>('.hz-open').forEach((b) => (b.onclick = () => (closeHazards(), openCase(b.dataset.case!))))
   }
   const closeHazards = () => hz.classList.add('hidden')
   $('hazards-btn').onclick = () => (renderHazards(), hz.classList.remove('hidden'))

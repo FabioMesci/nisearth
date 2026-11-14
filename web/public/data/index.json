@@ -18,5 +18,45 @@
    37.519999999999996
   ],
   "event": "2026-08-06"
+ },
+ {
+  "id": "granada",
+  "title": "Serie sísmica de Granada (Santa Fe · Alhendín)",
+  "kind": "earthquake",
+  "center": [
+   -3.63,
+   37.129999999999995
+  ],
+  "event": "2026-08-14"
+ },
+ {
+  "id": "lorca",
+  "title": "Subsidencia del Alto Guadalentín (Lorca)",
+  "kind": "subsidence",
+  "center": [
+   -1.6400000000000001,
+   37.7
+  ],
+  "event": "2026-06-25"
+ },
+ {
+  "id": "alora",
+  "title": "Talud del AVE en Álora (Málaga)",
+  "kind": "landslide",
+  "center": [
+   -4.67,
+   36.85
+  ],
+  "event": "2026-02-04"
+ },
+ {
+  "id": "lapalma",
+  "title": "Colada del Tajogaite (La Palma)",
+  "kind": "volcano",
+  "center": [
+   -17.92,
+   28.619999999999997
+  ],
+  "event": "2021-09-19"
  }
 ]

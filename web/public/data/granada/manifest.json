@@ -1,0 +1,163 @@
+{
+ "id": "granada",
+ "title": "Serie sísmica de Granada (Santa Fe · Alhendín)",
+ "kind": "earthquake",
+ "event": "2026-08-14",
+ "mock": false,
+ "bbox": [
+  -3.9,
+  36.98,
+  -3.36,
+  37.28
+ ],
+ "center": [
+  -3.63,
+  37.129999999999995
+ ],
+ "coordinates": [
+  [
+   -3.9,
+   37.28
+  ],
+  [
+   -3.36,
+   37.28
+  ],
+  [
+   -3.36,
+   36.98
+  ],
+  [
+   -3.9,
+   36.98
+  ]
+ ],
+ "pair": {
+  "before": "2026-08-19",
+  "after": "2026-08-24"
+ },
+ "frames": [
+  {
+   "date": "2026-08-19",
+   "ref": "2026-07-26",
+   "track": 87,
+   "dir": "A",
+   "hh": "d_87_20260726_20260819.webp",
+   "hv": "f_87_20260726_20260819.webp",
+   "rgb": "c_87_20260726_20260819.webp"
+  },
+  {
+   "date": "2026-08-19",
+   "ref": "2026-07-26",
+   "track": 95,
+   "dir": "D",
+   "hh": "d_95_20260726_20260819.webp",
+   "hv": "f_95_20260726_20260819.webp",
+   "rgb": "c_95_20260726_20260819.webp"
+  },
+  {
+   "date": "2026-08-24",
+   "ref": "2026-07-19",
+   "track": 167,
+   "dir": "D",
+   "hh": "d_167_20260719_20260824.webp",
+   "hv": "f_167_20260719_20260824.webp",
+   "rgb": "c_167_20260719_20260824.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2026-08-19",
+   "2026-08-19",
+   "2026-08-24"
+  ],
+  "hh": [
+   0.25,
+   1.3,
+   -0.19
+  ],
+  "hv": [
+   0.69,
+   0.69,
+   0.66
+  ]
+ },
+ "metrics": [
+  {
+   "id": "insar_epi",
+   "label": "Mayor desplazamiento cerca del epicentro (cualquier pasada)",
+   "value": 1.3,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_area",
+   "label": "Superficie que se mueve más que el ruido",
+   "value": 74,
+   "unit": "ha"
+  },
+  {
+   "id": "insar_noise",
+   "label": "Ruido de fondo (desviación típica)",
+   "value": 0.8,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_coh",
+   "label": "Coherencia media",
+   "value": 68.0,
+   "unit": "%"
+  },
+  {
+   "id": "insar_n",
+   "label": "Interferogramas NISAR usados",
+   "value": 3,
+   "unit": ""
+  }
+ ],
+ "overlays": {
+  "events": "events.geojson"
+ },
+ "insar": {
+  "mode": "pairs",
+  "product": "NISAR L2 GUNW",
+  "wavelength_cm": 23.8,
+  "vmax_cm": 4.0,
+  "fringe_cm": 2.0,
+  "hotspot": [
+   -3.6316,
+   37.1147
+  ],
+  "noise_cm": 0.79,
+  "rate_cm_yr": null,
+  "series": "point",
+  "threshold_cm": 1.96,
+  "days": 29,
+  "start": "2026-07-26",
+  "end": "2026-08-24",
+  "pairs": [
+   {
+    "track": 87,
+    "dir": "A",
+    "ref": "2026-07-26",
+    "sec": "2026-08-19"
+   },
+   {
+    "track": 95,
+    "dir": "D",
+    "ref": "2026-07-26",
+    "sec": "2026-08-19"
+   },
+   {
+    "track": 167,
+    "dir": "D",
+    "ref": "2026-07-19",
+    "sec": "2026-08-24"
+   }
+  ]
+ },
+ "refLabel": "Sismicidad: EMSC (seismicportal.eu)"
+}

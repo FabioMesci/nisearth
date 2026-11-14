@@ -47,6 +47,7 @@ export class DetailView {
   showInfra = true
   showFirms = true
   showRisk = false
+  showEvents = true
   private popup?: maplibregl.Popup
   sarOpacity = 0.9
   onFrame?: (f: Frame, i: number) => void
@@ -57,6 +58,7 @@ export class DetailView {
       container: el,
       style: {
         version: 8,
+        glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
         sources: {
           imagery: { type: 'raster', tiles: [ESRI_IMAGERY], tileSize: 256, maxzoom: 18, attribution: 'Imagery © Esri, Maxar, Earthstar Geographics' },
           labels: { type: 'raster', tiles: [ESRI_LABELS], tileSize: 256, maxzoom: 18 },
@@ -133,7 +135,7 @@ export class DetailView {
     // estado por defecto de cada caso (el panel lo lee después para marcar sus botones)
     this.m = m
     this.base = base
-    this.mode = 'compare'
+    this.mode = m.insar ? 'change' : 'compare'
     this.pol = m.kind === 'fire' ? 'hv' : 'hh'
     this.sensor = 'L'
     this.split = 0.5
@@ -142,10 +144,11 @@ export class DetailView {
     this.showInfra = true
     this.showFirms = false
     this.showRisk = false
+    this.showEvents = true
     this.frameIdx = Math.max(0, m.frames.indexOf(after))
 
-    for (const id of ['sar', 'mask', 'labels-top', 'rail', 'rail-glow', 'roads', 'effis', 'firms', 'risk']) if (this.map.getLayer(id)) this.map.removeLayer(id)
-    for (const id of ['sar', 'mask', 'rail', 'roads', 'effis', 'firms', 'risk']) if (this.map.getSource(id)) this.map.removeSource(id)
+    for (const id of ['sar', 'mask', 'labels-top', 'rail', 'rail-glow', 'roads', 'effis', 'firms', 'risk', 'events', 'events-lbl', 'hot']) if (this.map.getLayer(id)) this.map.removeLayer(id)
+    for (const id of ['sar', 'mask', 'rail', 'roads', 'effis', 'firms', 'risk', 'events', 'hot']) if (this.map.getSource(id)) this.map.removeSource(id)
 
     this.canvas.width = first.naturalWidth
     this.canvas.height = first.naturalHeight
@@ -166,7 +169,28 @@ export class DetailView {
         paint: { 'fill-color': ['match', ['get', 'cls'], 0, RISK_COLORS[0], 1, RISK_COLORS[1], 2, RISK_COLORS[2], 3, RISK_COLORS[3], RISK_COLORS[4]], 'fill-opacity': 0.62, 'fill-outline-color': 'rgba(7,9,13,0.35)' },
       })
     }
-    const ref = m.overlays.effis ?? m.overlays.ems
+    if (m.overlays.events) {
+      // terremotos (EMSC): círculo proporcional a la magnitud
+      this.map.addSource('events', { type: 'geojson', data: `${this.base}/${m.overlays.events}` })
+      const vis = this.showEvents ? 'visible' : 'none'
+      this.map.addLayer({
+        id: 'events', type: 'circle', source: 'events', layout: { visibility: vis },
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['get', 'mag'], 2.5, 3, 5.2, 16],
+          'circle-color': 'rgba(244,114,182,0.25)', 'circle-stroke-color': '#f472b6', 'circle-stroke-width': 1.5,
+        },
+      })
+      this.map.addLayer({
+        id: 'events-lbl', type: 'symbol', source: 'events', filter: ['>=', ['get', 'mag'], 4.5], layout: { visibility: vis, 'text-field': ['concat', 'M', ['to-string', ['get', 'mag']]], 'text-size': 12, 'text-offset': [0, -1.6], 'text-font': ['Open Sans Semibold'] },
+        paint: { 'text-color': '#fce7f3', 'text-halo-color': '#05070d', 'text-halo-width': 1.5 },
+      })
+    }
+    if (m.insar && m.insar.mode === 'chain' && m.insar.series !== 'region') {
+      // punto que más se mueve (la serie del gráfico se mide aquí)
+      this.map.addSource('hot', { type: 'geojson', data: { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: m.insar.hotspot } } })
+      this.map.addLayer({ id: 'hot', type: 'circle', source: 'hot', paint: { 'circle-radius': 7, 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 } })
+    }
+    const ref = m.overlays.effis ?? m.overlays.ems ?? m.overlays.ref
     if (ref) {
       // referencia oficial (validación): perímetro EFFIS o inundación de Copernicus EMS, línea discontinua amarilla
       this.map.addSource('effis', { type: 'geojson', data: `${this.base}/${ref}` })
@@ -282,6 +306,10 @@ export class DetailView {
     if (!on) this.popup?.remove()
     if (this.map.getLayer('risk')) this.map.setLayoutProperty('risk', 'visibility', on ? 'visible' : 'none')
   }
+  setEvents(on: boolean) {
+    this.showEvents = on
+    for (const id of ['events', 'events-lbl']) if (this.map.getLayer(id)) this.map.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none')
+  }
   setFirms(on: boolean) {
     this.showFirms = on
     if (this.map.getLayer('firms')) this.map.setLayoutProperty('firms', 'visibility', on ? 'visible' : 'none')
@@ -330,8 +358,16 @@ export class DetailView {
     this.handle.style.height = `${Math.max(40, Math.min(rect.height, bot.y) - Math.max(0, top.y))}px`
     const fmt = (d: string) => fmtDay(d)
     const pr = this.set.pair
-    document.getElementById('lbl-before')!.textContent = `${t('before')} · ${fmt(pr.before)}`
-    document.getElementById('lbl-after')!.textContent = `${t('after')} · ${fmt(pr.after)}`
+    if (this.m.insar && this.sensor === 'L') {
+      // interferogramas: cada lado es un par (fecha inicial → final)
+      const a = this.frameFor('before'), b = this.frameFor('after')
+      const lbl = (f: Frame) => `${fmt(f.ref ?? f.date)} → ${fmt(f.date)}${this.m!.insar!.mode === 'pairs' ? ` · ${f.track}${f.dir === 'A' ? '↑' : '↓'}` : ''}`
+      document.getElementById('lbl-before')!.textContent = lbl(a)
+      document.getElementById('lbl-after')!.textContent = this.m.insar.mode === 'chain' ? `${fmt(this.m.insar.start)} → ${fmt(b.date)}` : lbl(b)
+    } else {
+      document.getElementById('lbl-before')!.textContent = `${t('before')} · ${fmt(pr.before)}`
+      document.getElementById('lbl-after')!.textContent = `${t('after')} · ${fmt(pr.after)}`
+    }
     this.labels.style.left = `${rect.left + top.x}px`
     this.labels.style.top = `${rect.top + Math.max(8, top.y + 8)}px`
   }

@@ -11,6 +11,8 @@ export interface Hazard {
   color: string
   name: string
   status: 'live' | 'planned'
+  /** Caso de estudio de la app que lo ilustra */
+  caseId?: string
   tagline: string
   signature: string
   technique: string
@@ -21,6 +23,7 @@ export interface Hazard {
 export const HAZARDS: Hazard[] = [
   {
     id: 'fire',
+    caseId: 'niebla',
     icon: ICON.fire,
     color: '#fb923c',
     name: 'Wildfire',
@@ -33,6 +36,7 @@ export const HAZARDS: Hazard[] = [
   },
   {
     id: 'flood',
+    caseId: 'dana',
     icon: ICON.flood,
     color: '#38bdf8',
     name: 'Flood',
@@ -45,50 +49,54 @@ export const HAZARDS: Hazard[] = [
   },
   {
     id: 'earthquake',
+    caseId: 'granada',
     icon: ICON.earthquake,
     color: '#f472b6',
     name: 'Earthquake',
-    status: 'planned',
+    status: 'live',
     tagline: 'Centimetre-scale ground displacement along the fault.',
     signature: 'The interferometric phase changes between two passes (coseismic interferogram); each fringe is about half a wavelength of line-of-sight motion. Damaged buildings also lose coherence.',
     technique: 'InSAR from NISAR GUNW pairs, plus coherence-loss damage proxy maps.',
-    products: 'NISAR L2 GUNW / GSLC, ARIA damage proxy maps, USGS ShakeMap and event catalogue.',
+    products: 'NISAR L2 GUNW (three geometries), EMSC / USGS earthquake catalogue. Damage proxy maps from coherence loss where buildings collapse.',
     who: 'Seismologists, search-and-rescue coordination, structural engineers, reconstruction agencies.',
   },
   {
     id: 'landslide',
+    caseId: 'alora',
     icon: ICON.landslide,
     color: '#a3e635',
     name: 'Landslide',
-    status: 'planned',
+    status: 'live',
     tagline: 'Slow slope creep before failure, and scars after it.',
     signature: 'Persistent line-of-sight velocity on slopes before failure; abrupt backscatter and coherence change where the slide scar and debris appear.',
     technique: 'Time-series InSAR (SBAS / PS) for creep, change detection for new scars.',
-    products: 'NISAR L2 GUNW / GCOV, Sentinel-1 (OPERA DISP / EGMS in Europe), DEM slope maps.',
+    products: 'NISAR L2 GUNW, Sentinel-1 RTC for the failure itself, EGMS (Europe) or OPERA DISP (North America), OpenStreetMap rail.',
     who: 'Geological surveys, road and rail operators, mountain municipalities.',
   },
   {
     id: 'volcano',
+    caseId: 'lapalma',
     icon: ICON.volcano,
     color: '#ef4444',
     name: 'Volcanic unrest',
-    status: 'planned',
+    status: 'live',
     tagline: 'Inflation of the edifice before eruptions; lava and ash after.',
     signature: 'Ground uplift or subsidence rings around the volcano in InSAR; new lava flows and deposits change roughness and backscatter.',
     technique: 'InSAR time series, deformation source modelling (Mogi), backscatter change for flows.',
-    products: 'NISAR L2 GUNW, Sentinel-1, COMET LiCSAR, Smithsonian GVP eruption records.',
+    products: 'NISAR L2 GUNW in two geometries, lava-flow outline (OpenStreetMap), Sentinel-1 / COMET LiCSAR, Smithsonian GVP.',
     who: 'Volcano observatories, aviation authorities, local civil protection.',
   },
   {
     id: 'subsidence',
+    caseId: 'lorca',
     icon: ICON.subsidence,
     color: '#c084fc',
     name: 'Land subsidence',
-    status: 'planned',
+    status: 'live',
     tagline: 'Slow sinking from groundwater pumping, mining or tunnelling.',
-    signature: 'A steady millimetre-per-year line-of-sight velocity trend over urban areas, aquifers, mines, dams and embankments.',
-    technique: 'Persistent-scatterer / SBAS InSAR on long time series.',
-    products: 'NISAR L2 GUNW, Sentinel-1, EGMS (Europe), OPERA DISP.',
+    signature: 'A steady line-of-sight velocity trend, from millimetres to centimetres per year, over aquifers, cities, mines, dams and embankments. With a few months of NISAR data only centimetre-per-year rates stand out.',
+    technique: 'Chained 12-day interferograms summed into a cumulative time series (SBAS / persistent scatterers on longer series).',
+    products: 'NISAR L2 GUNW, Sentinel-1, EGMS (Europe), OPERA DISP (North America).',
     who: 'Water agencies, city planners, dam and railway asset managers.',
   },
 ]
@@ -118,7 +126,7 @@ const HAZARDS_ES: Record<string, HazardText> = {
     tagline: 'Desplazamientos del terreno de escala centimétrica a lo largo de la falla.',
     signature: 'La fase interferométrica cambia entre dos pasadas (interferograma cosísmico); cada franja equivale a media longitud de onda de movimiento en la línea de visión. Los edificios dañados también pierden coherencia.',
     technique: 'InSAR con pares NISAR GUNW, más mapas de daño a partir de la pérdida de coherencia.',
-    products: 'NISAR L2 GUNW / GSLC, mapas de daño ARIA, ShakeMap y catálogo de eventos del USGS.',
+    products: 'NISAR L2 GUNW (tres geometrías), catálogo sísmico EMSC / USGS. Mapas de daño por pérdida de coherencia donde caen edificios.',
     who: 'Sismólogos, coordinación de búsqueda y rescate, ingenieros de estructuras, agencias de reconstrucción.',
   },
   landslide: {
@@ -126,7 +134,7 @@ const HAZARDS_ES: Record<string, HazardText> = {
     tagline: 'Reptación lenta de la ladera antes de romper, y la cicatriz después.',
     signature: 'Velocidad persistente en la línea de visión sobre laderas antes de la rotura; cambio brusco de retrodispersión y coherencia donde aparecen la cicatriz y los derrubios.',
     technique: 'InSAR en serie temporal (SBAS / PS) para la reptación, detección de cambio para las nuevas cicatrices.',
-    products: 'NISAR L2 GUNW / GCOV, Sentinel-1 (OPERA DISP / EGMS en Europa), mapas de pendiente del MDT.',
+    products: 'NISAR L2 GUNW, Sentinel-1 RTC para la rotura, EGMS (Europa) u OPERA DISP (Norteamérica), vías de OpenStreetMap.',
     who: 'Servicios geológicos, operadores de carreteras y ferrocarril, municipios de montaña.',
   },
   volcano: {
@@ -134,15 +142,15 @@ const HAZARDS_ES: Record<string, HazardText> = {
     tagline: 'Hinchamiento del edificio antes de la erupción; lava y ceniza después.',
     signature: 'Anillos de levantamiento o hundimiento alrededor del volcán en InSAR; las nuevas coladas y depósitos cambian la rugosidad y la retrodispersión.',
     technique: 'Series temporales InSAR, modelado de la fuente de deformación (Mogi), cambio de retrodispersión para las coladas.',
-    products: 'NISAR L2 GUNW, Sentinel-1, COMET LiCSAR, registros de erupciones del Smithsonian GVP.',
+    products: 'NISAR L2 GUNW en dos geometrías, contorno de la colada (OpenStreetMap), Sentinel-1 / COMET LiCSAR, Smithsonian GVP.',
     who: 'Observatorios vulcanológicos, autoridades de aviación, protección civil local.',
   },
   subsidence: {
     name: 'Subsidencia del terreno',
     tagline: 'Hundimiento lento por bombeo de agua subterránea, minería o túneles.',
-    signature: 'Una tendencia constante de velocidad, de milímetros al año, en la línea de visión sobre ciudades, acuíferos, minas, presas y terraplenes.',
-    technique: 'InSAR de dispersores persistentes / SBAS sobre series temporales largas.',
-    products: 'NISAR L2 GUNW, Sentinel-1, EGMS (Europa), OPERA DISP.',
+    signature: 'Una tendencia constante de velocidad en la línea de visión, de milímetros a centímetros al año, sobre acuíferos, ciudades, minas, presas y terraplenes. Con pocos meses de NISAR solo destacan los centímetros por año.',
+    technique: 'Interferogramas de 12 días encadenados y sumados en una serie acumulada (SBAS / dispersores persistentes en series más largas).',
+    products: 'NISAR L2 GUNW, Sentinel-1, EGMS (Europa), OPERA DISP (Norteamérica).',
     who: 'Agencias del agua, urbanistas, gestores de presas e infraestructura ferroviaria.',
   },
 }

@@ -36,6 +36,56 @@ CASES = {
         "s1_pair": ("2026-07-21", "2026-08-26"),  # Sentinel-1: mismas fechas que NISAR
         "s1_track": 147,  # pasada 147 asc: cubre el 100 % del perímetro EFFIS (la 52 solo el 54 %)
     },
+    # ---- Casos de interferometría (InSAR, NISAR L2 GUNW): pipeline/08_insar.py ----
+    # mode "pairs": cada interferograma es un fotograma independiente (terremoto: varias geometrías)
+    # mode "chain": pares consecutivos de 12 días de una pasada, sumados = desplazamiento acumulado
+    "granada": {
+        "title": "Serie sísmica de Granada (Santa Fe · Alhendín)",
+        "kind": "earthquake",
+        "bbox": (-3.90, 36.98, -3.36, 37.28),
+        "window": ("2026-06-01", "2026-11-14"),
+        "event": "2026-08-14",  # M5,2 a las 23:04 UTC (EMSC, 2 km de profundidad); M4,9 el 18 ago 08:37 UTC
+        "insar": {
+            "mode": "pairs",
+            "pairs": [  # (pasada, antes, después): tres geometrías que abarcan los dos terremotos (la 15 solo cubre el 4 %)
+                (87, "2026-07-26", "2026-08-19"),
+                (95, "2026-07-26", "2026-08-19"),
+                (167, "2026-07-19", "2026-08-24"),
+            ],
+            "hotspot": (-3.6316, 37.1147),  # epicentro M5,2 (EMSC)
+            "res": 0.0005,
+            "vmax_cm": 4.0,
+            "fringe_cm": 2.0,
+            "exclude_km": 12,  # radio sin usar para quitar rampa y atmósfera
+        },
+    },
+    "lorca": {
+        "title": "Subsidencia del Alto Guadalentín (Lorca)",
+        "kind": "subsidence",
+        "bbox": (-1.86, 37.56, -1.42, 37.84),
+        "window": ("2026-06-01", "2026-11-14"),
+        "event": "2026-06-25",  # fenómeno continuo: inicio de la serie
+        "insar": {"mode": "chain", "track": 159, "hotspot": (-1.608, 37.605), "res": 0.0005, "vmax_cm": 4.0, "fringe_cm": 2.0, "exclude_km": 11},  # máximo NISAR (la bibliografía lo sitúa ~4 km al SO de Lorca)
+    },
+    "lapalma": {
+        "title": "Colada del Tajogaite (La Palma)",
+        "kind": "volcano",
+        "bbox": (-18.00, 28.56, -17.84, 28.68),
+        "window": ("2026-06-01", "2026-11-14"),
+        "event": "2021-09-19",  # inicio de la erupción; la colada sigue hundiéndose
+        "insar": {"mode": "chain", "track": 131, "hotspot": (-17.895, 28.617), "res": 0.0003, "vmax_cm": 3.0, "fringe_cm": 2.0, "exclude_km": 3.5,
+                  "context": {"osm_relation": 13249829, "ref_label": "Colada de 2021: © OpenStreetMap (relación 13249829)"}},
+    },
+    "alora": {
+        "title": "Talud del AVE en Álora (Málaga)",
+        "kind": "landslide",
+        "bbox": (-4.76, 36.78, -4.58, 36.92),
+        "window": ("2026-06-01", "2026-11-14"),
+        "event": "2026-02-04",  # rotura del talud en el PK 121 (borrasca Leonardo)
+        "insar": {"mode": "chain", "track": 95, "hotspot": (-4.70, 36.87), "res": 0.0003, "vmax_cm": 3.0, "fringe_cm": 1.5, "exclude_km": 2,
+                  "context": {"rail": True},
+                  "s1_pair": ("2026-02-03", "2026-02-09")},  # Sentinel-1 pasada 74 asc: la víspera y 5 días después de la rotura
+    },
 }
 
 

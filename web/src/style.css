@@ -277,6 +277,15 @@ body.in-detail .maplibregl-ctrl-bottom-right { right: 432px; }
 .passes text { font: 9.5px var(--mono); fill: var(--muted); }
 .passes text.gap { fill: var(--danger); font-weight: 500; }
 .passes text.row { fill: var(--text); font-weight: 500; }
+.legend-scale:empty { display: none; }
+.legend-scale { margin: 10px 0 2px; }
+.ls-bar { height: 8px; border-radius: 4px; }
+.ls-bar.disp { background: linear-gradient(90deg, #d7191c, #f6c6b8 40%, #f2f2f2 50%, #b8c8f6 60%, #1f4cff); }
+.ls-bar.fringe { background: linear-gradient(90deg, #e82828, #e8e828, #28e828, #28e8e8, #2828e8, #e828e8, #e82828); }
+.ls-bar.coh { background: linear-gradient(90deg, #1e1446, #6e3a6a, #c8875a, #ffdc5a); }
+.ls-ticks { display: flex; justify-content: space-between; font: 500 11px/1.4 'Geist Mono', monospace; color: var(--muted); margin-top: 4px; }
+.ls-ticks.sub { font-family: inherit; font-size: 11px; margin-top: 0; }
+.legend-scale .hint { margin: 6px 0 0; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
 .legend i.nisar { background: var(--flood); }
@@ -370,7 +379,9 @@ body.in-detail #lang { right: 436px; }
 .hz-intro { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
 /* min(290px, 100%): en móviles estrechos una sola columna que ocupa todo el ancho, sin desbordar */
 .hz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); gap: 12px; }
-.hz { padding: 14px; border: 1px solid var(--line); border-top: 2px solid var(--c); border-radius: var(--r-md); background: var(--raise); }
+.hz-open { margin-top: auto; width: 100%; justify-content: center; white-space: normal; text-align: center; line-height: 1.3; }
+.hz dl { margin-bottom: 14px; }
+.hz { display: flex; flex-direction: column; padding: 14px; border: 1px solid var(--line); border-top: 2px solid var(--c); border-radius: var(--r-md); background: var(--raise); }
 .hz header { display: flex; align-items: center; gap: 8px; }
 .hz header .ic { color: var(--c); display: grid; }
 .hz header .ic svg { width: 20px; height: 20px; }

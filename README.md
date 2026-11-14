@@ -8,6 +8,10 @@ para seguir los cambios que dejaron en la superficie de España dos desastres de
 | Caso | Qué muestra el radar |
 |---|---|
 | 🔥 **Incendio de Niebla (Huelva), agosto 2026** | Cicatriz del fuego medida a través del humo: ~32.000 ha, 89 % dentro del perímetro oficial EFFIS. Regla física: el fuego hace caer HV (volumen de hojas y ramas) pero no HH; la cosecha hace caer las dos. |
+| ⬇️ **Subsidencia del Alto Guadalentín (Lorca)** | Interferometría NISAR (8 pares GUNW encadenados, jun–oct): el llano se hunde ~6 cm en 108 días (~16 cm/año, ajuste lineal), en línea con los máximos publicados. |
+| 🌋 **Colada del Tajogaite (La Palma)** | 9 interferogramas: la colada de 2021 baja ~0,4 cm frente a su entorno, por debajo del ruido (±1,7 cm). La lava es muy coherente (0,86). |
+| 〰️ **Serie sísmica de Granada (M5,2, 14 ago)** | Tres interferogramas de tres pasadas abarcan los terremotos: ninguna deformación por encima de ~1 cm; las dos descendentes discrepan (atmósfera). |
+| ⛰️ **Talud del AVE en Álora (4 feb)** | NISAR no tenía datos hasta junio; Sentinel-1 la víspera y 5 días después. Desde junio la vía no se mueve (<1 mm frente a su entorno). |
 | 💧 **DANA Adam, La Safor (Valencia), octubre 2026** | Lo que el radar *no* llegó a ver: ningún radar pasó durante la tormenta (4,5 días sin datos) y, cuando NISAR volvió, el agua ya había drenado. Argumento para coordinar constelaciones radar en emergencias. |
 
 Un globo 3D (three.js / globe.gl) lleva a una vista detallada (MapLibre) con deslizador antes/después,
@@ -29,6 +33,8 @@ pipeline/            Procesado de datos (Python)
   05_external.py     NASA FIRMS, lluvia Open-Meteo y panel de vigilancia
   06_exposure.py     Cobertura del suelo (ESA WorldCover) y población (WorldPop) bajo cada máscara
   07_risk.py         Risk index per grid cell (hazard x exposure x vulnerability), cascades, CSV/GeoJSON export
+  08_insar.py        Interferometría NISAR L2 GUNW: recorte remoto, corrección de rampa y atmósfera, series acumuladas,
+                     catálogo EMSC, colada y vías de OSM, Sentinel-1 (casos lorca, lapalma, granada, alora)
   make_mock.py       Datos de prueba con el mismo formato (para desarrollar la web sin datos)
 web/                 Aplicación (Vite + TypeScript + globe.gl + MapLibre + Chart.js)
   public/data/       Salida del pipeline (lo único que necesita la web)
@@ -60,6 +66,12 @@ Risk index (see [docs/EVENTS_AND_RISK.md](docs/EVENTS_AND_RISK.md)):
 ```bash
 ../.venv/bin/python 07_risk.py niebla && ../.venv/bin/python 07_risk.py dana
 ```
+
+Interferometría (InSAR, casos de terreno que se mueve):
+```bash
+for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c; done
+```
+(Álora usa además Sentinel-1: `s1_hyp3.py submit` y `s1_hyp3.py fetch` antes de `08_insar.py context alora`.)
 
 ### 3. Web
 ```bash

@@ -25,7 +25,9 @@ pipeline/            Procesado de datos (Python)
   02_extract.py      Lee SOLO el recorte de cada HDF5 (1-2 GB) por HTTPS y lo lleva a una rejilla común
   s1_hyp3.py         Sentinel-1: procesado RTC en HyP3 (ASF) y recorte a la misma rejilla
   03_process.py      Filtro de speckle, detección de cambio, máscaras, serie temporal, PNG + manifest.json
-  04_context.py      Cruce con OpenStreetMap (vías, carreteras) y validación con EFFIS
+  04_context.py      Cruce con OpenStreetMap (vías, carreteras) y validación con EFFIS / Copernicus EMS
+  05_external.py     NASA FIRMS, lluvia Open-Meteo y panel de vigilancia
+  06_exposure.py     Cobertura del suelo (ESA WorldCover) y población (WorldPop) bajo cada máscara
   make_mock.py       Datos de prueba con el mismo formato (para desarrollar la web sin datos)
 web/                 Aplicación (Vite + TypeScript + globe.gl + MapLibre + Chart.js)
   public/data/       Salida del pipeline (lo único que necesita la web)
@@ -47,8 +49,8 @@ cd pipeline
 ../.venv/bin/python 02_extract.py dana --track 167
 ../.venv/bin/python s1_hyp3.py submit               # Sentinel-1 (opcional, ~30-60 min en ASF)
 ../.venv/bin/python s1_hyp3.py fetch
-../.venv/bin/python 03_process.py niebla && ../.venv/bin/python 04_context.py niebla
-../.venv/bin/python 03_process.py dana   && ../.venv/bin/python 04_context.py dana
+../.venv/bin/python 03_process.py niebla && ../.venv/bin/python 04_context.py niebla && ../.venv/bin/python 06_exposure.py niebla
+../.venv/bin/python 03_process.py dana   && ../.venv/bin/python 04_context.py dana   && ../.venv/bin/python 06_exposure.py dana
 ```
 
 ### 3. Web
@@ -68,18 +70,31 @@ npm run build                            # web estática en web/dist
 - **Inundación:** agua nueva = HH(después) < umbral de Otsu **y** ΔHH < −3 dB.
 - **Infraestructuras:** líneas de OpenStreetMap (`railway=rail`, carreteras principales) dentro de la máscara.
   En incendios solo se cuenta la zona quemada confirmada (radar ∩ EFFIS).
+- **Exposición:** ESA WorldCover 2021 (10 m) bajo la máscara y población WorldPop 2020 (100 m). En Niebla ardieron
+  ~28.300 ha de bosque, matorral y pasto (52 % bosque, 42 % matorral); 720 personas viven a menos de 1 km del borde.
+  El 73 % de lo que el radar marca fuera de EFFIS es cultivo: restos de cosecha, la principal fuente de falsos positivos.
+- **Validación DANA:** Copernicus EMS (EMSR935) cartografió 885 ha inundadas el 20 oct con SPOT/GeoEye.
+  NISAR el 23 oct solo veía como agua el 5 % de esa superficie: el agua drenó en tres días.
 
 ## Limitaciones (honestas)
 
 - Los umbrales del incendio se calibraron con EFFIS en el mismo evento; no es una validación independiente.
 - La imagen NISAR posterior a la DANA es de 4 días después del pico de lluvia: la inundación máxima no se observó.
+  Las otras pasadas disponibles (66 desc. y 58 asc.) son del 16 oct, antes de la lluvia, y del 28 oct, aún más tarde.
+- Probamos usar el suelo empapado como señal (subida de HH): en cultivos ΔHH = +0,47 dB tras la DANA, dentro de la
+  variación normal entre pasadas sin tormenta (−0,9 a +1,1 dB). No es distinguible y no se muestra como resultado.
+- La población es una estimación por celdas de 100 m (WorldPop 2020), no un recuento de afectados.
 - NISAR no tiene datos públicos sobre España entre febrero y mayo de 2026.
 
 ## Fuentes de datos
 
 - NISAR L2 GCOV — NASA/JPL-Caltech & ISRO, distribuido por [ASF DAAC](https://search.asf.alaska.edu)
 - Sentinel-1 — Copernicus/ESA, procesado con [ASF HyP3](https://hyp3-docs.asf.alaska.edu)
-- Perímetros de incendios — [EFFIS](https://effis.jrc.ec.europa.eu), Copernicus Emergency Management Service
+- Perímetros de incendios — [EFFIS](https://effis.jrc.ec.europa.eu)
+- Inundación DANA — [Copernicus EMS Rapid Mapping EMSR935](https://rapidmapping.emergency.copernicus.eu/EMSR935)
+- Cobertura del suelo — [ESA WorldCover 2021](https://esa-worldcover.org) (CC BY 4.0)
+- Población — [WorldPop](https://www.worldpop.org) 2020, España, 100 m constrained (CC BY 4.0)
+- Focos activos — [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov) (VIIRS) · Lluvia — [Open-Meteo](https://open-meteo.com) / ERA5
 - Vías y carreteras — © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL)
 - Mapa base — Esri World Imagery; texturas del globo — three-globe (NASA Blue Marble)
 

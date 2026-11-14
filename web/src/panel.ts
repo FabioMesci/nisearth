@@ -2,7 +2,7 @@ import { Chart, LineController, LineElement, PointElement, BarController, BarEle
 import { RISK_COLORS, type DetailView, type ViewMode, type Pol } from './detail'
 import type { Manifest } from './types'
 import { CONTENT, KIND_META } from './content'
-import { t, locale, metricLabel, fmtDay } from './i18n'
+import { t, locale, metricLabel, fmtDay, fmtDec } from './i18n'
 import { ICON } from './icons'
 
 Chart.register(LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler)
@@ -277,7 +277,7 @@ export class Panel {
         maintainAspectRatio: false,
         animation: false,
         interaction: { mode: 'index', intersect: false },
-        plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${(c.parsed.y ?? 0).toFixed(1)} dB` } } },
+        plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmtDec(c.parsed.y ?? 0, 1)} dB` } } },
         scales: {
           x: { ticks: { color: '#8b93a7', font: { size: 10, family: 'Geist Mono' }, maxRotation: 0, autoSkipPadding: 12 }, grid: { color: 'rgba(255,255,255,0.04)' } },
           y: { ticks: { color: '#8b93a7', font: { size: 10, family: 'Geist Mono' } }, grid: { color: 'rgba(255,255,255,0.06)' } },
@@ -324,7 +324,7 @@ function riskCard(m: Manifest) {
   const top = (o: Record<string, number>) => Object.entries(o).sort((a, b) => b[1] - a[1])[0][0]
   const total = r.classes.reduce((s, c) => s + c.area_ha, 0) || 1
   const rows = r.classes.map((c, i) => ({ ...c, i })).filter((c) => c.cells > 0)
-  const bar = (label: string, v: number) => `<div class="rp-row"><span>${label}</span><i><b style="width:${Math.round(v * 100)}%"></b></i><em>${v.toFixed(2)}</em></div>`
+  const bar = (label: string, v: number) => `<div class="rp-row"><span>${label}</span><i><b style="width:${Math.round(v * 100)}%"></b></i><em>${fmtDec(v)}</em></div>`
   const seen = new Set<string>()
   const hot = r.hotspots.filter((h) => !seen.has(h.place) && seen.add(h.place)).slice(0, 3)
   const idx = (name: string) => r.classes.findIndex((c) => c.cls === name)
@@ -348,7 +348,7 @@ function riskCard(m: Manifest) {
     </div>
     <div class="risk-hot">
       <p class="hint">${t('riskHot')}</p>
-      ${hot.map((h) => `<div><span>${t('riskNear')(h.place)}</span><b style="color:${RISK_COLORS[idx(h.class)]}">${names[idx(h.class)]} · ${h.risk.toFixed(2)}</b></div>`).join('')}
+      ${hot.map((h) => `<div><span>${t('riskNear')(h.place)}</span><b style="color:${RISK_COLORS[idx(h.class)]}">${names[idx(h.class)]} · ${fmtDec(h.risk)}</b></div>`).join('')}
     </div>
     <p class="hint">${cascade}</p>
     <p class="hint">${t('riskStable')(r.stability.mean_pct, r.stability.runs, r.stability.spread_pct)}</p>

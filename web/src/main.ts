@@ -5,7 +5,7 @@ import { Panel } from './panel'
 import { CONTENT, KIND_META, getStory } from './content'
 import { lang, setLang, onLang, t, locale } from './i18n'
 import { ICON } from './icons'
-import { HAZARDS } from './hazards'
+import { getHazards } from './hazards'
 import { Sheet } from './sheet'
 import type { CaseIndexItem, Manifest, Watch, WatchFire } from './types'
 
@@ -215,7 +215,7 @@ async function main() {
           <button class="btn ghost icon" id="hz-close" aria-label="${t('close')}" title="${t('close')}">${ICON.close}</button>
         </div>
         <div class="hz-grid">
-          ${HAZARDS.map(
+          ${getHazards().map(
             (h) => `<article class="hz" style="--c:${h.color}">
               <header><span class="ic">${h.icon}</span><b>${h.name}</b><em class="${h.status}">${h.status === 'live' ? t('hazLive') : t('hazPlanned')}</em></header>
               <p class="tag">${h.tagline}</p>

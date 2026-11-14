@@ -6,7 +6,7 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 // Vite reempaqueta MapLibre: le indicamos dónde está su worker
 maplibregl.setWorkerUrl(workerUrl)
 import type { Manifest, Frame, Sensor } from './types'
-import { t, fmtDay } from './i18n'
+import { t, fmtDay, fmtDec } from './i18n'
 
 export type Pol = 'hh' | 'hv' | 'rgb'
 export type ViewMode = 'compare' | 'timeline' | 'change'
@@ -77,19 +77,19 @@ export class DetailView {
       const p = e.features?.[0]?.properties
       if (!p) return
       const names = t('riskClasses')
-      const bar = (label: string, v: number) => `<div class="rp-row"><span>${label}</span><i><b style="width:${Math.round(v * 100)}%"></b></i><em>${(+v).toFixed(2)}</em></div>`
+      const bar = (label: string, v: number) => `<div class="rp-row"><span>${label}</span><i><b style="width:${Math.round(v * 100)}%"></b></i><em>${fmtDec(v)}</em></div>`
       this.popup?.remove()
       this.popup = new maplibregl.Popup({ className: 'risk-popup', maxWidth: '260px' })
         .setLngLat(e.lngLat)
         .setHTML(
-          `<div class="rp-head"><i style="background:${RISK_COLORS[p.cls]}"></i><b>${names[p.cls]}</b><span>${(+p.risk).toFixed(2)}</span></div>
+          `<div class="rp-head"><i style="background:${RISK_COLORS[p.cls]}"></i><b>${names[p.cls]}</b><span>${fmtDec(p.risk)}</span></div>
           ${p.place ? `<div class="rp-place">${t('riskNear')(p.place)}</div>` : ''}
           ${bar(t('riskH'), p.hazard)}${bar(t('riskE'), p.exposure)}${bar(t('riskV'), p.vulnerability)}
           <dl><dt>${t('riskCellPop')}</dt><dd>${Math.round(p.population)}</dd>
-          <dt>${t('riskCellRoads')}</dt><dd>${(+p.roads_km + +p.rail_km).toFixed(1)} km</dd>
-          <dt>${t('riskCellHosp')}</dt><dd>${p.hospital_km} km</dd>
+          <dt>${t('riskCellRoads')}</dt><dd>${fmtDec(+p.roads_km + +p.rail_km, 1)} km</dd>
+          <dt>${t('riskCellHosp')}</dt><dd>${fmtDec(p.hospital_km, 1)} km</dd>
           <dt>${t('riskCellAge')}</dt><dd>${Math.round(p.dependent_age_pct)} %</dd>
-          <dt>${t('riskCellSlope')}</dt><dd>${p.slope_deg}°</dd>
+          <dt>${t('riskCellSlope')}</dt><dd>${fmtDec(p.slope_deg, 1)}°</dd>
           <dt>${t('riskCellStab')}</dt><dd>${Math.round(p.stability * 100)} %</dd></dl>`,
         )
         .addTo(this.map)

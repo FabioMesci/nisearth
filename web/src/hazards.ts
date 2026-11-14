@@ -3,6 +3,7 @@
 // here and can be turned into a case by adding an entry to pipeline/config.py.
 import type { Kind } from './types'
 import { ICON } from './icons'
+import { lang } from './i18n'
 
 export interface Hazard {
   id: Kind
@@ -92,4 +93,61 @@ export const HAZARDS: Hazard[] = [
   },
 ]
 
-export const hazardMeta = (k: Kind) => HAZARDS.find((h) => h.id === k)!
+type HazardText = Pick<Hazard, 'name' | 'tagline' | 'signature' | 'technique' | 'products' | 'who'>
+
+/** Textos en español; icono, color y estado se comparten con la versión inglesa */
+const HAZARDS_ES: Record<string, HazardText> = {
+  fire: {
+    name: 'Incendio forestal',
+    tagline: 'Cicatrices del fuego medidas a través del humo y las nubes.',
+    signature: 'La retrodispersión HV cae donde se pierde el volumen del dosel, mientras HH se mantiene más o menos estable (troncos y suelo siguen devolviendo señal).',
+    technique: 'Detección de cambio antes/después sobre gamma0 con filtro de speckle (HH, HV).',
+    products: 'NISAR L2 GCOV, Sentinel-1 RTC. Validación: perímetros de EFFIS / Copernicus EMS.',
+    who: 'Servicios forestales, protección civil, planificación de la erosión y el riesgo de inundación tras el fuego.',
+  },
+  flood: {
+    name: 'Inundación',
+    tagline: 'Agua en superficie vista de día y de noche, bajo las nubes de tormenta.',
+    signature: 'El agua lisa refleja el pulso lejos del satélite, así que las zonas inundadas se ven muy oscuras (HH/VV bajos).',
+    technique: 'Umbral de Otsu más una caída respecto a la imagen anterior al evento.',
+    products: 'NISAR L2 GCOV, Sentinel-1 RTC. Infraestructuras de OpenStreetMap.',
+    who: 'Gestores de emergencias, operadores ferroviarios y de carreteras, aseguradoras.',
+  },
+  earthquake: {
+    name: 'Terremoto',
+    tagline: 'Desplazamientos del terreno de escala centimétrica a lo largo de la falla.',
+    signature: 'La fase interferométrica cambia entre dos pasadas (interferograma cosísmico); cada franja equivale a media longitud de onda de movimiento en la línea de visión. Los edificios dañados también pierden coherencia.',
+    technique: 'InSAR con pares NISAR GUNW, más mapas de daño a partir de la pérdida de coherencia.',
+    products: 'NISAR L2 GUNW / GSLC, mapas de daño ARIA, ShakeMap y catálogo de eventos del USGS.',
+    who: 'Sismólogos, coordinación de búsqueda y rescate, ingenieros de estructuras, agencias de reconstrucción.',
+  },
+  landslide: {
+    name: 'Deslizamiento de ladera',
+    tagline: 'Reptación lenta de la ladera antes de romper, y la cicatriz después.',
+    signature: 'Velocidad persistente en la línea de visión sobre laderas antes de la rotura; cambio brusco de retrodispersión y coherencia donde aparecen la cicatriz y los derrubios.',
+    technique: 'InSAR en serie temporal (SBAS / PS) para la reptación, detección de cambio para las nuevas cicatrices.',
+    products: 'NISAR L2 GUNW / GCOV, Sentinel-1 (OPERA DISP / EGMS en Europa), mapas de pendiente del MDT.',
+    who: 'Servicios geológicos, operadores de carreteras y ferrocarril, municipios de montaña.',
+  },
+  volcano: {
+    name: 'Actividad volcánica',
+    tagline: 'Hinchamiento del edificio antes de la erupción; lava y ceniza después.',
+    signature: 'Anillos de levantamiento o hundimiento alrededor del volcán en InSAR; las nuevas coladas y depósitos cambian la rugosidad y la retrodispersión.',
+    technique: 'Series temporales InSAR, modelado de la fuente de deformación (Mogi), cambio de retrodispersión para las coladas.',
+    products: 'NISAR L2 GUNW, Sentinel-1, COMET LiCSAR, registros de erupciones del Smithsonian GVP.',
+    who: 'Observatorios vulcanológicos, autoridades de aviación, protección civil local.',
+  },
+  subsidence: {
+    name: 'Subsidencia del terreno',
+    tagline: 'Hundimiento lento por bombeo de agua subterránea, minería o túneles.',
+    signature: 'Una tendencia constante de velocidad, de milímetros al año, en la línea de visión sobre ciudades, acuíferos, minas, presas y terraplenes.',
+    technique: 'InSAR de dispersores persistentes / SBAS sobre series temporales largas.',
+    products: 'NISAR L2 GUNW, Sentinel-1, EGMS (Europa), OPERA DISP.',
+    who: 'Agencias del agua, urbanistas, gestores de presas e infraestructura ferroviaria.',
+  },
+}
+
+/** Guía de riesgos en el idioma activo */
+export const getHazards = (): Hazard[] => (lang === 'es' ? HAZARDS.map((h) => ({ ...h, ...HAZARDS_ES[h.id] })) : HAZARDS)
+
+export const hazardMeta = (k: Kind) => getHazards().find((h) => h.id === k)!

@@ -319,7 +319,7 @@ body.in-detail #lang { right: 436px; }
   /* sin padding superior: `sticky` lo respeta y la barra quedaría desplazada sobre el contenido; la propia barra hace de margen */
   #cases { left: 0; right: 0; bottom: 0; width: auto; height: 46vh; max-height: none; border-radius: 24px 24px 0 0; padding: 0 16px; border-bottom: 0; }
   body.in-detail #cases { display: none; }
-  #story-btn { bottom: 12px; }
+  #story-btn { position: static; box-shadow: none; } /* en el flujo, como «Guía de riesgos» */
   #panel { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 52vh; border-radius: 24px 24px 0 0; padding: 0 18px 20px; border-bottom: 0; }
   #panel, #cases { background: var(--surface-solid); transition: height 0.45s var(--ease); overscroll-behavior: contain; }
   #panel.dragging, #cases.dragging { transition: none; }
@@ -405,4 +405,4 @@ body.in-detail #lang { right: 436px; }
 .risk-popup .rp-row { grid-template-columns: 84px 1fr 30px; }
 .risk-popup dl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line); }
 .risk-popup dt { color: var(--muted); white-space: nowrap; }
-.risk-popup dd { margin: 0; font: 500 11.5px var(--mono); text-align: right; }
+.risk-popup dd { margin: 0; white-space: nowrap; font: 500 11.5px var(--mono); text-align: right; }

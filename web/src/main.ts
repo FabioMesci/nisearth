@@ -3,8 +3,8 @@ import { GlobeView } from './globe'
 import { DetailView } from './detail'
 import { Panel } from './panel'
 import { CONTENT, KIND_META, getStory } from './content'
-import { lang, setLang, onLang, t } from './i18n'
-import type { CaseIndexItem, Manifest } from './types'
+import { lang, setLang, onLang, t, locale } from './i18n'
+import type { CaseIndexItem, Manifest, Watch, WatchFire } from './types'
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T
 
@@ -41,6 +41,7 @@ async function main() {
   const goHome = () => {
     if (!current) return
     current = null
+    sel = -1
     panel.stop()
     document.body.classList.remove('in-detail')
     globe.show(true)
@@ -52,6 +53,57 @@ async function main() {
   }
 
   const globe = new GlobeView($('globe'), cases, openCase)
+
+  // ---------- Vigilancia España: incendios activos + próxima pasada NISAR (pipeline/05_external.py watch) ----------
+  let watch: Watch | null = null
+  let sel = -1
+  const fmtPass = (iso: string) => {
+    const d = new Date(iso)
+    const days = Math.round((new Date(d.toDateString()).getTime() - new Date(new Date().toDateString()).getTime()) / 86400000)
+    const hour = d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })
+    if (days < 0) return t('passDone')
+    return days === 0 ? `${t('today')} ${hour}` : days === 1 ? `${t('tomorrow')} ${hour}` : t('inDays')(days, d.toLocaleDateString(locale(), { day: 'numeric', month: 'short' }))
+  }
+  const swathOf = (f: WatchFire) => {
+    const p = f.passes[0]
+    const tr = p && watch?.tracks.find((x) => x.track === p.track && x.dir === p.dir)
+    if (!tr) return []
+    return tr.geom.type === 'Polygon' ? [{ geometry: tr.geom }] : tr.geom.coordinates.map((c: number[][][]) => ({ geometry: { type: 'Polygon', coordinates: c } }))
+  }
+  const renderWatch = () => {
+    const box = $('watch')
+    if (!watch) return box.classList.add('hidden')
+    box.classList.remove('hidden')
+    const fires = watch.fires.slice(0, 5)
+    box.innerHTML = `
+      <div class="label">${t('watch')}</div>
+      <p class="watch-sub">${t('watchSub')(watch.hotspots, watch.industrial)}</p>
+      ${fires.length ? `<ul>${fires.map((f, i) => {
+        const p = f.passes[0]
+        return `<li><button data-i="${i}" class="${i === sel ? 'on' : ''}"><span class="dot"></span><span>
+          <b>${f.town || '—'}</b> ${f.region && f.region !== f.town ? `<em>${f.region}</em>` : ''}
+          <i>${f.n} ${t('hotspots')} · ${p ? `${t('nisarNext')} ${fmtPass(p.next)} · ${t('track')} ${p.track} ${p.dir === 'asc' ? '↑' : '↓'}` : t('noPass')}</i></span></button></li>`
+      }).join('')}</ul>` : `<p class="watch-sub">${t('noFires')}</p>`}
+      <p class="watch-ex">${t('watchExample')}</p>
+      <p class="watch-src">NASA FIRMS VIIRS · ASF NISAR · ${new Date(watch.generated).toLocaleString(locale(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>`
+  }
+  $('watch').onclick = (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-i]')
+    if (!b || !watch) return
+    sel = +b.dataset.i!
+    const f = watch.fires[sel]
+    globe.setWatch(watch.fires, swathOf(f))
+    globe.lookAt(f.lng, f.lat, 0.3)
+    renderWatch()
+  }
+  fetch('/data/live/watch.json')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j: Watch | null) => {
+      watch = j
+      if (watch) globe.setWatch(watch.fires)
+      renderWatch()
+    })
+    .catch(() => {})
 
   // lista lateral de incidentes
   const list = $('case-list')
@@ -84,6 +136,7 @@ async function main() {
   onLang(() => {
     applyStatic()
     renderList()
+    renderWatch()
     globe.refresh()
     panel.rerender()
     detail.render()

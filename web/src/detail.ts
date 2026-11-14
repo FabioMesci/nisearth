@@ -42,6 +42,7 @@ export class DetailView {
   showMask = false
   showRef = true
   showInfra = true
+  showFirms = true
   sarOpacity = 0.9
   onFrame?: (f: Frame, i: number) => void
 
@@ -88,8 +89,8 @@ export class DetailView {
     this.sensor = 'L'
     this.frameIdx = Math.max(0, m.frames.findIndex((f) => f.date === m.pair.after))
 
-    for (const id of ['sar', 'mask', 'labels-top', 'rail', 'rail-glow', 'roads', 'effis']) if (this.map.getLayer(id)) this.map.removeLayer(id)
-    for (const id of ['sar', 'mask', 'rail', 'roads', 'effis']) if (this.map.getSource(id)) this.map.removeSource(id)
+    for (const id of ['sar', 'mask', 'labels-top', 'rail', 'rail-glow', 'roads', 'effis', 'firms']) if (this.map.getLayer(id)) this.map.removeLayer(id)
+    for (const id of ['sar', 'mask', 'rail', 'roads', 'effis', 'firms']) if (this.map.getSource(id)) this.map.removeSource(id)
 
     const first = await this.img(this.layerOf(this.frameFor('after')))
     this.canvas.width = first.naturalWidth
@@ -117,10 +118,28 @@ export class DetailView {
       this.map.addLayer({ id: 'rail-glow', type: 'line', source: 'rail', layout: { visibility: vis }, paint: { 'line-color': '#ff3b5c', 'line-width': 8, 'line-opacity': 0.35, 'line-blur': 4 } })
       this.map.addLayer({ id: 'rail', type: 'line', source: 'rail', layout: { visibility: vis }, paint: { 'line-color': '#ff3b5c', 'line-width': 2.5 } })
     }
+    if (m.overlays.firms && m.firms) {
+      // focos térmicos NASA FIRMS (VIIRS 375 m): de amarillo (primer día) a rojo oscuro (último)
+      const t0 = new Date(m.firms.from).getTime(), t1 = new Date(m.firms.to).getTime()
+      const data = await (await fetch(`${this.base}/${m.overlays.firms}`)).json()
+      for (const f of data.features) f.properties.k = (new Date(f.properties.date).getTime() - t0) / Math.max(1, t1 - t0)
+      this.map.addSource('firms', { type: 'geojson', data })
+      this.map.addLayer({
+        id: 'firms', type: 'circle', source: 'firms', layout: { visibility: this.showFirms ? 'visible' : 'none' },
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 1.6, 13, 5],
+          'circle-color': ['interpolate', ['linear'], ['get', 'k'], 0, '#fde047', 0.5, '#f97316', 1, '#b91c1c'],
+          'circle-opacity': 0.85, 'circle-stroke-width': 0.4, 'circle-stroke-color': '#1c0a00',
+        },
+      })
+    }
     this.map.addLayer({ id: 'labels-top', type: 'raster', source: 'labels', paint: { 'raster-opacity': 0.8 } })
 
     const [x0, y0, x1, y1] = m.bbox
-    this.map.fitBounds([[x0, y0], [x1, y1]], { padding: { top: 60, bottom: 60, left: 40, right: window.innerWidth > 900 ? 420 : 40 }, duration: 0 })
+    const wide = window.innerWidth > 900
+    // en móvil el panel ocupa el 52 % inferior de la pantalla
+    const padding = wide ? { top: 60, bottom: 60, left: 40, right: 420 } : { top: 64, bottom: Math.round(window.innerHeight * 0.52) + 16, left: 16, right: 16 }
+    this.map.fitBounds([[x0, y0], [x1, y1]], { padding, duration: 0 })
     await this.render()
   }
 
@@ -192,6 +211,10 @@ export class DetailView {
   setInfra(on: boolean) {
     this.showInfra = on
     for (const id of ['roads', 'rail', 'rail-glow']) if (this.map.getLayer(id)) this.map.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none')
+  }
+  setFirms(on: boolean) {
+    this.showFirms = on
+    if (this.map.getLayer('firms')) this.map.setLayoutProperty('firms', 'visibility', on ? 'visible' : 'none')
   }
   setSensor(s: Sensor) {
     this.sensor = s

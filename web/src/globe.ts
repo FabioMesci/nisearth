@@ -1,6 +1,6 @@
 import Globe, { type GlobeInstance } from 'globe.gl'
 import { KIND_META, CONTENT } from './content'
-import type { CaseIndexItem } from './types'
+import type { CaseIndexItem, WatchFire } from './types'
 
 const HOME = { lat: 34, lng: -4, altitude: 1.55 }
 
@@ -63,6 +63,29 @@ export class GlobeView {
     const resize = () => this.globe.width(el.clientWidth).height(el.clientHeight)
     window.addEventListener('resize', resize)
     resize()
+  }
+
+  /** Vigilancia España: un punto por incendio activo; la huella de la próxima pasada NISAR del seleccionado */
+  setWatch(fires: WatchFire[], swath: object[] = []) {
+    this.globe
+      .pointsData(fires)
+      .pointLat('lat')
+      .pointLng('lng')
+      .pointAltitude((f: object) => 0.01 + Math.log10(1 + (f as WatchFire).frp) * 0.02)
+      .pointRadius(0.22)
+      .pointColor(() => '#f97316')
+      .pointsMerge(false)
+      .polygonsData(swath)
+      .polygonCapColor(() => 'rgba(76,201,240,0.16)')
+      .polygonSideColor(() => 'rgba(76,201,240,0.05)')
+      .polygonStrokeColor(() => 'rgba(76,201,240,0.9)')
+      .polygonAltitude(0.004)
+  }
+
+  /** Vista cercana de un punto sin entrar en el mapa de detalle */
+  lookAt(lng: number, lat: number, altitude = 0.35) {
+    this.globe.controls().autoRotate = false
+    this.globe.pointOfView({ lat, lng, altitude }, 1400)
   }
 
   /** Acerca la cámara al caso; resuelve cuando termina la animación. */

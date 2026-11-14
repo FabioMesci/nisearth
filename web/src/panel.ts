@@ -1,10 +1,10 @@
-import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Filler } from 'chart.js'
+import { Chart, LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler } from 'chart.js'
 import type { DetailView, ViewMode, Pol } from './detail'
 import type { Manifest } from './types'
 import { CONTENT, KIND_META } from './content'
-import { t, locale, metricLabel } from './i18n'
+import { t, locale, metricLabel, fmtDay } from './i18n'
 
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Filler)
+Chart.register(LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler)
 
 const fmtDate = (d: string) => new Date(d).toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' })
 const fmtNum = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: Math.abs(v) >= 1000 ? 0 : 1 })
@@ -12,6 +12,7 @@ const fmtNum = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits
 export class Panel {
   private el: HTMLElement
   private chart?: Chart
+  private chart2?: Chart
   private timer = 0
   private view: DetailView
 
@@ -38,6 +39,7 @@ export class Panel {
       v.pol = m.kind === 'fire' ? 'hv' : 'hh'
       v.showMask = false
       v.sensor = 'L'
+      v.showFirms = false
     }
 
     this.el.style.setProperty('--accent', meta.color)
@@ -73,6 +75,7 @@ export class Panel {
         <div class="row toggles">
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${t('infra')}</span></label>` : ''}
           ${m.overlays.effis ? `<label class="toggle"><input type="checkbox" id="chk-ref" ${v.showRef ? 'checked' : ''} /> <span>${t('effis')}</span></label>` : ''}
+          ${m.overlays.firms ? `<label class="toggle"><input type="checkbox" id="chk-firms" ${v.showFirms ? 'checked' : ''} /> <span>${t('firms')}</span></label>` : ''}
         </div>
         <div class="timeline" id="timeline">
           <button id="play" class="btn icon" aria-label="Reproducir">▶</button>
@@ -92,6 +95,12 @@ export class Panel {
         <div class="chart-box"><canvas id="chart"></canvas></div>
       </section>
 
+      ${m.daily ? `<section class="card">
+        <div class="label">${m.daily.kind === 'rain' ? t('rainChart')(m.daily.place ?? '') : t('firmsChart')}</div>
+        <div class="chart-box"><canvas id="chart2"></canvas></div>
+        <p class="hint">${m.daily.kind === 'rain' ? t('rainNote') : t('firmsNote')(m.firms?.in_mask_pct ?? 0)}</p>
+      </section>` : ''}
+
       <section>
         <div class="label">${t('why')}</div>
         ${c.why.map((w) => `<details class="why"><summary>${w.title}</summary><p>${w.text}</p></details>`).join('')}
@@ -103,12 +112,16 @@ export class Panel {
       </section>
 
       <footer class="src">
-        ${t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1)}
+        ${t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1)}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
       </footer>
     `
     this.bind(m)
+    // el mapa crea sus capas antes de que el panel fije los valores por defecto: sincronizarlas
+    v.setFirms(v.showFirms)
+    v.setMask(v.showMask)
     this.sync()
     this.drawChart(m)
+    this.drawDaily(m)
   }
 
   private bind(m: Manifest) {
@@ -139,6 +152,7 @@ export class Panel {
     }
     $<HTMLInputElement>('#chk-mask').onchange = (e) => v.setMask((e.target as HTMLInputElement).checked)
     this.el.querySelector<HTMLInputElement>('#chk-infra')?.addEventListener('change', (e) => v.setInfra((e.target as HTMLInputElement).checked))
+    this.el.querySelector<HTMLInputElement>('#chk-firms')?.addEventListener('change', (e) => v.setFirms((e.target as HTMLInputElement).checked))
     this.el.querySelector<HTMLInputElement>('#chk-ref')?.addEventListener('change', (e) => v.setRef((e.target as HTMLInputElement).checked))
     $<HTMLInputElement>('#opacity').oninput = (e) => v.setOpacity(+(e.target as HTMLInputElement).value)
     $<HTMLInputElement>('#frame').oninput = (e) => {
@@ -183,6 +197,61 @@ export class Panel {
     const hints: Record<ViewMode, string> = { compare: t('hintCompare'), timeline: t('hintTimeline'), change: t('hintChange') }
     this.el.querySelector('#mode-hint')!.textContent = hints[v.mode]
     if (v.mode !== 'timeline') this.el.querySelector('#frame-date')!.textContent = ''
+  }
+
+  /** Barras diarias: lluvia (Open-Meteo) o focos FIRMS. En lluvia se marcan las pasadas NISAR. */
+  private drawDaily(m: Manifest) {
+    this.chart2?.destroy()
+    this.chart2 = undefined
+    const d = m.daily
+    const ctx = this.el.querySelector<HTMLCanvasElement>('#chart2')
+    if (!d || !ctx) return
+    const rain = d.kind === 'rain'
+    const color = rain ? '#38bdf8' : '#f97316'
+    const marks = rain ? [m.pair.before, m.pair.after] : []
+    const unit = rain ? 'mm' : t('hotspots')
+    this.chart2 = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: d.dates.map((x) => fmtDay(x)),
+        datasets: [{ data: d.values, backgroundColor: d.dates.map((x) => (marks.includes(x) ? '#e2e8f0' : color)), borderRadius: 2, maxBarThickness: 18 }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: { tooltip: { callbacks: { label: (c) => `${fmtNum(c.parsed.y ?? 0)} ${unit}` } } },
+        scales: {
+          x: { ticks: { color: '#7c8aa5', font: { size: 10 }, maxRotation: 0, autoSkipPadding: 10 }, grid: { display: false } },
+          y: { beginAtZero: true, ticks: { color: '#7c8aa5', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.06)' } },
+        },
+      },
+      plugins: [
+        {
+          id: 'passes',
+          afterDraw: (ch) => {
+            const g = ch.ctx
+            for (const date of marks) {
+              const j = d.dates.indexOf(date)
+              if (j < 0) continue
+              const x = ch.scales.x.getPixelForValue(j)
+              g.save()
+              g.strokeStyle = '#e2e8f0'
+              g.setLineDash([3, 3])
+              g.beginPath()
+              g.moveTo(x, ch.chartArea.top)
+              g.lineTo(x, ch.chartArea.bottom)
+              g.stroke()
+              g.fillStyle = '#e2e8f0'
+              g.font = '10px JetBrains Mono'
+              g.textAlign = j < d.dates.length / 2 ? 'left' : 'right'
+              g.fillText('NISAR', x + (j < d.dates.length / 2 ? 4 : -4), ch.chartArea.top + 10)
+              g.restore()
+            }
+          },
+        },
+      ],
+    })
   }
 
   private drawChart(m: Manifest) {

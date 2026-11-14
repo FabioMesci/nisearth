@@ -1,4 +1,4 @@
-export type Kind = 'flood' | 'fire'
+export type Kind = 'flood' | 'fire' | 'earthquake' | 'landslide' | 'volcano' | 'subsidence'
 
 export interface CaseIndexItem {
   id: string

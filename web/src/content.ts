@@ -22,9 +22,13 @@ export interface CaseContent {
   order: number
 }
 
-const META = {
+const META: Record<Kind, { icon: string; color: string }> = {
   flood: { icon: '💧', color: '#38bdf8' },
   fire: { icon: '🔥', color: '#fb923c' },
+  earthquake: { icon: '🌍', color: '#f472b6' },
+  landslide: { icon: '⛰️', color: '#a3e635' },
+  volcano: { icon: '🌋', color: '#ef4444' },
+  subsidence: { icon: '🏗️', color: '#c084fc' },
 }
 export const KIND_META = new Proxy({} as Record<Kind, { icon: string; color: string; label: string }>, {
   get: (_, k: Kind) => ({ ...META[k], label: t(k) }),

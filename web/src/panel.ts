@@ -7,7 +7,7 @@ import { ICON } from './icons'
 
 Chart.register(LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler)
 
-const fmtDate = (d: string) => new Date(d).toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' })
+const fmtDate = (d: string) => fmtDay(d, { day: 'numeric', month: 'short', year: 'numeric' })
 const fmtNum = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: Math.abs(v) >= 1000 ? 0 : 1 })
 
 export class Panel {
@@ -26,23 +26,15 @@ export class Panel {
 
   /** Vuelve a pintar el panel (p. ej. al cambiar de idioma) conservando el estado de la vista */
   rerender() {
-    if (this.m) this.render(this.m, true)
+    if (this.m) this.render(this.m)
   }
 
-  render(m: Manifest, keepState = false) {
+  /** Pinta el panel a partir del estado de la vista (los valores por defecto de cada caso los fija DetailView.open) */
+  render(m: Manifest) {
     this.m = m
     const c = CONTENT[m.id]
     const meta = KIND_META[m.kind]
     const v = this.view
-    if (!keepState) {
-      // modo y polarización por defecto según el tipo de evento
-      v.mode = 'compare'
-      v.pol = m.kind === 'fire' ? 'hv' : 'hh'
-      v.showMask = false
-      v.sensor = 'L'
-      v.showFirms = false
-      v.showRisk = false
-    }
 
     this.el.style.setProperty('--accent', meta.color)
     this.el.innerHTML = `
@@ -80,7 +72,7 @@ export class Panel {
           ${m.overlays.risk ? `<label class="toggle"><input type="checkbox" id="chk-risk" ${v.showRisk ? 'checked' : ''} /> <span>${t('riskToggle')}</span></label>` : ''}
         </div>
         <div class="timeline" id="timeline">
-          <button id="play" class="btn icon" aria-label="Reproducir">${ICON.play}</button>
+          <button id="play" class="btn icon" aria-label="${t('play')}">${this.timer ? ICON.pause : ICON.play}</button>
           <input type="range" id="frame" min="0" max="${v.frames.length - 1}" step="1" />
           <span id="frame-date" class="mono"></span>
         </div>
@@ -118,15 +110,12 @@ export class Panel {
       </section>
 
       <footer class="src">
-        ${t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1)}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
+        ${t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
       </footer>
     `
     this.bind(m)
-    // el mapa crea sus capas antes de que el panel fije los valores por defecto: sincronizarlas
-    v.setFirms(v.showFirms)
-    v.setRisk(v.showRisk)
+    // las dos casillas de riesgo (controles y tarjeta) reflejan el estado de la vista
     this.el.querySelectorAll<HTMLInputElement>('#chk-risk, #chk-risk2').forEach((c) => (c.checked = v.showRisk))
-    v.setMask(v.showMask)
     this.sync()
     this.drawChart(m)
     this.drawDaily(m)
@@ -179,7 +168,9 @@ export class Panel {
       $<HTMLInputElement>('#frame').value = String(i)
       const ev = new Date(f.date) > new Date(m.event)
       $('#frame-date').innerHTML = `${fmtDate(f.date)} <em class="${ev ? 'post' : 'pre'}">${ev ? t('post') : t('pre')}</em>`
-      this.chart?.setActiveElements([{ datasetIndex: 0, index: Math.min(i, m.series.dates.length - 1) }])
+      // la serie del gráfico es de NISAR: marcar la fecha, no el índice (en banda C las fechas son otras)
+      const j = m.series.dates.indexOf(f.date)
+      this.chart?.setActiveElements(j >= 0 ? [{ datasetIndex: 0, index: j }] : [])
       this.chart?.update('none')
     }
   }
@@ -275,7 +266,7 @@ export class Panel {
     this.chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: m.series.dates.map((d) => new Date(d).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })),
+        labels: m.series.dates.map((d) => fmtDay(d)),
         datasets: [
           { label: 'HH', data: m.series.hh, borderColor: m.kind === 'flood' ? accent : '#94a3b8', backgroundColor: 'transparent', tension: 0.3, pointRadius: 0, pointHoverRadius: 4, borderWidth: 2 },
           { label: 'HV', data: m.series.hv, borderColor: m.kind === 'fire' ? accent : '#94a3b8', backgroundColor: 'transparent', tension: 0.3, pointRadius: 0, pointHoverRadius: 4, borderWidth: 2, borderDash: m.kind === 'flood' ? [4, 4] : [] },
@@ -398,26 +389,29 @@ function landcoverCard(m: Manifest) {
   </section>`
 }
 
+/** Instante UTC de una fecha ISO; las horas sin zona ('2026-10-10T06:09') son UTC, no la hora local del visitante */
+const utc = (d: string) => new Date(d.length > 10 && !/(Z|[+-]\d\d:?\d\d)$/.test(d) ? `${d}Z` : d).getTime()
+
 function passesSvg(p: NonNullable<(typeof CONTENT)[string]['passes']>) {
   const W = 340, H = 92, L = 8, R = 8
-  const t0 = new Date(p.from).getTime(), t1 = new Date(p.to).getTime()
-  const x = (d: string) => L + ((new Date(d).getTime() - t0) / (t1 - t0)) * (W - L - R)
+  const t0 = utc(p.from), t1 = utc(p.to)
+  const x = (d: string) => L + ((utc(d) - t0) / (t1 - t0)) * (W - L - R)
   const rowY = { NISAR: 30, S1C: 52, S1D: 52 } as const
   const days: string[] = []
   for (let t = t0; t <= t1; t += 86400000) days.push(new Date(t).toISOString().slice(0, 10))
   const ev0 = x(p.event[0]), ev1 = x(p.event[1])
   // hueco sin ninguna pasada que contiene el evento
-  const ts = p.list.map((q) => new Date(q.date).getTime()).sort((a, b) => a - b)
-  const evT = new Date(p.event[0]).getTime()
+  const ts = p.list.map((q) => utc(q.date)).sort((a, b) => a - b)
+  const evT = utc(p.event[0])
   const before = Math.max(...ts.filter((t) => t <= evT)), after = Math.min(...ts.filter((t) => t > evT))
   const gx0 = x(new Date(before).toISOString()), gx1 = x(new Date(after).toISOString())
   const gapDays = ((after - before) / 86400000).toLocaleString(locale(), { maximumFractionDigits: 1 })
-  return `<svg class="passes" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pasadas de radar alrededor del evento">
+  return `<svg class="passes" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('passes')}">
     <rect x="${gx0}" y="16" width="${gx1 - gx0}" height="48" fill="rgba(239,68,68,0.10)" stroke="rgba(239,68,68,0.5)" stroke-dasharray="3 3"/>
     <text x="${(gx0 + gx1) / 2}" y="12" text-anchor="middle" class="gap">${t('gap')(gapDays)}</text>
     <rect x="${ev0}" y="18" width="${Math.max(3, ev1 - ev0)}" height="44" class="ev"/>
     <text x="4" y="33" class="row">L</text><text x="4" y="55" class="row">C</text>
     ${p.list.map((q) => `<circle cx="${x(q.date)}" cy="${rowY[q.sensor]}" r="3.6" class="${q.sensor === 'NISAR' ? 'nisar' : 's1'}"><title>${q.sensor} · ${q.date.replace('T', ' ')} UTC</title></circle>`).join('')}
-    ${days.filter((_, i) => i % 3 === 1).map((d) => `<text x="${x(d)}" y="${H - 6}" text-anchor="middle" class="tick">${new Date(d).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })}</text>`).join('')}
+    ${days.filter((_, i) => i % 3 === 1).map((d) => `<text x="${x(d)}" y="${H - 6}" text-anchor="middle" class="tick">${fmtDay(d)}</text>`).join('')}
   </svg>`
 }

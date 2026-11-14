@@ -1,5 +1,5 @@
 import * as maplibregl from 'maplibre-gl'
-import type { ImageSource, Map as MLMap } from 'maplibre-gl'
+import type { GeoJSONSourceSpecification, ImageSource, Map as MLMap } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 
@@ -103,24 +103,50 @@ export class DetailView {
     return this.map.loaded() ? Promise.resolve() : new Promise<void>((r) => this.map.once('load', () => r()))
   }
 
-  private img(name: string) {
-    const url = `${this.base}/${name}`
+  private img(name: string, base = this.base) {
+    const url = `${base}/${name}`
     const hit = this.cache.get(url)
     if (hit) return Promise.resolve(hit)
     return loadImg(url).then((i) => (this.cache.set(url, i), i))
   }
 
+  /** Contadores para descartar aperturas y repintados que otro más reciente ha dejado obsoletos */
+  private openSeq = 0
+  private renderSeq = 0
+
   async open(m: Manifest) {
+    const seq = ++this.openSeq
     await this.ready()
+    const base = `/data/${m.id}`
+    // primero todo lo asíncrono; el mapa solo se toca si nadie ha abierto otro caso mientras tanto
+    const after = m.frames.find((f) => f.date === m.pair.after) ?? m.frames[m.frames.length - 1]
+    const first = await this.img(after.hh, base)
+    let firms: { features: { properties: { date: string; k?: number } }[] } | null = null
+    if (m.overlays.firms && m.firms) {
+      // focos térmicos NASA FIRMS: k = 0 (primer día, amarillo) … 1 (último, rojo oscuro)
+      const t0 = new Date(m.firms.from).getTime(), t1 = new Date(m.firms.to).getTime()
+      firms = await (await fetch(`${base}/${m.overlays.firms}`)).json()
+      for (const f of firms!.features) f.properties.k = (new Date(f.properties.date).getTime() - t0) / Math.max(1, t1 - t0)
+    }
+    if (seq !== this.openSeq) return
+
+    // estado por defecto de cada caso (el panel lo lee después para marcar sus botones)
     this.m = m
-    this.base = `/data/${m.id}`
+    this.base = base
+    this.mode = 'compare'
+    this.pol = m.kind === 'fire' ? 'hv' : 'hh'
     this.sensor = 'L'
-    this.frameIdx = Math.max(0, m.frames.findIndex((f) => f.date === m.pair.after))
+    this.split = 0.5
+    this.showMask = false
+    this.showRef = true
+    this.showInfra = true
+    this.showFirms = false
+    this.showRisk = false
+    this.frameIdx = Math.max(0, m.frames.indexOf(after))
 
     for (const id of ['sar', 'mask', 'labels-top', 'rail', 'rail-glow', 'roads', 'effis', 'firms', 'risk']) if (this.map.getLayer(id)) this.map.removeLayer(id)
     for (const id of ['sar', 'mask', 'rail', 'roads', 'effis', 'firms', 'risk']) if (this.map.getSource(id)) this.map.removeSource(id)
 
-    const first = await this.img(this.layerOf(this.frameFor('after')))
     this.canvas.width = first.naturalWidth
     this.canvas.height = first.naturalHeight
 
@@ -156,12 +182,8 @@ export class DetailView {
       this.map.addLayer({ id: 'rail-glow', type: 'line', source: 'rail', layout: { visibility: vis }, paint: { 'line-color': '#ff3b5c', 'line-width': 8, 'line-opacity': 0.35, 'line-blur': 4 } })
       this.map.addLayer({ id: 'rail', type: 'line', source: 'rail', layout: { visibility: vis }, paint: { 'line-color': '#ff3b5c', 'line-width': 2.5 } })
     }
-    if (m.overlays.firms && m.firms) {
-      // focos térmicos NASA FIRMS (VIIRS 375 m): de amarillo (primer día) a rojo oscuro (último)
-      const t0 = new Date(m.firms.from).getTime(), t1 = new Date(m.firms.to).getTime()
-      const data = await (await fetch(`${this.base}/${m.overlays.firms}`)).json()
-      for (const f of data.features) f.properties.k = (new Date(f.properties.date).getTime() - t0) / Math.max(1, t1 - t0)
-      this.map.addSource('firms', { type: 'geojson', data })
+    if (firms) {
+      this.map.addSource('firms', { type: 'geojson', data: firms as unknown as GeoJSONSourceSpecification['data'] })
       this.map.addLayer({
         id: 'firms', type: 'circle', source: 'firms', layout: { visibility: this.showFirms ? 'visible' : 'none' },
         paint: {
@@ -175,8 +197,9 @@ export class DetailView {
 
     const [x0, y0, x1, y1] = m.bbox
     const wide = window.innerWidth > 900
-    // en móvil el panel ocupa el 52 % inferior de la pantalla
-    const padding = wide ? { top: 60, bottom: 60, left: 40, right: 420 } : { top: 64, bottom: Math.round(window.innerHeight * 0.52) + 16, left: 16, right: 16 }
+    // en móvil el panel inferior tapa la parte de abajo: encuadrar en la zona visible
+    const padding = wide ? { top: 60, bottom: 60, left: 40, right: 420 } : { top: 64, bottom: Math.round(this.bottomInset) + 16, left: 16, right: 16 }
+    this.settledInset = this.bottomInset
     this.map.fitBounds([[x0, y0], [x1, y1]], { padding, duration: 0 })
     await this.render()
   }
@@ -202,23 +225,27 @@ export class DetailView {
 
   async render() {
     if (!this.m) return
+    const seq = ++this.renderSeq
+    const set = this.set
+    const mode = this.mode === 'change' && !set.change ? 'compare' : this.mode
+    const f = set.frames[Math.min(this.frameIdx, set.frames.length - 1)]
+    // cargar antes de borrar: si mientras tanto llega otro repintado, este se descarta (sin parpadeos ni imágenes cruzadas)
+    const imgs =
+      mode === 'change' ? [await this.img(set.change!)]
+      : mode === 'timeline' ? [await this.img(this.layerOf(f))]
+      : await Promise.all([this.img(this.layerOf(this.frameFor('after'))), this.img(this.layerOf(this.frameFor('before')))])
+    if (seq !== this.renderSeq) return
+
     const ctx = this.canvas.getContext('2d')!
     const { width: W, height: H } = this.canvas
     ctx.clearRect(0, 0, W, H)
-
-    const set = this.set
-    if (this.mode === 'change' && set.change) {
-      ctx.drawImage(await this.img(set.change), 0, 0, W, H)
-    } else if (this.mode === 'timeline') {
-      const f = set.frames[Math.min(this.frameIdx, set.frames.length - 1)]
-      ctx.drawImage(await this.img(this.layerOf(f)), 0, 0, W, H)
-      this.onFrame?.(f, this.frameIdx)
-    } else {
-      const [b, a] = await Promise.all([this.img(this.layerOf(this.frameFor('before'))), this.img(this.layerOf(this.frameFor('after')))])
-      ctx.drawImage(a, 0, 0, W, H)
+    ctx.drawImage(imgs[0], 0, 0, W, H)
+    if (mode === 'compare') {
+      const b = imgs[1]
       const sx = Math.round(this.split * W)
       if (sx > 0) ctx.drawImage(b, 0, 0, sx * (b.naturalWidth / W), b.naturalHeight, 0, 0, sx, H)
     }
+    if (mode === 'timeline') this.onFrame?.(f, this.frameIdx)
     const src = this.map.getSource('sar') as unknown as { play?: () => void; pause?: () => void } | undefined
     src?.play?.()
     requestAnimationFrame(() => src?.pause?.())
@@ -268,6 +295,17 @@ export class DetailView {
   setOpacity(v: number) {
     this.sarOpacity = v
     if (this.map.getLayer('sar')) this.map.setPaintProperty('sar', 'raster-opacity', v)
+  }
+
+  /** Altura del panel inferior (móvil). Al soltarlo, la imagen se desplaza para quedar centrada en la zona visible. */
+  bottomInset = 0
+  private settledInset = 0
+  setBottomInset(px: number, settled: boolean) {
+    this.bottomInset = px
+    if (!settled) return
+    const shift = (this.settledInset - px) / 2
+    this.settledInset = px
+    if (this.m && Math.abs(shift) > 1 && !this.el.classList.contains('hidden')) this.map.panBy([0, -shift], { duration: 400 })
   }
 
   show(visible: boolean) {

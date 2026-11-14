@@ -28,8 +28,10 @@ export function setLang(l: Lang) {
 export const onLang = (f: () => void) => listeners.push(f)
 
 export const locale = () => (lang === 'es' ? 'es-ES' : 'en-GB')
+/** Fechas de adquisición ('2026-10-23'): se interpretan y se muestran en UTC.
+ *  Sin timeZone, un visitante en América vería el día anterior. */
 export const fmtDay = (d: string, opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }) =>
-  new Date(d).toLocaleDateString(locale(), opts)
+  new Date(d).toLocaleDateString(locale(), { ...opts, timeZone: 'UTC' })
 
 const UI = {
   es: {
@@ -84,12 +86,17 @@ const UI = {
     pre: 'antes',
     post: 'después',
     mock: 'DATOS DE PRUEBA · pendiente de datos NISAR reales',
-    source: (track: number, a: string, b: string, s1: boolean) =>
+    source: (track: number, a: string, b: string, s1: boolean, ref: string) =>
       `Datos: NASA-ISRO NISAR L2 GCOV (banda L, HH/HV) vía ASF DAAC · pasada ${track} · par ${a} → ${b}` +
       (s1 ? ' · Copernicus Sentinel-1 (banda C, VV/VH) procesado con ASF HyP3' : '') +
-      ' · Perímetros: EFFIS · Infraestructuras: © OpenStreetMap',
+      (ref ? ` · Referencia: ${ref}` : '') +
+      ' · Infraestructuras: © OpenStreetMap',
     close: 'Salir',
     next: 'Siguiente',
+    prev: 'Anterior',
+    play: 'Reproducir / pausar',
+    sliderAria: 'Deslizador antes/después',
+    sheetGrip: 'Subir o bajar el panel',
     explore: 'Explorar',
     titleHH: 'Polarización HH: sensible al agua y al suelo',
     titleHV: 'Polarización HV: sensible al volumen de vegetación',
@@ -195,12 +202,17 @@ const UI = {
     pre: 'before',
     post: 'after',
     mock: 'MOCK DATA · real NISAR data pending',
-    source: (track: number, a: string, b: string, s1: boolean) =>
+    source: (track: number, a: string, b: string, s1: boolean, ref: string) =>
       `Data: NASA-ISRO NISAR L2 GCOV (L-band, HH/HV) via ASF DAAC · track ${track} · pair ${a} → ${b}` +
       (s1 ? ' · Copernicus Sentinel-1 (C-band, VV/VH) processed with ASF HyP3' : '') +
-      ' · Perimeters: EFFIS · Infrastructure: © OpenStreetMap',
+      (ref ? ` · Reference: ${ref}` : '') +
+      ' · Infrastructure: © OpenStreetMap',
     close: 'Close',
     next: 'Next',
+    prev: 'Previous',
+    play: 'Play / pause',
+    sliderAria: 'Before/after slider',
+    sheetGrip: 'Raise or lower the panel',
     explore: 'Explore',
     titleHH: 'HH polarization: sensitive to water and soil',
     titleHV: 'HV polarization: sensitive to vegetation volume',

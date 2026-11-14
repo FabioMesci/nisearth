@@ -6,6 +6,7 @@ import { CONTENT, KIND_META, getStory } from './content'
 import { lang, setLang, onLang, t, locale } from './i18n'
 import { ICON } from './icons'
 import { HAZARDS } from './hazards'
+import { Sheet } from './sheet'
 import type { CaseIndexItem, Manifest, Watch, WatchFire } from './types'
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T
@@ -22,26 +23,46 @@ async function main() {
   )
 
   const detail = new DetailView($('map'))
-  const panel = new Panel($('panel'), detail)
+  const panel = new Panel($('panel-body'), detail)
+
+  // móvil: panel del caso y lista de incidentes como paneles inferiores deslizables
+  const vh = () => window.innerHeight
+  const panelSheet = new Sheet($('panel'), $('panel').querySelector<HTMLElement>('.sheet-grip')!, () => [104, Math.round(vh() * 0.52), Math.round(vh() * 0.88)])
+  panelSheet.onChange = (h, settled) => {
+    // los controles del mapa y la tarjeta de la historia siguen al borde del panel
+    document.body.style.setProperty('--sheet-h', `${Math.round(h)}px`)
+    detail.setBottomInset(h, settled)
+  }
+  panelSheet.reset()
+  new Sheet($('cases'), $('cases').querySelector<HTMLElement>('.sheet-grip')!, () => [100, Math.round(vh() * 0.46), Math.round(vh() * 0.82)])
   let current: string | null = null
+  // cada navegación (abrir caso / volver) incrementa nav; una apertura que ve otro valor tras un await se abandona
+  let nav = 0
 
   const openCase = async (id: string) => {
     if (current === id) return
+    const token = ++nav
+    panel.stop()
     const m = await getManifest(id)
+    if (token !== nav) return
     current = id
     document.body.classList.add('in-detail')
+    markActive()
+    panelSheet.reset() // cada caso empieza con el panel a media altura
     await globe.flyTo(m.center[0], m.center[1])
+    if (token !== nav) return
     detail.show(true)
     await detail.open(m)
+    if (token !== nav) return
     globe.show(false)
     panel.render(m)
-    $('panel').scrollTop = 0
     $('panel').classList.remove('hidden')
+    $('panel').scrollTop = 0 // después de mostrarlo: con display:none no tiene efecto
     $('back-btn').classList.remove('hidden')
-    markActive()
   }
 
   const goHome = () => {
+    nav++ // cancela cualquier apertura en curso
     if (!current) return
     current = null
     sel = -1
@@ -131,6 +152,8 @@ async function main() {
       el.innerHTML = t(el.dataset.i18n as Parameters<typeof t>[0]) as string
     })
     document.querySelectorAll<HTMLButtonElement>('#lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang))
+    $('slider-handle').setAttribute('aria-label', t('sliderAria'))
+    document.querySelectorAll('.sheet-grip').forEach((g) => g.setAttribute('aria-label', t('sheetGrip')))
   }
   $('lang').onclick = (e) => {
     const b = (e.target as HTMLElement).closest('button')
@@ -165,7 +188,7 @@ async function main() {
         <div class="story-nav">
           <button class="btn ghost icon" id="st-close" aria-label="${t('close')}" title="${t('close')}">${ICON.close}</button>
           <span class="steps" aria-label="${step + 1} / ${STORY.length}">${STORY.map((_, i) => `<i class="${i === step ? 'on' : i < step ? 'done' : ''}"></i>`).join('')}</span>
-          ${step > 0 ? `<button class="btn ghost icon" id="st-prev" aria-label="←">${ICON.prev}</button>` : ''}
+          ${step > 0 ? `<button class="btn ghost icon" id="st-prev" aria-label="${t('prev')}" title="${t('prev')}">${ICON.prev}</button>` : ''}
           <button class="btn primary" id="st-next">${step < STORY.length - 1 ? t('next') : t('explore')}${ICON.next}</button>
         </div>
       </div>`

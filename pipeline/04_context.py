@@ -126,7 +126,11 @@ def main():
         import pandas as pd
         ems = pd.concat([gpd.read_file(f) for f in sorted((RAW / "ems").glob("aoi0*/*observedEventA*.json"))]).to_crs(4326)
         ems = ems[ems["notation"] == "Flooded area"][["notation", "geometry"]]
-        ems.to_file(out / "ems.geojson", driver="GeoJSON")
+        # copia para la web: un solo contorno simplificado (~4 m) y 5 decimales (12,7 MB -> ~0,6 MB);
+        # las métricas de abajo usan la geometría original
+        web = ems.dissolve()
+        web["geometry"] = web.geometry.simplify(0.00004, preserve_topology=True)
+        web.to_file(out / "ems.geojson", driver="GeoJSON", COORDINATE_PRECISION=5)
         overlays["ems"] = "ems.geojson"
         with rasterio.open(WORK / cid / "mask.tif") as ds:
             m = ds.read(1).astype(bool)

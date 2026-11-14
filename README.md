@@ -52,6 +52,8 @@ cd pipeline
 ../.venv/bin/python s1_hyp3.py fetch
 ../.venv/bin/python 03_process.py niebla && ../.venv/bin/python 04_context.py niebla && ../.venv/bin/python 06_exposure.py niebla
 ../.venv/bin/python 03_process.py dana   && ../.venv/bin/python 04_context.py dana   && ../.venv/bin/python 06_exposure.py dana
+../.venv/bin/python 05_external.py niebla && ../.venv/bin/python 05_external.py dana  # focos FIRMS y lluvia (FIRMS_MAP_KEY en .env)
+../.venv/bin/python 05_external.py watch            # panel «Vigilancia España»: repetir justo antes de la demo
 ```
 
 Risk index (see [docs/EVENTS_AND_RISK.md](docs/EVENTS_AND_RISK.md)):

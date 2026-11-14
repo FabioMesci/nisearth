@@ -148,6 +148,8 @@ body.in-detail #cases { width: 280px; max-height: calc(100vh - 110px); }
   display: flex; flex-direction: column; gap: 0;
 }
 #panel:not(.hidden) { animation: panel-in 0.7s var(--ease) both; }
+#panel-body { display: flex; flex-direction: column; }
+.sheet-grip { display: none; }
 @keyframes panel-in {
   from { opacity: 0; transform: translateX(28px); filter: blur(8px); clip-path: inset(0 0 0 12% round 24px); }
   to { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0 round 24px); }
@@ -313,16 +315,32 @@ body.in-detail #lang { right: 436px; }
   #brand h1 { font-size: 40px; margin-bottom: 8px; }
   #brand p { font-size: 13.5px; }
   #brand .credit { display: none; }
-  #cases { left: 16px; right: 16px; bottom: 16px; width: auto; max-height: 46vh; }
+  /* paneles inferiores deslizables (src/sheet.ts fija la altura) */
+  /* sin padding superior: `sticky` lo respeta y la barra quedaría desplazada sobre el contenido; la propia barra hace de margen */
+  #cases { left: 0; right: 0; bottom: 0; width: auto; height: 46vh; max-height: none; border-radius: 24px 24px 0 0; padding: 0 16px; border-bottom: 0; }
   body.in-detail #cases { display: none; }
-  #panel { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 52vh; border-radius: 24px 24px 0 0; padding: 20px 18px; }
+  #story-btn { bottom: 12px; }
+  #panel { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 52vh; border-radius: 24px 24px 0 0; padding: 0 18px 20px; border-bottom: 0; }
+  #panel, #cases { background: var(--surface-solid); transition: height 0.45s var(--ease); overscroll-behavior: contain; }
+  #panel.dragging, #cases.dragging { transition: none; }
+  .sheet-grip {
+    display: flex; flex: none; align-items: center; justify-content: center;
+    position: sticky; top: 0; z-index: 3; height: 30px; padding: 0; border: 0; cursor: grab; touch-action: none;
+    background: linear-gradient(var(--surface-solid) 75%, transparent);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sheet-grip span { width: 40px; height: 5px; border-radius: 3px; background: var(--line-2); transition: background 0.2s var(--ease), width 0.2s var(--ease); }
+  .sheet-grip:hover span, .dragging > .sheet-grip span { background: var(--muted); width: 48px; }
+  .dragging > .sheet-grip { cursor: grabbing; }
+  #panel > .sheet-grip { margin: 0 -18px 4px; width: calc(100% + 36px); }
+  #cases > .sheet-grip { margin: 0 -16px 2px; width: calc(100% + 32px); }
   #panel:not(.hidden) { animation-name: sheet-in; }
   #panel h2 { font-size: 28px; }
   #back-btn { top: 12px; left: 16px; }
   #lang { top: 12px; right: 16px; }
   body.in-detail #lang { right: 16px; }
-  body.in-detail .maplibregl-ctrl-bottom-right { right: 0; bottom: 52vh; }
-  body.in-detail #story { left: 50%; width: calc(100vw - 32px); bottom: calc(52vh + 12px); }
+  body.in-detail .maplibregl-ctrl-bottom-right { right: 0; bottom: var(--sheet-h, 52vh); }
+  body.in-detail #story { left: 50%; width: calc(100vw - 32px); bottom: calc(var(--sheet-h, 52vh) + 12px); }
 }
 @keyframes sheet-in { from { opacity: 0; transform: translateY(40px); } }
 

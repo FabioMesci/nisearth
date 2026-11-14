@@ -361,12 +361,15 @@ body.in-detail #lang { right: 436px; }
 
 /* ---------- hazard guide ---------- */
 #hazards-btn { margin-top: 6px; width: 100%; }
-#hazards { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3, 5, 10, 0.72); backdrop-filter: blur(6px); }
-.hz-card { background: var(--surface-solid); border: 1px solid var(--line-2); border-radius: var(--r-lg); width: min(980px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; padding: 20px 22px; scrollbar-width: thin; }
-.hz-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
-.hz-head h2 { margin: 6px 0 4px; font-size: 22px; }
-.hz-head p { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
-.hz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+#hazards { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3, 5, 10, 0.72); backdrop-filter: blur(6px); overscroll-behavior: contain; }
+/* dvh: en móvil 100vh incluye la barra del navegador y cortaría la parte de abajo */
+.hz-card { background: var(--surface-solid); border: 1px solid var(--line-2); border-radius: var(--r-lg); width: min(980px, 100%); max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow-y: auto; overscroll-behavior: contain; padding: 0 22px 20px; scrollbar-width: thin; }
+/* cabecera fija al hacer scroll: el botón de cerrar siempre a mano (sin padding superior en la tarjeta: sticky lo respeta) */
+.hz-head { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; padding: 20px 0 10px; background: var(--surface-solid); }
+.hz-head h2 { margin: 6px 0 0; font-size: 22px; }
+.hz-intro { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
+/* min(290px, 100%): en móviles estrechos una sola columna que ocupa todo el ancho, sin desbordar */
+.hz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); gap: 12px; }
 .hz { padding: 14px; border: 1px solid var(--line); border-top: 2px solid var(--c); border-radius: var(--r-md); background: var(--raise); }
 .hz header { display: flex; align-items: center; gap: 8px; }
 .hz header .ic { color: var(--c); display: grid; }
@@ -406,3 +409,12 @@ body.in-detail #lang { right: 436px; }
 .risk-popup dl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line); }
 .risk-popup dt { color: var(--muted); white-space: nowrap; }
 .risk-popup dd { margin: 0; white-space: nowrap; font: 500 11.5px var(--mono); text-align: right; }
+
+/* guía de riesgos en móvil: casi pantalla completa */
+@media (max-width: 600px) {
+  #hazards { padding: 12px; }
+  .hz-card { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); padding: 0 16px 16px; }
+  .hz-head { padding-top: 16px; }
+  .hz-head h2 { font-size: 20px; line-height: 1.2; }
+  .hz header { flex-wrap: wrap; }
+}

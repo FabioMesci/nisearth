@@ -211,9 +211,10 @@ async function main() {
     hz.innerHTML = `
       <div class="hz-card card">
         <div class="hz-head">
-          <div><div class="kicker">${t('hazardsBtn')}</div><h2>${t('hazards')}</h2><p>${t('hazardsIntro')}</p></div>
+          <div><div class="kicker">${t('hazardsBtn')}</div><h2>${t('hazards')}</h2></div>
           <button class="btn ghost icon" id="hz-close" aria-label="${t('close')}" title="${t('close')}">${ICON.close}</button>
         </div>
+        <p class="hz-intro">${t('hazardsIntro')}</p>
         <div class="hz-grid">
           ${getHazards().map(
             (h) => `<article class="hz" style="--c:${h.color}">

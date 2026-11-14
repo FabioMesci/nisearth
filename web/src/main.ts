@@ -5,6 +5,7 @@ import { Panel } from './panel'
 import { CONTENT, KIND_META, getStory } from './content'
 import { lang, setLang, onLang, t, locale } from './i18n'
 import { ICON } from './icons'
+import { HAZARDS } from './hazards'
 import type { CaseIndexItem, Manifest, Watch, WatchFire } from './types'
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T
@@ -180,6 +181,38 @@ async function main() {
     step = -1
   }
   $('story-btn').onclick = () => ((step = 0), renderStep())
+
+  // ---------- hazard guide ----------
+  const hz = $('hazards')
+  const renderHazards = () => {
+    hz.innerHTML = `
+      <div class="hz-card card">
+        <div class="hz-head">
+          <div><div class="kicker">${t('hazardsBtn')}</div><h2>${t('hazards')}</h2><p>${t('hazardsIntro')}</p></div>
+          <button class="btn ghost icon" id="hz-close" aria-label="${t('close')}" title="${t('close')}">${ICON.close}</button>
+        </div>
+        <div class="hz-grid">
+          ${HAZARDS.map(
+            (h) => `<article class="hz" style="--c:${h.color}">
+              <header><span class="ic">${h.icon}</span><b>${h.name}</b><em class="${h.status}">${h.status === 'live' ? t('hazLive') : t('hazPlanned')}</em></header>
+              <p class="tag">${h.tagline}</p>
+              <dl>
+                <dt>${t('hazSignature')}</dt><dd>${h.signature}</dd>
+                <dt>${t('hazTechnique')}</dt><dd>${h.technique}</dd>
+                <dt>${t('hazProducts')}</dt><dd>${h.products}</dd>
+                <dt>${t('hazWho')}</dt><dd>${h.who}</dd>
+              </dl>
+            </article>`,
+          ).join('')}
+        </div>
+      </div>`
+    $('hz-close').onclick = closeHazards
+  }
+  const closeHazards = () => hz.classList.add('hidden')
+  $('hazards-btn').onclick = () => (renderHazards(), hz.classList.remove('hidden'))
+  hz.onclick = (e) => e.target === hz && closeHazards()
+  window.addEventListener('keydown', (e) => e.key === 'Escape' && closeHazards())
+  onLang(() => !hz.classList.contains('hidden') && renderHazards())
 }
 
 main()

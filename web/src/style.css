@@ -340,3 +340,22 @@ body.in-detail #lang { right: 436px; }
 .sec .hint + .hint { margin-top: 6px; }
 .src-inline { font-size: 11px; opacity: 0.75; }
 .metric:last-child:nth-child(odd) { grid-column: 1 / -1; padding-right: 0; }
+
+/* ---------- hazard guide ---------- */
+#hazards-btn { margin-top: 6px; width: 100%; }
+#hazards { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3, 5, 10, 0.72); backdrop-filter: blur(6px); }
+.hz-card { background: var(--surface-solid); border: 1px solid var(--line-2); border-radius: var(--r-lg); width: min(980px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; padding: 20px 22px; scrollbar-width: thin; }
+.hz-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.hz-head h2 { margin: 6px 0 4px; font-size: 22px; }
+.hz-head p { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
+.hz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+.hz { padding: 14px; border: 1px solid var(--line); border-top: 2px solid var(--c); border-radius: var(--r-md); background: var(--raise); }
+.hz header { display: flex; align-items: center; gap: 8px; }
+.hz header .ic { color: var(--c); display: grid; }
+.hz header .ic svg { width: 20px; height: 20px; }
+.hz header b { flex: 1; font-size: 15px; }
+.hz header em { font: 600 9.5px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); font-style: normal; }
+.hz header em.live { color: var(--c); border-color: var(--c); }
+.hz .tag { margin: 6px 0 8px; color: var(--text-2); font-size: 13px; }
+.hz dt { font: 600 10px var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--c); margin-top: 8px; }
+.hz dd { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }

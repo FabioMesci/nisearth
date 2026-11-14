@@ -26,6 +26,10 @@ export interface CaseContent {
 const META = {
   flood: { icon: ICON.flood, color: '#5cb8f2' },
   fire: { icon: ICON.fire, color: '#ff8a3d' },
+  earthquake: { icon: ICON.earthquake, color: '#f472b6' },
+  landslide: { icon: ICON.landslide, color: '#a3e635' },
+  volcano: { icon: ICON.volcano, color: '#ef4444' },
+  subsidence: { icon: ICON.subsidence, color: '#c084fc' },
 }
 export const KIND_META = new Proxy({} as Record<Kind, { icon: string; color: string; label: string }>, {
   get: (_, k: Kind) => ({ ...META[k], label: t(k) }),

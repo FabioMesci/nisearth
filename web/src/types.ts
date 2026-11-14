@@ -37,7 +37,7 @@ export interface Manifest {
   layers: { mask?: string; change?: string }
   series: { dates: string[]; hh: number[]; hv: number[] }
   metrics: Metric[]
-  overlays: { rail?: string; roads?: string; effis?: string; firms?: string }
+  overlays: { rail?: string; roads?: string; effis?: string; ems?: string; firms?: string }
   /** Serie diaria externa: lluvia (Open-Meteo) o nº de focos (FIRMS) */
   daily?: { kind: 'rain' | 'firms'; dates: string[]; values: number[]; unit: string; source: string; place?: string }
   firms?: { from: string; to: string; count: number; in_mask_pct: number }
@@ -45,6 +45,16 @@ export interface Manifest {
   s1?: { pair: { before: string; after: string }; frames: Frame[]; change: string; delta_in_mask: { vv: number; vh: number } }
   nisar_delta_in_mask?: { hh: number; hv: number }
   stats?: Record<string, unknown>
+  /** Cobertura del suelo bajo la máscara (ESA WorldCover) */
+  landcover?: { source: string; inside: LandRow[]; outside_ref?: LandRow[] }
+  /** Población expuesta (WorldPop) */
+  exposure?: { source: string; pop_inside: number; pop_1km?: number }
+}
+
+export interface LandRow {
+  cls: string
+  ha: number
+  pct: number
 }
 
 export type Sensor = 'L' | 'C'

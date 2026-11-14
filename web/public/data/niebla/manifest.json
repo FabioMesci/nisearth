@@ -196,6 +196,18 @@
    "label": "Focos FIRMS dentro de la zona quemada (radar)",
    "value": 94,
    "unit": "%"
+  },
+  {
+   "id": "forest",
+   "label": "Bosque y matorral quemados (confirmado)",
+   "value": 28307,
+   "unit": "ha"
+  },
+  {
+   "id": "pop1km",
+   "label": "Personas a menos de 1 km del borde quemado",
+   "value": 720.0,
+   "unit": "hab."
   }
  ],
  "overlays": {
@@ -281,5 +293,87 @@
   ],
   "unit": "focos",
   "source": "NASA FIRMS VIIRS 375 m"
+ },
+ "landcover": {
+  "source": "ESA WorldCover 2021 (10 m)",
+  "inside": [
+   {
+    "cls": "tree",
+    "ha": 14739,
+    "pct": 51.8
+   },
+   {
+    "cls": "shrub",
+    "ha": 11893,
+    "pct": 41.8
+   },
+   {
+    "cls": "grass",
+    "ha": 1675,
+    "pct": 5.9
+   },
+   {
+    "cls": "bare",
+    "ha": 78,
+    "pct": 0.3
+   },
+   {
+    "cls": "built",
+    "ha": 25,
+    "pct": 0.1
+   },
+   {
+    "cls": "crop",
+    "ha": 24,
+    "pct": 0.1
+   },
+   {
+    "cls": "water",
+    "ha": 17,
+    "pct": 0.1
+   }
+  ],
+  "outside_ref": [
+   {
+    "cls": "crop",
+    "ha": 2673,
+    "pct": 73.3
+   },
+   {
+    "cls": "grass",
+    "ha": 450,
+    "pct": 12.3
+   },
+   {
+    "cls": "tree",
+    "ha": 235,
+    "pct": 6.4
+   },
+   {
+    "cls": "shrub",
+    "ha": 157,
+    "pct": 4.3
+   },
+   {
+    "cls": "built",
+    "ha": 80,
+    "pct": 2.2
+   },
+   {
+    "cls": "bare",
+    "ha": 31,
+    "pct": 0.9
+   },
+   {
+    "cls": "water",
+    "ha": 19,
+    "pct": 0.5
+   }
+  ]
+ },
+ "exposure": {
+  "source": "WorldPop 2020 (100 m)",
+  "pop_inside": 86,
+  "pop_1km": 721
  }
 }

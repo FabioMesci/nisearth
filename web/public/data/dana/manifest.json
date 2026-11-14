@@ -148,6 +148,18 @@
    "unit": "km²"
   },
   {
+   "id": "rain",
+   "label": "Lluvia entre las dos pasadas NISAR (Oliva)",
+   "value": 78.6,
+   "unit": "mm"
+  },
+  {
+   "id": "ems_seen",
+   "label": "De la inundación vista por Copernicus EMS, aún visible para NISAR",
+   "value": 5,
+   "unit": "%"
+  },
+  {
    "id": "rail",
    "label": "Vía férrea en zona inundada",
    "value": 0.0,
@@ -160,20 +172,26 @@
    "unit": "km"
   },
   {
-   "id": "rain",
-   "label": "Lluvia entre las dos pasadas NISAR (Oliva)",
-   "value": 78.6,
-   "unit": "mm"
+   "id": "pop",
+   "label": "Personas en zona con agua nueva",
+   "value": 161,
+   "unit": "hab."
   }
  ],
  "overlays": {
   "rail": "rail_affected.geojson",
-  "roads": "roads_affected.geojson"
+  "roads": "roads_affected.geojson",
+  "ems": "ems.geojson"
  },
  "stats": {
   "otsu_threshold_db": -12.16,
   "permanent_water_km2": 221.1,
-  "rail_lines": []
+  "rail_lines": [],
+  "ems_code": "EMSR935",
+  "ems_date": "2026-10-20",
+  "ems_ha": 885,
+  "ems_seen_pct": 5.4,
+  "nisar_in_ems_pct": 27.8
  },
  "s1": {
   "pair": {
@@ -277,5 +295,49 @@
   "source": "Open-Meteo (reanálisis ERA5)",
   "peak_hour_mm": 8.2,
   "peak_hour": "2026-10-19T02:00"
+ },
+ "landcover": {
+  "source": "ESA WorldCover 2021 (10 m)",
+  "inside": [
+   {
+    "cls": "crop",
+    "ha": 96,
+    "pct": 56.2
+   },
+   {
+    "cls": "wetland",
+    "ha": 65,
+    "pct": 38.0
+   },
+   {
+    "cls": "tree",
+    "ha": 5,
+    "pct": 2.6
+   },
+   {
+    "cls": "water",
+    "ha": 4,
+    "pct": 2.3
+   },
+   {
+    "cls": "grass",
+    "ha": 1,
+    "pct": 0.7
+   },
+   {
+    "cls": "shrub",
+    "ha": 0,
+    "pct": 0.1
+   },
+   {
+    "cls": "built",
+    "ha": 0,
+    "pct": 0.1
+   }
+  ]
+ },
+ "exposure": {
+  "source": "WorldPop 2020 (100 m)",
+  "pop_inside": 161
  }
 }

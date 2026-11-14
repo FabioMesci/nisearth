@@ -121,7 +121,7 @@ body.in-detail #cases { width: 280px; max-height: calc(100vh - 110px); }
 .btn.ghost { background: transparent; border-color: var(--line); }
 .btn.ghost:hover { background: var(--raise); }
 .btn.icon { width: 38px; padding: 0; flex: none; }
-#story-btn { width: 100%; position: sticky; bottom: 0; box-shadow: 0 -12px 16px -4px var(--surface-solid); }
+#story-btn { width: 100%; } /* en el flujo, con el mismo estilo que «Guía de riesgos» */
 #back-btn { position: fixed; top: 24px; left: 32px; z-index: 6; padding-left: 10px; background: var(--surface); border-color: var(--line); box-shadow: var(--shadow); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 
 /* ---------- marcadores del globo ---------- */
@@ -339,7 +339,6 @@ body.in-detail #lang { right: 436px; }
   /* sin padding superior: `sticky` lo respeta y la barra quedaría desplazada sobre el contenido; la propia barra hace de margen */
   #cases { left: 0; right: 0; bottom: 0; width: auto; height: 46vh; max-height: none; border-radius: 24px 24px 0 0; padding: 0 16px; border-bottom: 0; }
   body.in-detail #cases { display: none; }
-  #story-btn { position: static; box-shadow: none; } /* en el flujo, como «Guía de riesgos» */
   #panel { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 52vh; border-radius: 24px 24px 0 0; padding: 0 18px 20px; border-bottom: 0; }
   #panel, #cases { background: var(--surface-solid); transition: height 0.45s var(--ease); overscroll-behavior: contain; }
   #panel.dragging, #cases.dragging { transition: none; }

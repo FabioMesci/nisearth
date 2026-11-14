@@ -386,5 +386,5 @@ body.in-detail #lang { right: 436px; }
 .rp-place { color: var(--muted); margin-bottom: 6px; }
 .risk-popup .rp-row { grid-template-columns: 84px 1fr 30px; }
 .risk-popup dl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line); }
-.risk-popup dt { color: var(--muted); }
+.risk-popup dt { color: var(--muted); white-space: nowrap; }
 .risk-popup dd { margin: 0; font: 500 11.5px var(--mono); text-align: right; }

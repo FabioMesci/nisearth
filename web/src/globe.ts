@@ -43,8 +43,10 @@ export class GlobeView {
         const wrap = document.createElement('div')
         const m = document.createElement('button')
         m.className = `marker ${c.center[0] < -3 ? 'left' : ''}`
+        m.dataset.id = c.id
+        m.setAttribute('aria-label', CONTENT[c.id]?.place ?? c.title)
         m.style.setProperty('--c', meta.color)
-        m.innerHTML = `<span class="dot">${meta.icon}</span><span class="tag"><b>${CONTENT[c.id]?.place ?? c.title}</b><i>${meta.label} · ${CONTENT[c.id]?.dateLabel ?? ''}</i></span>`
+        m.innerHTML = `<span class="dot">${meta.icon}</span><span class="tag"><b>${CONTENT[c.id]?.short ?? c.title} <em>${CONTENT[c.id]?.region ?? ''}</em></b><i>${meta.label} · ${CONTENT[c.id]?.dateLabel ?? ''}</i></span>`
         m.onclick = (e) => {
           e.stopPropagation()
           onSelect(c.id)
@@ -93,6 +95,11 @@ export class GlobeView {
     this.globe.controls().autoRotate = false
     this.globe.pointOfView({ lat, lng, altitude: 0.25 }, 1600)
     return new Promise((r) => setTimeout(r, 1500))
+  }
+
+  /** Muestra la etiqueta de un caso (al pasar por su fila en la lista) */
+  highlight(id: string | null) {
+    this.el.querySelectorAll<HTMLElement>('.marker').forEach((m) => m.classList.toggle('hl', m.dataset.id === id))
   }
 
   /** Regenera los marcadores (cambio de idioma) */

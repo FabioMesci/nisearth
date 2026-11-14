@@ -11,6 +11,9 @@ export interface Pass {
 
 export interface CaseContent {
   place: string
+  /** Nombre corto y provincia para la lista y el globo */
+  short: string
+  region: string
   dateLabel: string
   headline: string
   summary: string
@@ -37,6 +40,8 @@ export const KIND_META = new Proxy({} as Record<Kind, { icon: string; color: str
 
 const CONTENT_ES: Record<string, CaseContent> = {
   niebla: {
+    short: 'Niebla',
+    region: 'Huelva',
     order: 1,
     place: 'Niebla (Huelva)',
     dateLabel: '7–15 ago 2026',
@@ -72,6 +77,8 @@ const CONTENT_ES: Record<string, CaseContent> = {
     ],
   },
   dana: {
+    short: 'La Safor',
+    region: 'Valencia',
     order: 2,
     place: 'La Safor · Oliva (Valencia)',
     dateLabel: '18–19 oct 2026',
@@ -125,6 +132,8 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Adif · Renfe', text: 'Con revisita suficiente: tramos de vía bajo el agua para priorizar inspecciones.' },
     ],
   },  lorca: {
+    short: 'Lorca',
+    region: 'Murcia',
     order: 3,
     place: 'Alto Guadalentín · Lorca (Murcia)',
     dateLabel: 'jun–oct 2026',
@@ -144,9 +153,11 @@ const CONTENT_ES: Record<string, CaseContent> = {
     ],
   },
   lapalma: {
+    short: 'La Palma',
+    region: 'Canarias',
     order: 4,
     place: 'Tajogaite · La Palma',
-    dateLabel: 'erupción 2021 · jun–oct 2026',
+    dateLabel: 'jun–oct 2026',
     headline: 'La Palma: la colada que ya casi no se mueve',
     summary:
       'La erupción de 2021 dejó unas 1.200 ha de lava nueva. En 2022, estudios preliminares midieron hundimientos de hasta 22 cm/año mientras la colada se enfriaba y compactaba. Cinco años después, 9 interferogramas NISAR (23 jun → 21 oct) no encuentran un hundimiento claro: la colada baja unos 0,4 cm frente a su entorno, por debajo del ruido (±1,7 cm). Lo que sí se ve es lo estable que es: la lava tiene una coherencia de 0,86, frente a 0,6 alrededor.',
@@ -163,6 +174,8 @@ const CONTENT_ES: Record<string, CaseContent> = {
     ],
   },
   granada: {
+    short: 'Granada',
+    region: 'Vega de Granada',
     order: 5,
     place: 'Santa Fe · Alhendín (Granada)',
     dateLabel: '14–18 ago 2026',
@@ -182,6 +195,8 @@ const CONTENT_ES: Record<string, CaseContent> = {
     ],
   },
   alora: {
+    short: 'Álora',
+    region: 'Málaga',
     order: 6,
     place: 'Álora (Málaga) · AVE Córdoba–Málaga',
     dateLabel: '4 feb 2026',
@@ -293,8 +308,9 @@ const CONTENT_EN: Record<string, CaseContent> = {
   },
   lapalma: {
     ...CONTENT_ES.lapalma,
+    region: 'Canary Islands',
     place: 'Tajogaite · La Palma (Spain)',
-    dateLabel: '2021 eruption · Jun–Oct 2026',
+    dateLabel: 'Jun–Oct 2026',
     headline: 'La Palma: the lava flow that has almost stopped moving',
     summary:
       'The 2021 eruption left about 1,200 ha of new lava. In 2022, preliminary studies measured up to 22 cm/yr of subsidence as the flow cooled and compacted. Five years on, 9 NISAR interferograms (23 Jun → 21 Oct) find no clear subsidence: the flow drops about 0.4 cm relative to its surroundings, below the noise (±1.7 cm). What does stand out is how stable it is: coherence on the lava is 0.86, versus 0.6 around it.',

@@ -132,14 +132,23 @@ async function main() {
   // lista lateral de incidentes
   const list = $('case-list')
   const renderList = () => {
-    list.innerHTML = cases
-      .map((c) => {
-        const meta = KIND_META[c.kind]
-        return `<li><button data-id="${c.id}" style="--c:${meta.color}"><span class="ic">${meta.icon}</span><span><b>${CONTENT[c.id]?.place ?? c.title}</b><i>${meta.label} · ${CONTENT[c.id]?.dateLabel ?? ''}</i></span></button></li>`
-      })
-      .join('')
+    // dos grupos: cambios de la superficie (antes/después) y movimiento del terreno (interferometría)
+    const surface = (k: string) => k === 'fire' || k === 'flood'
+    const row = (c: CaseIndexItem) => {
+      const meta = KIND_META[c.kind]
+      const ct = CONTENT[c.id]
+      return `<li><button data-id="${c.id}" style="--c:${meta.color}" title="${ct?.place ?? c.title}"><span class="ic">${meta.icon}</span><span class="txt"><b>${ct?.short ?? c.title}<span class="rg">${ct?.region ?? ''}</span></b><i>${meta.label} · ${ct?.dateLabel ?? ''}</i></span></button></li>`
+    }
+    const groups = [
+      { label: t('groupSurface'), items: cases.filter((c) => surface(c.kind)) },
+      { label: t('groupGround'), items: cases.filter((c) => !surface(c.kind)) },
+    ].filter((g) => g.items.length)
+    list.innerHTML = groups.map((g) => `<li class="grp">${g.label}</li>${g.items.map(row).join('')}`).join('')
     markActive()
   }
+  // pasar por una fila resalta su marcador en el globo
+  list.addEventListener('pointerover', (e) => globe.highlight((e.target as HTMLElement).closest<HTMLButtonElement>('button[data-id]')?.dataset.id ?? null))
+  list.addEventListener('pointerleave', () => globe.highlight(null))
   list.onclick = (e) => {
     const b = (e.target as HTMLElement).closest('button')
     if (b?.dataset.id) openCase(b.dataset.id)

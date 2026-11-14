@@ -22,6 +22,8 @@ CASES = {
         "pair": ("2026-10-11", "2026-10-23"),  # misma pasada 167 desc
         "track": 167,
         "s1_pair": ("2026-10-16", "2026-10-22"),  # Sentinel-1 pasada 8 desc: la imagen más cercana tras la DANA
+        # Copernicus EMS Rapid Mapping: inundación cartografiada con SPOT/GeoEye el 20 oct (data/raw/ems/)
+        "ems": {"code": "EMSR935", "date": "2026-10-20"},
     },
     "niebla": {
         "title": "Incendio de Niebla (Huelva)",

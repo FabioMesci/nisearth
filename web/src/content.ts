@@ -2,6 +2,7 @@
 // Las cifras salen del pipeline (manifest.json); aquí solo va la narrativa.
 import type { Kind } from './types'
 import { lang, t } from './i18n'
+import { ICON } from './icons'
 
 export interface Pass {
   date: string // ISO con hora UTC
@@ -23,8 +24,8 @@ export interface CaseContent {
 }
 
 const META = {
-  flood: { icon: '💧', color: '#38bdf8' },
-  fire: { icon: '🔥', color: '#fb923c' },
+  flood: { icon: ICON.flood, color: '#5cb8f2' },
+  fire: { icon: ICON.fire, color: '#ff8a3d' },
 }
 export const KIND_META = new Proxy({} as Record<Kind, { icon: string; color: string; label: string }>, {
   get: (_, k: Kind) => ({ ...META[k], label: t(k) }),
@@ -72,7 +73,7 @@ const CONTENT_ES: Record<string, CaseContent> = {
     dateLabel: '18–19 oct 2026',
     headline: 'DANA Adam: lo que el radar no llegó a ver',
     summary:
-      'Cientos de litros por metro cuadrado en una noche sobre la costa de Oliva: campings evacuados, Cercanías C1 suspendida y carreteras cortadas. Pero ningún radar pasó durante la tormenta. Cuando NISAR volvió, cuatro días después, el agua ya había drenado casi por completo.',
+      'Cientos de litros por metro cuadrado en una noche sobre la costa de Oliva: campings evacuados, Cercanías C1 suspendida y carreteras cortadas. Pero ningún radar pasó durante la tormenta. Cuando NISAR volvió, cuatro días después, el agua ya había drenado casi por completo: de las 885 ha que Copernicus EMS cartografió inundadas el 20 oct, NISAR solo veía como agua el 5 % el 23 oct.',
     passes: {
       from: '2026-10-09',
       to: '2026-10-29',
@@ -175,7 +176,7 @@ const CONTENT_EN: Record<string, CaseContent> = {
     dateLabel: '18–19 Oct 2026',
     headline: 'Storm “Adam”: what the radar never saw',
     summary:
-      'Hundreds of litres per square metre in one night on the coast of Oliva: campsites evacuated, the C1 commuter line suspended, roads cut. But no radar passed over during the storm. When NISAR came back four days later, the water had almost entirely drained away.',
+      'Hundreds of litres per square metre in one night on the coast of Oliva: campsites evacuated, the C1 commuter line suspended, roads cut. But no radar passed over during the storm. When NISAR came back four days later, the water had almost entirely drained away: of the 885 ha Copernicus EMS mapped as flooded on 20 Oct, NISAR saw only 5% still under water on 23 Oct.',
     notes: [{ date: '2026-10-19', label: 'Storm' }],
     why: [
       { title: 'Water is a mirror', text: 'A sheet of water reflects the radar pulse away from the satellite: flooded areas look very dark in HH. NISAR still detects residual water next to the Pego-Oliva marshland.' },

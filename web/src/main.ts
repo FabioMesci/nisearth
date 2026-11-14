@@ -4,6 +4,7 @@ import { DetailView } from './detail'
 import { Panel } from './panel'
 import { CONTENT, KIND_META, getStory } from './content'
 import { lang, setLang, onLang, t, locale } from './i18n'
+import { ICON } from './icons'
 import type { CaseIndexItem, Manifest, Watch, WatchFire } from './types'
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T
@@ -33,6 +34,7 @@ async function main() {
     await detail.open(m)
     globe.show(false)
     panel.render(m)
+    $('panel').scrollTop = 0
     $('panel').classList.remove('hidden')
     $('back-btn').classList.remove('hidden')
     markActive()
@@ -157,14 +159,13 @@ async function main() {
     const s = STORY[step]
     story.innerHTML = `
       <div class="card story-card">
-        <div class="kicker">${step + 1} / ${STORY.length}</div>
         <h3>${s.title}</h3>
         <p>${s.text}</p>
         <div class="story-nav">
-          <button class="btn ghost" id="st-close">${t('close')}</button>
-          <span></span>
-          ${step > 0 ? '<button class="btn ghost" id="st-prev">←</button>' : ''}
-          <button class="btn" id="st-next">${step < STORY.length - 1 ? t('next') : t('explore')}</button>
+          <button class="btn ghost icon" id="st-close" aria-label="${t('close')}" title="${t('close')}">${ICON.close}</button>
+          <span class="steps" aria-label="${step + 1} / ${STORY.length}">${STORY.map((_, i) => `<i class="${i === step ? 'on' : i < step ? 'done' : ''}"></i>`).join('')}</span>
+          ${step > 0 ? `<button class="btn ghost icon" id="st-prev" aria-label="←">${ICON.prev}</button>` : ''}
+          <button class="btn primary" id="st-next">${step < STORY.length - 1 ? t('next') : t('explore')}${ICON.next}</button>
         </div>
       </div>`
     story.classList.remove('hidden')

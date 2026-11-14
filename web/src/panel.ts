@@ -3,6 +3,7 @@ import type { DetailView, ViewMode, Pol } from './detail'
 import type { Manifest } from './types'
 import { CONTENT, KIND_META } from './content'
 import { t, locale, metricLabel, fmtDay } from './i18n'
+import { ICON } from './icons'
 
 Chart.register(LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler)
 
@@ -45,15 +46,14 @@ export class Panel {
     this.el.style.setProperty('--accent', meta.color)
     this.el.innerHTML = `
       <div class="p-head">
-        <div class="kicker">${meta.icon} ${meta.label} · ${c.dateLabel}</div>
         <h2>${c.headline}</h2>
-        <div class="place">${c.place}</div>
+        <div class="meta"><span class="chip">${meta.icon}${meta.label}</span><span>${c.place}</span><span class="mono">${c.dateLabel}</span></div>
         ${m.mock ? `<div class="mock">${t('mock')}</div>` : ''}
       </div>
       <p class="summary">${c.summary}</p>
-      ${c.passes ? `<section class="card"><div class="label">${t('passes')}</div>${passesSvg(c.passes)}<div class="legend"><span><i class="nisar"></i>${t('legendL')}</span><span><i class="s1"></i>${t('legendC')}</span><span><i class="ev"></i>${t('legendEv')}</span></div></section>` : ''}
+      ${c.passes ? `<section class="sec"><div class="label">${t('passes')}</div>${passesSvg(c.passes)}<div class="legend"><span><i class="nisar"></i>${t('legendL')}</span><span><i class="s1"></i>${t('legendC')}</span><span><i class="ev"></i>${t('legendEv')}</span></div></section>` : ''}
 
-      <section class="card controls">
+      <section class="sec controls">
         <div class="label">${t('radarView')}</div>
         <div class="seg" id="seg-mode">
           <button data-v="compare">${t('compare')}</button>
@@ -74,11 +74,11 @@ export class Panel {
         </div>
         <div class="row toggles">
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${t('infra')}</span></label>` : ''}
-          ${m.overlays.effis ? `<label class="toggle"><input type="checkbox" id="chk-ref" ${v.showRef ? 'checked' : ''} /> <span>${t('effis')}</span></label>` : ''}
+          ${m.overlays.effis || m.overlays.ems ? `<label class="toggle"><input type="checkbox" id="chk-ref" ${v.showRef ? 'checked' : ''} /> <span>${m.overlays.ems ? t('ems') : t('effis')}</span></label>` : ''}
           ${m.overlays.firms ? `<label class="toggle"><input type="checkbox" id="chk-firms" ${v.showFirms ? 'checked' : ''} /> <span>${t('firms')}</span></label>` : ''}
         </div>
         <div class="timeline" id="timeline">
-          <button id="play" class="btn icon" aria-label="Reproducir">▶</button>
+          <button id="play" class="btn icon" aria-label="Reproducir">${ICON.play}</button>
           <input type="range" id="frame" min="0" max="${v.frames.length - 1}" step="1" />
           <span id="frame-date" class="mono"></span>
         </div>
@@ -90,23 +90,25 @@ export class Panel {
         ${m.metrics.map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${x.unit}</small></b><span>${metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
       </section>
 
-      <section class="card">
+      ${m.landcover ? landcoverCard(m) : ''}
+
+      <section class="sec">
         <div class="label">${t('chart')}</div>
         <div class="chart-box"><canvas id="chart"></canvas></div>
       </section>
 
-      ${m.daily ? `<section class="card">
+      ${m.daily ? `<section class="sec">
         <div class="label">${m.daily.kind === 'rain' ? t('rainChart')(m.daily.place ?? '') : t('firmsChart')}</div>
         <div class="chart-box"><canvas id="chart2"></canvas></div>
         <p class="hint">${m.daily.kind === 'rain' ? t('rainNote') : t('firmsNote')(m.firms?.in_mask_pct ?? 0)}</p>
       </section>` : ''}
 
-      <section>
+      <section class="sec">
         <div class="label">${t('why')}</div>
         ${c.why.map((w) => `<details class="why"><summary>${w.title}</summary><p>${w.text}</p></details>`).join('')}
       </section>
 
-      <section>
+      <section class="sec">
         <div class="label">${t('who')}</div>
         <div class="who">${c.who.map((w) => `<div><b>${w.title}</b><span>${w.text}</span></div>`).join('')}</div>
       </section>
@@ -174,7 +176,7 @@ export class Panel {
     const v = this.view
     if (v.mode !== 'timeline') v.setMode('timeline')
     this.sync()
-    this.el.querySelector('#play')!.textContent = '❚❚'
+    this.el.querySelector('#play')!.innerHTML = ICON.pause
     this.timer = window.setInterval(() => v.setFrame(v.frameIdx + 1), 900)
   }
 
@@ -182,7 +184,7 @@ export class Panel {
     clearInterval(this.timer)
     this.timer = 0
     const b = this.el.querySelector('#play')
-    if (b) b.textContent = '▶'
+    if (b) b.innerHTML = ICON.play
   }
 
   private sync() {
@@ -207,7 +209,7 @@ export class Panel {
     const ctx = this.el.querySelector<HTMLCanvasElement>('#chart2')
     if (!d || !ctx) return
     const rain = d.kind === 'rain'
-    const color = rain ? '#38bdf8' : '#f97316'
+    const color = rain ? '#5cb8f2' : '#ff8a3d'
     const marks = rain ? [m.pair.before, m.pair.after] : []
     const unit = rain ? 'mm' : t('hotspots')
     this.chart2 = new Chart(ctx, {
@@ -222,8 +224,8 @@ export class Panel {
         animation: false,
         plugins: { tooltip: { callbacks: { label: (c) => `${fmtNum(c.parsed.y ?? 0)} ${unit}` } } },
         scales: {
-          x: { ticks: { color: '#7c8aa5', font: { size: 10 }, maxRotation: 0, autoSkipPadding: 10 }, grid: { display: false } },
-          y: { beginAtZero: true, ticks: { color: '#7c8aa5', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.06)' } },
+          x: { ticks: { color: '#8b93a7', font: { size: 10, family: 'Geist Mono' }, maxRotation: 0, autoSkipPadding: 10 }, grid: { display: false } },
+          y: { beginAtZero: true, ticks: { color: '#8b93a7', font: { size: 10, family: 'Geist Mono' } }, grid: { color: 'rgba(255,255,255,0.06)' } },
         },
       },
       plugins: [
@@ -243,7 +245,7 @@ export class Panel {
               g.lineTo(x, ch.chartArea.bottom)
               g.stroke()
               g.fillStyle = '#e2e8f0'
-              g.font = '10px JetBrains Mono'
+              g.font = '500 10px "Geist Mono"'
               g.textAlign = j < d.dates.length / 2 ? 'left' : 'right'
               g.fillText('NISAR', x + (j < d.dates.length / 2 ? 4 : -4), ch.chartArea.top + 10)
               g.restore()
@@ -263,8 +265,8 @@ export class Panel {
       data: {
         labels: m.series.dates.map((d) => new Date(d).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })),
         datasets: [
-          { label: 'HH', data: m.series.hh, borderColor: m.kind === 'flood' ? accent : '#94a3b8', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2.5, borderWidth: 2 },
-          { label: 'HV', data: m.series.hv, borderColor: m.kind === 'fire' ? accent : '#94a3b8', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2.5, borderWidth: 2, borderDash: m.kind === 'flood' ? [4, 4] : [] },
+          { label: 'HH', data: m.series.hh, borderColor: m.kind === 'flood' ? accent : '#94a3b8', backgroundColor: 'transparent', tension: 0.3, pointRadius: 0, pointHoverRadius: 4, borderWidth: 2 },
+          { label: 'HV', data: m.series.hv, borderColor: m.kind === 'fire' ? accent : '#94a3b8', backgroundColor: 'transparent', tension: 0.3, pointRadius: 0, pointHoverRadius: 4, borderWidth: 2, borderDash: m.kind === 'flood' ? [4, 4] : [] },
         ],
       },
       options: {
@@ -274,8 +276,8 @@ export class Panel {
         interaction: { mode: 'index', intersect: false },
         plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${(c.parsed.y ?? 0).toFixed(1)} dB` } } },
         scales: {
-          x: { ticks: { color: '#7c8aa5', font: { size: 10 }, maxRotation: 0, autoSkipPadding: 12 }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { ticks: { color: '#7c8aa5', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.06)' } },
+          x: { ticks: { color: '#8b93a7', font: { size: 10, family: 'Geist Mono' }, maxRotation: 0, autoSkipPadding: 12 }, grid: { color: 'rgba(255,255,255,0.04)' } },
+          y: { ticks: { color: '#8b93a7', font: { size: 10, family: 'Geist Mono' } }, grid: { color: 'rgba(255,255,255,0.06)' } },
         },
       },
       plugins: [
@@ -299,7 +301,7 @@ export class Panel {
               g.lineTo(x, ch.chartArea.bottom)
               g.stroke()
               g.fillStyle = accent
-              g.font = '10px JetBrains Mono'
+              g.font = '500 10px "Geist Mono"'
               g.fillText(n.label.toUpperCase(), x + 4, ch.chartArea.top + 10)
               g.restore()
             }
@@ -308,6 +310,35 @@ export class Panel {
       ],
     })
   }
+}
+
+const LC_COLORS: Record<string, string> = {
+  tree: '#2f7d4a', shrub: '#8fae3c', grass: '#d8c35a', crop: '#e39b4a', built: '#c4484a',
+  bare: '#9a8f84', water: '#3a8fd6', wetland: '#5cc7c0', other: '#55617a',
+}
+
+/** Barra apilada de cobertura del suelo + nota de población */
+function landcoverCard(m: Manifest) {
+  const lc = m.landcover!
+  const fire = m.kind === 'fire'
+  const names = t('lc')
+  const rows = lc.inside.filter((r) => r.pct >= 0.5)
+  const fmt = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: 0 })
+  const crop = lc.outside_ref?.find((r) => r.cls === 'crop')
+  const ex = m.exposure
+  const pop = ex ? (fire ? t('lcPop')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : t('lcPopFlood')(fmt(ex.pop_inside))) : ''
+  return `<section class="sec">
+    <div class="label">${t('lcTitle')(fire)}</div>
+    <div class="lc-bar" role="img" aria-label="${rows.map((r) => `${names[r.cls] ?? r.cls} ${r.pct}%`).join(', ')}">
+      ${rows.map((r) => `<i style="flex:${r.pct};background:${LC_COLORS[r.cls] ?? LC_COLORS.other}" title="${names[r.cls] ?? r.cls}: ${fmt(r.ha)} ha"></i>`).join('')}
+    </div>
+    <div class="lc-legend">
+      ${rows.map((r) => `<span><i style="background:${LC_COLORS[r.cls] ?? LC_COLORS.other}"></i>${names[r.cls] ?? r.cls}<b>${fmt(r.ha)} ha · ${r.pct.toLocaleString(locale(), { maximumFractionDigits: 0 })} %</b></span>`).join('')}
+    </div>
+    ${crop && crop.pct >= 30 ? `<p class="hint">${t('lcOutside')(Math.round(crop.pct), fmt(crop.ha))}</p>` : ''}
+    ${pop ? `<p class="hint">${pop}</p>` : ''}
+    <p class="hint src-inline">${t('srcLc')}</p>
+  </section>`
 }
 
 function passesSvg(p: NonNullable<(typeof CONTENT)[string]['passes']>) {

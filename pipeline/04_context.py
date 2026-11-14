@@ -121,6 +121,25 @@ def main():
             man.setdefault("stats", {}).update({"effis_recall": round(recall), "effis_precision": round(precision)})
             man["metrics"] = [x for x in man["metrics"] if x["id"] != "effis"] + [
                 {"id": "effis", "label": "De lo detectado, dentro del perímetro EFFIS", "value": round(precision), "unit": "%"}]
+    if case["kind"] == "flood" and case.get("ems"):
+        # Copernicus EMS Rapid Mapping (óptico, el día después del pico): ¿cuánto de esa agua seguía al pasar NISAR?
+        import pandas as pd
+        ems = pd.concat([gpd.read_file(f) for f in sorted((RAW / "ems").glob("aoi0*/*observedEventA*.json"))]).to_crs(4326)
+        ems = ems[ems["notation"] == "Flooded area"][["notation", "geometry"]]
+        ems.to_file(out / "ems.geojson", driver="GeoJSON")
+        overlays["ems"] = "ems.geojson"
+        with rasterio.open(WORK / cid / "mask.tif") as ds:
+            m = ds.read(1).astype(bool)
+            e = rasterize([(g, 1) for g in ems.geometry], out_shape=m.shape, transform=ds.transform).astype(bool)
+            lat = (case["bbox"][1] + case["bbox"][3]) / 2
+            pxha = (abs(ds.transform.a) * 111320 * np.cos(np.radians(lat))) * (abs(ds.transform.e) * 110570) / 1e4
+        seen = 100 * (m & e).sum() / max(e.sum(), 1)
+        print(f"[ems] {case['ems']['code']}: {e.sum() * pxha:.0f} ha inundadas el {case['ems']['date']}; NISAR ve {seen:.1f} %")
+        man.setdefault("stats", {}).update({"ems_code": case["ems"]["code"], "ems_date": case["ems"]["date"],
+                                            "ems_ha": round(float(e.sum() * pxha)), "ems_seen_pct": round(float(seen), 1),
+                                            "nisar_in_ems_pct": round(float(100 * (m & e).sum() / max(m.sum(), 1)), 1)})
+        man["metrics"] = [x for x in man["metrics"] if x["id"] != "ems_seen"] + [
+            {"id": "ems_seen", "label": "De la inundación vista por Copernicus EMS, aún visible para NISAR", "value": round(float(seen)), "unit": "%"}]
     lab = "en zona inundada" if case["kind"] == "flood" else "en zona quemada confirmada"
     new = [
         {"id": "rail", "label": f"Vía férrea {lab}", "value": rail_km, "unit": "km"},

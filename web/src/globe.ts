@@ -17,9 +17,9 @@ export class GlobeView {
     this.globe = new Globe(el, { animateIn: false })
       .globeImageUrl('/earth-blue-marble.jpg')
       .bumpImageUrl('/earth-topology.png')
-      .backgroundImageUrl('/night-sky.png')
-      .atmosphereColor('#4cc9f0')
-      .atmosphereAltitude(0.18)
+      .backgroundColor('rgba(0,0,0,0)') // el cielo lo pinta CSS (#globe::before), más oscuro
+      .atmosphereColor('#2f5d8c')
+      .atmosphereAltitude(0.14)
       // anillos pulsantes
       .ringsData(pts)
       .ringLat('lat')
@@ -73,7 +73,7 @@ export class GlobeView {
       .pointLng('lng')
       .pointAltitude((f: object) => 0.01 + Math.log10(1 + (f as WatchFire).frp) * 0.02)
       .pointRadius(0.22)
-      .pointColor(() => '#f97316')
+      .pointColor(() => '#ff8a3d')
       .pointsMerge(false)
       .polygonsData(swath)
       .polygonCapColor(() => 'rgba(76,201,240,0.16)')

@@ -103,10 +103,11 @@ export class DetailView {
       this.map.addSource('mask', { type: 'image', url: `${this.base}/${m.layers.mask}`, coordinates: m.coordinates })
       this.map.addLayer({ id: 'mask', type: 'raster', source: 'mask', layout: { visibility: this.showMask ? 'visible' : 'none' }, paint: { 'raster-opacity': 0.85 } })
     }
-    if (m.overlays.effis) {
-      // perímetro oficial EFFIS (validación): línea discontinua amarilla
-      this.map.addSource('effis', { type: 'geojson', data: `${this.base}/${m.overlays.effis}` })
-      this.map.addLayer({ id: 'effis', type: 'line', source: 'effis', layout: { visibility: this.showRef ? 'visible' : 'none' }, paint: { 'line-color': '#facc15', 'line-width': 1.6, 'line-dasharray': [3, 2] } })
+    const ref = m.overlays.effis ?? m.overlays.ems
+    if (ref) {
+      // referencia oficial (validación): perímetro EFFIS o inundación de Copernicus EMS, línea discontinua amarilla
+      this.map.addSource('effis', { type: 'geojson', data: `${this.base}/${ref}` })
+      this.map.addLayer({ id: 'effis', type: 'line', source: 'effis', layout: { visibility: this.showRef ? 'visible' : 'none' }, paint: { 'line-color': '#facc15', 'line-width': m.overlays.ems ? 1.2 : 1.6, 'line-dasharray': [3, 2] } })
     }
     if (m.overlays.roads) {
       this.map.addSource('roads', { type: 'geojson', data: `${this.base}/${m.overlays.roads}` })

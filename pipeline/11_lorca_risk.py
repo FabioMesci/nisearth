@@ -91,7 +91,7 @@ for r, c in zip(*np.nonzero(keep)):
     features.append({'type': 'Feature', 'geometry': {'type': 'Polygon', 'coordinates': [[[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]]]}, 'properties': props})
 (out / 'risk.geojson').write_text(json.dumps({'type':'FeatureCollection', 'features':features}, separators=(',', ':')), encoding='utf-8')
 with (out / 'risk.csv').open('w', newline='', encoding='utf-8') as f:
-    writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+    writer = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator='\n')
     writer.writeheader()
     writer.writerows(sorted(rows, key=lambda x: -x['risk']))
 classes = [{'cls': name, 'cells': int((keep & (cls == i)).sum()),

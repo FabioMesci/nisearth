@@ -187,6 +187,7 @@ CASES = {
         "event": "2026-08-26",
         "pair": ("2026-08-19", "2026-08-31"),  # pasada 98 asc, 100 %: 7 días antes y 5 después
         "track": 98,
+        "debris": {"buffer_m": 300, "min_db": 3.0},
         "official": None,  # NASA no ha publicado imagen NISAR de este evento: solo nuestro procesado
     },
 }

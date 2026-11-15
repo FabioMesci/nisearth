@@ -357,6 +357,40 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Protección civil', text: 'Un terreno que baja cambia por dónde corre el agua en las inundaciones.' },
     ],
   },
+  nepal: {
+    short: 'Rasuwa',
+    region: 'Nepal',
+    order: 11,
+    place: 'Bhote Koshi – Trishuli · Rasuwa (Nepal)',
+    dateLabel: '26 ago 2026',
+    headline: 'Rasuwa: la riada que bajó del Tíbet',
+    summary:
+      'El 26 de agosto una crecida súbita bajó por el Bhote Koshi desde el Tíbet, quizá por un alud de hielo que represó temporalmente el río Lhende (OMS, datos preliminares). Arrasó viviendas, mercados, puentes, carreteras e instalaciones hidroeléctricas en el corredor Bhote Koshi–Trishuli; el Gobierno declaró 15 municipios en crisis. NISAR pasó 7 días antes y 5 días después: el agua ya se había ido, pero en 385 ha del fondo del valle la señal radar cambia más de 3 dB, sobre todo en el Trishuli aguas abajo.',
+    notes: [{ date: '2026-08-26', label: 'Riada' }],
+    why: [
+      {
+        title: 'El agua se va, la cicatriz se queda',
+        text: 'Como en la DANA, una riada relámpago en un valle encajado drena en horas. Lo que el radar sí ve es el cauce cambiado: sedimento y bloques nuevos, márgenes comidas, vegetación de ribera arrancada. Eso altera HH y HV aunque no quede agua.',
+      },
+      {
+        title: 'Solo en el fondo del valle',
+        text: 'En el Himalaya las laderas son tan empinadas que el radar ve zonas en sombra o plegadas sobre sí mismas (layover), con cambios que no son reales. Por eso buscamos cambios solo a menos de 300 m de los ríos de OpenStreetMap (303 km de cauce).',
+      },
+      {
+        title: 'Sin comparación oficial',
+        text: 'Es el único caso mundial sin imagen NISAR publicada por NASA: el resultado es solo nuestro. Lo marcado es «cambio fuerte», no daño confirmado; habría que validarlo con imágenes ópticas o datos sobre el terreno.',
+      },
+      {
+        title: 'Un aviso que podría llegar antes',
+        text: 'La crecida vino de otro país, aguas arriba. Vigilar con radar los lagos y represamientos glaciares de la cabecera, cada 12 días y a través de las nubes del monzón, daría tiempo para avisar.',
+      },
+    ],
+    who: [
+      { title: 'Gestión de desastres (NDRRMA)', text: 'Qué tramos del valle cambiaron más, aunque el monzón tape a los satélites ópticos.' },
+      { title: 'Hidroeléctricas y carreteras', text: 'Priorizar inspecciones de presas, puentes y de la carretera a la frontera de Rasuwagadhi.' },
+      { title: 'Cooperación transfronteriza', text: 'La amenaza nace en el Tíbet: compartir vigilancia radar de la cabecera entre China y Nepal.' },
+    ],
+  },
 }
 
 const STORY_ES = [
@@ -590,6 +624,26 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Water management (CONAGUA)', text: 'See every 12 days where pumping sinks the ground most, to rebalance the wells.' },
       { title: 'Metro and infrastructure', text: 'Uneven subsidence breaks pipes, warps tracks and damages Metro Line 12 and historic buildings.' },
       { title: 'Civil protection', text: 'Sinking ground changes where water runs during floods.' },
+    ],
+  },
+  nepal: {
+    ...CONTENT_ES.nepal,
+    place: 'Bhote Koshi – Trishuli · Rasuwa (Nepal)',
+    dateLabel: '26 Aug 2026',
+    headline: 'Rasuwa: the flood that came down from Tibet',
+    summary:
+      'On 26 August a sudden surge came down the Bhote Koshi from Tibet, possibly after an ice avalanche temporarily dammed the Lhende River (WHO, preliminary). It destroyed homes, markets, bridges, roads and hydropower facilities along the Bhote Koshi–Trishuli corridor; the government declared 15 municipalities crisis-affected. NISAR passed 7 days before and 5 days after: the water was gone, but over 385 ha of valley floor the radar signal changes by more than 3 dB, mostly on the Trishuli downstream.',
+    notes: [{ date: '2026-08-26', label: 'Flood' }],
+    why: [
+      { title: 'The water leaves, the scar stays', text: 'As in the Valencia storm, a flash flood in a deep valley drains within hours. What radar does see is the changed channel: new sediment and boulders, eroded banks, stripped riverside vegetation. That alters HH and HV even with no water left.' },
+      { title: 'Only on the valley floor', text: 'Himalayan slopes are so steep that radar sees areas in shadow or folded onto themselves (layover), with changes that are not real. So we only look for change within 300 m of OpenStreetMap rivers (303 km of channel).' },
+      { title: 'No official comparison', text: 'This is the only world case without a NISAR image published by NASA: the result is ours alone. What is flagged is “strong change”, not confirmed damage; it should be checked against optical imagery or field data.' },
+      { title: 'A warning that could come earlier', text: 'The surge came from another country, upstream. Watching glacial lakes and dams in the headwaters with radar every 12 days, through monsoon clouds, would buy time to warn.' },
+    ],
+    who: [
+      { title: 'Disaster management (NDRRMA)', text: 'Which stretches of the valley changed most, even when the monsoon blinds optical satellites.' },
+      { title: 'Hydropower and roads', text: 'Prioritise inspections of dams, bridges and the road to the Rasuwagadhi border crossing.' },
+      { title: 'Cross-border cooperation', text: 'The hazard starts in Tibet: share radar monitoring of the headwaters between China and Nepal.' },
     ],
   },
 }

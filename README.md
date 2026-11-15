@@ -13,7 +13,7 @@ the app is produced by our own pipeline from NISAR and Sentinel-1 data and check
 The point is not only to show what the satellite can do. It is also to show where the gaps are, so that emergency
 managers know when they can rely on it.
 
-## The six cases
+## The six cases in Spain
 
 | Case | Technique | What radar shows |
 |---|---|---|
@@ -23,6 +23,18 @@ managers know when they can rely on it.
 | 〰️ **Granada earthquake series (M5.2, 14 Aug)** | InSAR, 3 tracks | No deformation above ~1 cm. The two descending tracks disagree (+1.3 vs −0.2 cm): that is the atmosphere, not the earthquake. A useful upper bound. |
 | ⛰️ **High-speed rail slope at Álora (4 Feb)** | InSAR + Sentinel-1 | NISAR had no data until June; Sentinel-1 passed the day before and 5 days after. Since June the repaired line moves **<1 mm** relative to its surroundings. |
 | 💧 **Storm "Adam", La Safor (Valencia), Oct 2026** | Backscatter change + Copernicus EMS | What radar **did not** see: no radar passed during the storm (4.5 days without data). Three days after the optical map from Copernicus EMS, NISAR still saw only **5 %** of the 885 ha flooded. A case for coordinating radar constellations in emergencies. |
+
+## NISAR around the world
+
+The same pipeline, applied to five events abroad. For four of them NASA/JPL published its own NISAR image; the app shows it next to ours, with credit, so judges can compare (ours is processed independently from the same public ASF data).
+
+| Case | Technique | What radar shows | NASA/JPL says |
+|---|---|---|---|
+| 〰️ **Venezuela earthquakes (M7.2 + M7.5, 24 Jun 2026)** | InSAR, 3 tracks (2 asc, 1 desc) | Up to **−59 cm** along the line of sight on the La Guaira coast. No ramp or height fit (deformation fills the scene); zero set inland. | ~60 cm westward next to the airport |
+| 🌋 **Krasheninnikov volcano (Kamchatka)** | Backscatter change, 11 dates | New bright lobes at the NE front of the flow (13 Jul → 23 Sep); HH over them rises from −14 dB (Jun) to −4.5 dB (18 Aug), then levels off. Part of the flagged area is melting snow patches. | 17-frame time-lapse, Dec 2025 – Aug 2026 |
+| 💧 **Limpopo floods (Mozambique, Jan 2026)** | Backscatter change, 4 dates | **325 km²** of new water between 5 and 17 Jan (threshold −14 dB at the histogram valley); 5.4 km of railway and 19 km of roads under water (OSM). | Before/after, >600,000 displaced |
+| ⬇️ **Mexico City subsidence** | InSAR, 10 chained pairs (Oct–Feb) | ~37,500 ha of the old lakebed sink; **−22 cm in 120 days** at Chalco. Ramp and height fitted on the hills only (> 2,280 m). | > 2 cm/month |
+| 🌊 **Rasuwa flash flood (Nepal, 26 Aug 2026)** | Backscatter change, 6 dates | Water gone by the next pass; **385 ha** of valley floor (within 300 m of OSM rivers) change by > 3 dB. Not validated. | — (no NASA image) |
 
 ## What the app does
 
@@ -127,6 +139,12 @@ for c in niebla dana; do
   && ../.venv/bin/python 07_risk.py $c
 done
 for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c; done
+# NISAR around the world / NISAR en el mundo
+for c in venezuela cdmx; do ../.venv/bin/python 08_insar.py all $c; done
+../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
+../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
+../.venv/bin/python 02_extract.py nepal --track 98 && ../.venv/bin/python 03_process.py nepal
+../.venv/bin/python 09_world.py                     # NASA/JPL image + "world" region (after processing)
 ../.venv/bin/python 05_external.py watch            # "Spain watch" panel: rerun right before a demo
 ```
 (Álora also uses Sentinel-1: run `s1_hyp3.py submit` and `s1_hyp3.py fetch` before `08_insar.py context alora`.)

@@ -102,5 +102,16 @@
   ],
   "event": "2025-10-25",
   "region": "world"
+ },
+ {
+  "id": "nepal",
+  "title": "Riada del Bhote Koshi–Trishuli (Rasuwa, Nepal)",
+  "kind": "flood",
+  "center": [
+   85.30000000000001,
+   28.1
+  ],
+  "event": "2026-08-26",
+  "region": "world"
  }
 ]

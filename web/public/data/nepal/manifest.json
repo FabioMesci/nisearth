@@ -1,0 +1,128 @@
+{
+ "id": "nepal",
+ "title": "Riada del Bhote Koshi–Trishuli (Rasuwa, Nepal)",
+ "kind": "flood",
+ "event": "2026-08-26",
+ "mock": false,
+ "bbox": [
+  85.15,
+  27.85,
+  85.45,
+  28.35
+ ],
+ "center": [
+  85.30000000000001,
+  28.1
+ ],
+ "coordinates": [
+  [
+   85.15,
+   28.35
+  ],
+  [
+   85.45,
+   28.35
+  ],
+  [
+   85.45,
+   27.85
+  ],
+  [
+   85.15,
+   27.85
+  ]
+ ],
+ "pair": {
+  "before": "2026-08-19",
+  "after": "2026-08-31"
+ },
+ "frames": [
+  {
+   "date": "2026-07-26",
+   "track": 98,
+   "hh": "hh_20260726.webp",
+   "hv": "hv_20260726.webp",
+   "rgb": "rgb_20260726.webp"
+  },
+  {
+   "date": "2026-08-19",
+   "track": 98,
+   "hh": "hh_20260819.webp",
+   "hv": "hv_20260819.webp",
+   "rgb": "rgb_20260819.webp"
+  },
+  {
+   "date": "2026-08-31",
+   "track": 98,
+   "hh": "hh_20260831.webp",
+   "hv": "hv_20260831.webp",
+   "rgb": "rgb_20260831.webp"
+  },
+  {
+   "date": "2026-09-12",
+   "track": 98,
+   "hh": "hh_20260912.webp",
+   "hv": "hv_20260912.webp",
+   "rgb": "rgb_20260912.webp"
+  },
+  {
+   "date": "2026-09-24",
+   "track": 98,
+   "hh": "hh_20260924.webp",
+   "hv": "hv_20260924.webp",
+   "rgb": "rgb_20260924.webp"
+  },
+  {
+   "date": "2026-10-06",
+   "track": 98,
+   "hh": "hh_20261006.webp",
+   "hv": "hv_20261006.webp",
+   "rgb": "rgb_20261006.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2026-07-26",
+   "2026-08-19",
+   "2026-08-31",
+   "2026-09-12",
+   "2026-09-24",
+   "2026-10-06"
+  ],
+  "hh": [
+   7.88,
+   8.55,
+   7.23,
+   7.29,
+   7.29,
+   6.65
+  ],
+  "hv": [
+   -0.26,
+   0.47,
+   -1.19,
+   -0.93,
+   -1.14,
+   -1.42
+  ]
+ },
+ "metrics": [
+  {
+   "id": "area_debris",
+   "label": "Cauce con cambio fuerte de señal (radar)",
+   "value": 385,
+   "unit": "ha"
+  }
+ ],
+ "overlays": {},
+ "stats": {
+  "rule": "|dHH| o |dHV| > 3.0 dB (media 3x3) a menos de 300 m de los ríos (OSM)",
+  "river_km": 303.1
+ },
+ "change": "debris",
+ "region": "world"
+}

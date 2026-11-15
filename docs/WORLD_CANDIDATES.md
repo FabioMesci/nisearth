@@ -22,3 +22,9 @@ Cada caso cubre un tipo de riesgo distinto (terremoto, subsidencia, volcán e in
 - https://www.jpl.nasa.gov/images/pia26709-us-indian-spacecraft-captures-mexico-city-subsidence/
 - https://www.jpl.nasa.gov/news/us-india-satellite-captures-time-lapse-video-of-volcanic-eruption/
 - https://svs.gsfc.nasa.gov/5661
+
+## Estado (15 nov 2026)
+Los cuatro candidatos están procesados con el pipeline (ver README, «NISAR en el mundo»), y además se ha añadido un quinto caso:
+- **Riada de Rasuwa (Nepal, 26 ago 2026)**: crecida súbita del Bhote Koshi desde el Tíbet (OMS: posible alud de hielo y represamiento del río Lhende). GCOV pasada 98 asc, 19 ago → 31 ago. NASA no ha publicado imagen NISAR, así que solo está nuestro procesado, sin validar. Fuente: https://www.who.int/nepal/emergencies/2026-rasuwa-flash-floods
+- Ciudad de México se limita al 25 oct – 22 feb: desde finales de febrero la coherencia en Chalco cae por debajo de 0,3.
+- Krasheninnikov: los datos públicos en ASF empiezan el 19 jun 2026 (NASA usa imágenes desde el 25 dic 2025).

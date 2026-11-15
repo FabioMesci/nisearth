@@ -67,6 +67,8 @@ export interface Manifest {
   nisar_delta_in_mask?: { hh: number; hv: number }
   region?: 'es' | 'world'
   official?: Official
+  /** Regla de cambio especial del pipeline (03_process.py): lava nueva o cauce arrasado */
+  change?: 'lava' | 'debris' | null
   stats?: Record<string, unknown>
   /** Cobertura del suelo bajo la máscara (ESA WorldCover) */
   landcover?: { source: string; inside: LandRow[]; outside_ref?: LandRow[] }

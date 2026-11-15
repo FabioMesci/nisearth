@@ -63,7 +63,7 @@ export class Panel {
             <button data-v="hv" title="${t('titleHV')}">HV</button>
             ${m.frames[0]?.rgb ? `<button data-v="rgb" title="${t('titleRGB')}">RGB</button>` : ''}
           </div>
-          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.kind === 'flood' ? t('maskWater') : m.kind === 'volcano' ? t('maskLava') : t('maskBurn')}</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.change === 'debris' ? t('maskDebris') : m.kind === 'flood' ? t('maskWater') : m.kind === 'volcano' ? t('maskLava') : t('maskBurn')}</span></label>
         </div>
         <div class="row toggles">
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${m.insar ? t('railOsm') : t('infra')}</span></label>` : ''}

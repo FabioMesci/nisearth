@@ -13,7 +13,7 @@ independientes (EFFIS, Copernicus EMS, NASA FIRMS, tasas de subsidencia publicad
 decimos y explicamos por qué. No queremos solo enseñar lo que puede hacer el satélite: también dónde están sus
 huecos, para que quien gestiona una emergencia sepa cuándo puede contar con él.
 
-## Los seis casos
+## Los seis casos en España
 
 | Caso | Técnica | Qué muestra el radar |
 |---|---|---|
@@ -23,6 +23,18 @@ huecos, para que quien gestiona una emergencia sepa cuándo puede contar con él
 | 〰️ **Serie sísmica de Granada (M5,2, 14 ago)** | InSAR, 3 pasadas | Ninguna deformación por encima de ~1 cm. Las dos pasadas descendentes discrepan (+1,3 frente a −0,2 cm): es la atmósfera, no el terremoto. Un límite superior útil. |
 | ⛰️ **Talud del AVE en Álora (4 feb)** | InSAR + Sentinel-1 | NISAR no tenía datos hasta junio; Sentinel-1 pasó la víspera y 5 días después. Desde junio la vía reparada se mueve **<1 mm** frente a su entorno. |
 | 💧 **DANA Adam, La Safor (Valencia), octubre 2026** | Cambio de retrodispersión + Copernicus EMS | Lo que el radar **no** vio: ningún radar pasó durante la tormenta (4,5 días sin datos). Tres días después del mapa óptico de Copernicus EMS, NISAR solo veía el **5 %** de las 885 ha inundadas. Argumento para coordinar constelaciones radar en emergencias. |
+
+## NISAR en el mundo
+
+El mismo pipeline aplicado a cinco eventos fuera de España. Para cuatro de ellos NASA/JPL publicó su propia imagen NISAR; la web la muestra junto a la nuestra, con su crédito, para poder comparar (la nuestra se procesa de forma independiente con los mismos datos públicos de ASF).
+
+| Caso | Técnica | Qué muestra el radar | Qué dice NASA/JPL |
+|---|---|---|---|
+| 〰️ **Terremotos de Venezuela (M7,2 + M7,5, 24 jun 2026)** | InSAR, 3 pasadas (2 asc, 1 desc) | Hasta **−59 cm** en la línea de visión en la costa de La Guaira. Sin rampa ni ajuste de relieve (la deformación ocupa la escena); cero en el interior. | ~60 cm hacia el oeste junto al aeropuerto |
+| 🌋 **Volcán Krasheninnikov (Kamchatka)** | Cambio de retrodispersión, 11 fechas | Lóbulos nuevos y brillantes en el frente NE de la colada (13 jul → 23 sep); HH sobre ellos sube de −14 dB (jun) a −4,5 dB (18 ago) y se estabiliza. Parte de lo marcado son neveros que se funden. | Timelapse de 17 imágenes, dic 2025 – ago 2026 |
+| 💧 **Inundaciones del Limpopo (Mozambique, ene 2026)** | Cambio de retrodispersión, 4 fechas | **325 km²** de agua nueva entre el 5 y el 17 ene (umbral −14 dB en el valle del histograma); 5,4 km de vía férrea y 19 km de carreteras bajo el agua (OSM). | Antes/después, >600.000 desplazados |
+| ⬇️ **Subsidencia de Ciudad de México** | InSAR, 10 pares encadenados (oct–feb) | Unas 37.500 ha del antiguo lago se hunden; **−22 cm en 120 días** en Chalco. Rampa y relieve ajustados solo en los cerros (> 2.280 m). | > 2 cm/mes |
+| 🌊 **Riada de Rasuwa (Nepal, 26 ago 2026)** | Cambio de retrodispersión, 6 fechas | El agua ya no está en la siguiente pasada; **385 ha** del fondo del valle (a <300 m de los ríos de OSM) cambian más de 3 dB. Sin validar. | — (sin imagen de NASA) |
 
 ## Qué hace la web
 
@@ -129,6 +141,12 @@ for c in niebla dana; do
   && ../.venv/bin/python 07_risk.py $c
 done
 for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c; done
+# NISAR around the world / NISAR en el mundo
+for c in venezuela cdmx; do ../.venv/bin/python 08_insar.py all $c; done
+../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
+../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
+../.venv/bin/python 02_extract.py nepal --track 98 && ../.venv/bin/python 03_process.py nepal
+../.venv/bin/python 09_world.py                     # NASA/JPL image + "world" region (after processing)
 ../.venv/bin/python 05_external.py watch            # panel «Vigilancia España»: repetir justo antes de la demo
 ```
 (Álora usa además Sentinel-1: `s1_hyp3.py submit` y `s1_hyp3.py fetch` antes de `08_insar.py context alora`.)

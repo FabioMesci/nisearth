@@ -79,6 +79,13 @@ HAZARD = {
         "w_edge": 0.25,
         "intensity_floor": 1.0,
     },
+    "landslide": {
+        "w_ref_only": 1.0,
+        "w_radar_only": 1.0,
+        "edge_m": 500,         # valley-floor runout / terrace hazard buffer
+        "w_edge": 0.30,
+        "intensity_floor": 1.0,
+    },
 }
 RATE_REF_CM_YR = 20      # subsidence rate -> hazard 1
 GRAD_SMOOTH_KM = 0.5     # gradient of the rate smoothed over ~500 m (outside the bowl: p90 ~ 4 cm/yr/km, CDMX and Lorca)
@@ -104,11 +111,12 @@ SUSCEPTIBILITY = {
     "flood": {"tree": 0.3, "shrub": 0.3, "grass": 0.3, "crop": 0.7, "built": 0.9, "bare": 0.2, "water": 0.0, "wetland": 0.1},
     "debris": {"tree": 0.6, "shrub": 0.6, "grass": 0.7, "crop": 0.9, "built": 1.0, "bare": 0.3, "water": 0.0, "wetland": 0.5},
     "subsidence": {"tree": 0.1, "shrub": 0.1, "grass": 0.1, "crop": 0.3, "built": 1.0, "bare": 0.1, "water": 0.0, "wetland": 0.2},
+    "landslide": {"tree": 0.6, "shrub": 0.7, "grass": 0.6, "crop": 0.8, "built": 0.95, "bare": 0.4, "water": 0.1, "wetland": 0.3},
 }
-LAND_ASSET = {"fire": ("tree", "shrub"), "flood": ("crop",), "debris": ("crop",), "subsidence": ()}  # () = no land term
+LAND_ASSET = {"fire": ("tree", "shrub"), "flood": ("crop",), "debris": ("crop",), "landslide": ("crop", "tree", "shrub"), "subsidence": ()}  # () = no land term
 
 WC_URL = "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_{tile}_Map.tif"
-WC_CLASSES = {10: "tree", 20: "shrub", 30: "grass", 40: "crop", 50: "built", 60: "bare", 80: "water", 90: "wetland"}
+WC_CLASSES = {10: "tree", 20: "shrub", 30: "grass", 40: "crop", 50: "built", 60: "bare", 70: "bare", 80: "water", 90: "wetland", 100: "grass"}
 # WorldPop 2020 constrained 100 m: most countries are under BSGM, a few (Mozambique) only under maxar_v1 (UN-adjusted)
 POP_URL = {
     "BSGM": "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/{ISO}/{iso}_ppp_2020_constrained.tif",
@@ -336,7 +344,9 @@ def main():
 
     # ---- land cover and slope on the fine grid
     wc = worldcover(fshape, ftr, bbox, cache / "worldcover.npz")
-    lc = {name: avg(wc == code) for code, name in WC_CLASSES.items()}
+    lc = {name: np.zeros(cshape) for name in set(WC_CLASSES.values())}
+    for code, name in WC_CLASSES.items():
+        lc[name] += avg(wc == code)
     slope = slope_deg(fshape, ftr, bbox, cache / "slope.npz")
     slope_c = avg(slope)
     land = avg(wc > 0)  # share of the cell that is not sea / nodata
@@ -430,9 +440,10 @@ def main():
     share = np.where(share > 0, share, area_share)
     d_hosp, _ = nearest_km(LON, LAT, hospitals, lat0)
     d_fire, _ = nearest_km(LON, LAT, stations, lat0)
-    # non-Latin names (Devanagari in Nepal) fall back to the English name tag when OSM has one
+    # non-Latin names fall back to a known transliteration or the English name tag
+    TRANS = {"郭巴村": "Guoba", "स्याप्रु बेसी": "Syaphrubesi"}
     latin = lambda n: all(ord(ch) < 0x250 for ch in n)
-    label = lambda tg: tg["name"] if latin(tg["name"]) else tg.get("name:en") or tg["name"]
+    label = lambda tg: TRANS.get(tg["name"]) or (tg["name"] if latin(tg["name"]) else tg.get("name:en") or tg["name"])
     places = [(pt(e), label(e["tags"])) for e in tagged if e.get("tags", {}).get("place") and e["tags"].get("name")]
     _, place_idx = nearest_km(LON, LAT, [p for p, _ in places], lat0)
 

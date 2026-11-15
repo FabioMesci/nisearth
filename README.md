@@ -20,11 +20,13 @@ managers know when they can rely on it.
 | Case | Technique | What radar shows |
 |---|---|---|
 | 🔥 **Niebla wildfire (Huelva), Aug 2026** | Backscatter change (HH/HV) | Burn scar measured through the smoke: **~32,100 ha**, **89 %** inside the official EFFIS perimeter, **94 %** of NASA FIRMS hotspots fall inside it. Physical rule: fire drops HV (canopy volume) but not HH; harvest drops both. 28,300 ha of forest, shrub and grass burned; 720 people live within 1 km of the edge. |
-| ⬇️ **Alto Guadalentín subsidence (Lorca)** | InSAR, 8 chained NISAR GUNW pairs (Jun–Oct) | The valley floor sinks **6 cm in 108 days** (~**16 cm/yr**, linear fit; noise ±1.2 cm), in line with the published maxima of 10–16 cm/yr. A real detection. |
+| ⬇️ **Alto Guadalentín subsidence (Lorca)** | InSAR, 8 chained NISAR GUNW pairs (Jun–Oct) | Preliminary line-of-sight series compared with daily ERA5 precipitation; [method and limitations](docs/LORCA_RAIN.md). |
 | 🌋 **Tajogaite lava flow (La Palma)** | InSAR, 9 interferograms | The 2021 flow moves **~0.4 cm** relative to its surroundings, below the noise (±1.7 cm): it has almost stopped settling. The lava is very coherent (0.86). |
 | 〰️ **Granada earthquake series (M5.2, 14 Aug)** | InSAR, 3 tracks | No deformation above ~1 cm. The two descending tracks disagree (+1.3 vs −0.2 cm): that is the atmosphere, not the earthquake. A useful upper bound. |
 | ⛰️ **High-speed rail slope at Álora (4 Feb)** | InSAR + Sentinel-1 | NISAR had no data until June; Sentinel-1 passed the day before and 5 days after. Since June the repaired line moves **<1 mm** relative to its surroundings. |
 | 💧 **Storm "Adam", La Safor (Valencia), Oct 2026** | Backscatter change + Copernicus EMS | What radar **did not** see: no radar passed during the storm (4.5 days without data). Three days after the optical map from Copernicus EMS, NISAR still saw only **5 %** of the 885 ha flooded. A case for coordinating radar constellations in emergencies. |
+| ⛰️ **Rasuwa landslide & GLOF — Langtang (Nepal), 26 Aug 2026** | Backscatter change (NISAR L-band + Sentinel-1 C-band) | At the height of the Himalayan monsoon (5 weeks of 49–97 % cloud cover on Sentinel-2 and 323.5 mm of rain in 22 days), NISAR ascending track 98 maps **633 ha** of glacial avalanche tongue and scoured canyon (GLOF, EMSR927) with a **−3.4 dB** mean HV drop, **0.6 km** of highway hit and **2,884 people** exposed along the corridor (<1 km). |
+| 〰️ **Venezuela earthquake doublet (Yaracuy · La Guaira), 24 Jun 2026** | InSAR, 4 NISAR GUNW tracks (2 asc. + 2 desc.) + USGS | The **Mw 7.2** (San Felipe, 22:04:31 UTC) and **Mw 7.5** (Catia La Mar, 22:05:03 UTC, 10 km depth) doublet was captured just **12 hours later** by NISAR ascending track 162: line-of-sight displacements up to **−37.9 cm** (asc.) and **+32.7 cm** (desc.), sign reversal proving right-lateral strike-slip along the Morón and San Sebastián faults, and **102,325 ha** of coherent ground deformation. |
 
 ## NISAR around the world
 
@@ -74,10 +76,9 @@ radar will pass, and when it will not).
   ΔHH > −1.2 dB. Thresholds calibrated against the EFFIS perimeter of this fire (recall 65 %, precision 89 %,
   IoU 0.60). Without the HH condition precision drops to 57 %: harvested fields look like fire.
 - **Flood:** new water = HH(after) < Otsu threshold **and** ΔHH < −3 dB.
-- **InSAR:** GUNW interferograms of 12 days chained into a cumulative series (intermediate atmospheric delays cancel),
-  ramp and DEM-correlated atmosphere removed while excluding the deforming area, sign convention −phase·λ/4π
-  (positive = towards the satellite, verified on Lorca). The ionosphere correction shipped in the product *added*
-  noise in these small scenes (4.7 cm vs 2.4 cm at Lorca), so it is off by default.
+- **InSAR:** chained GUNW pairs with per-scene plane and elevation fits. Lorca's sign convention and spatial
+  reference require validation. Intervals span 12 and 24 days and the chain allows pixels with missing pairs;
+  see [Lorca method and limitations](docs/LORCA_RAIN.md).
 - **Infrastructure:** OpenStreetMap lines (`railway=rail`, main roads) inside the mask. For fires only the confirmed
   burned area (radar ∩ EFFIS) is counted.
 - **Exposure:** ESA WorldCover 2021 (10 m) under the mask and WorldPop 2020 population (100 m).
@@ -146,8 +147,10 @@ for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c;
 for c in venezuela cdmx langtang; do ../.venv/bin/python 08_insar.py all $c; done
 ../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
 ../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
-../.venv/bin/python 02_extract.py nepal --track 98 && ../.venv/bin/python 03_process.py nepal
-for c in mozambique nepal lorca cdmx; do ../.venv/bin/python 07_risk.py $c; done
+../.venv/bin/python 02_extract.py rasuwa --track 98 && ../.venv/bin/python 03_process.py rasuwa && ../.venv/bin/python 04_context.py rasuwa \
+  && ../.venv/bin/python 06_exposure.py rasuwa && ../.venv/bin/python 05_external.py rasuwa
+for c in mozambique rasuwa cdmx; do ../.venv/bin/python 07_risk.py $c; done
+../.venv/bin/python 11_lorca_risk.py
 ../.venv/bin/python 09_world.py                     # NASA/JPL image + "world" region (after processing)
 ../.venv/bin/python 05_external.py watch            # "Spain watch" panel: rerun right before a demo
 ```

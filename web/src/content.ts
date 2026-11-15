@@ -133,26 +133,81 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Agencias espaciales', text: 'Coordinar NISAR, Sentinel-1 y otras misiones para no dejar huecos durante el evento.' },
       { title: 'Adif · Renfe', text: 'Con revisita suficiente: tramos de vía bajo el agua para priorizar inspecciones.' },
     ],
-  },  lorca: {
+  },
+  rasuwa: {
+    short: 'Rasuwa · Langtang',
+    region: 'Nepal',
+    order: 11,
+    place: 'Langtang Lirung · río Lhende · Rasuwa (Nepal)',
+    dateLabel: '26 ago 2026',
+    headline: 'Rasuwa: la montaña que se vino abajo, vista a través del monzón',
+    summary:
+      'El 26 de agosto de 2026, a las 8:37 hora local y en pleno monzón, se desplomó la cara norte del Langtang Lirung: una avalancha de roca y hielo a unos 5300 m que se convirtió en un flujo de derrubios, represó el río Lhende en la frontera con el Tíbet y, al vaciarse, bajó 72 km por el Bhote Koshi–Trishuli. Más de 1400 muertos y miles de desaparecidos; viviendas, puentes, carreteras y 12 centrales hidroeléctricas dañadas (activación Copernicus EMSR927). Mientras las nubes tapaban a los satélites ópticos durante cinco semanas, NISAR (pasada 98 ascendente, 19 → 31 ago) cartografió 633 ha de lengua de derrubios y garganta arrasada, con una caída media de −3,4 dB en HV allí donde la avenida arrancó el bosque. La ladera que se movía antes de romperse está en el caso «Langtang Lirung».',
+    passes: {
+      from: '2026-08-15',
+      to: '2026-09-06',
+      event: ['2026-08-26T02:52', '2026-08-26T18:00'],
+      list: [
+        { date: '2026-08-16T12:21', sensor: 'S1D' },
+        { date: '2026-08-16T12:58', sensor: 'NISAR' },
+        { date: '2026-08-19T23:39', sensor: 'NISAR' },
+        { date: '2026-08-23T13:06', sensor: 'NISAR' },
+        { date: '2026-08-24T00:18', sensor: 'S1D' },
+        { date: '2026-08-28T12:21', sensor: 'S1D' },
+        { date: '2026-08-28T12:58', sensor: 'NISAR' },
+        { date: '2026-08-31T23:39', sensor: 'NISAR' },
+        { date: '2026-09-04T13:06', sensor: 'NISAR' },
+        { date: '2026-09-05T00:18', sensor: 'S1D' },
+      ],
+    },
+    notes: [{ date: '2026-08-26', label: 'Colapso y riada' }],
+    why: [
+      {
+        title: 'Atravesar cinco semanas de monzón',
+        text: 'Entre el 24 de agosto y el 28 de septiembre todas las pasadas ópticas de Sentinel-2 tuvieron entre un 49 % y un 97 % de nubes; la primera imagen despejada llegó el 1 de octubre. NISAR midió el alcance completo cinco días después del colapso.',
+      },
+      {
+        title: 'Lengua de derrubios y garganta arrasada',
+        text: 'La caída de HV (−3,4 dB de media) traza tanto el lóbulo del desprendimiento al pie de la cara norte (211 ha de roca y hielo) como las 254 ha de bosque subalpino y de ribera arrancadas a lo largo del cañón hacia Syaphrubesi.',
+      },
+      {
+        title: 'No fue un lago glaciar',
+        text: 'Copernicus EMS activó la cartografía como un desbordamiento de lago glaciar (GLOF) y así se contó al principio. Los análisis posteriores (sismogramas del USGS, imágenes ópticas) apuntan a un colapso de roca y hielo que represó temporalmente el Lhende, cuyo vaciado alimentó la riada.',
+      },
+      {
+        title: 'Geometría en cañones de 5.000 m',
+        text: 'En gargantas profundas del Himalaya la geometría de visión es crítica: la pasada 98 ascendente (modo 40 MHz DHDH) cubre el 100 % del valle sin huecos, mientras que la pasada 48 descendente del 28 de agosto dejó una franja ciega entre sub-haces sobre la cabecera.',
+      },
+      {
+        title: 'Lluvia continua antes de la rotura',
+        text: 'El reanálisis ERA5 registra lluvia todos los días del 15 de agosto al 5 de septiembre (323 mm en total, 125,5 mm solo entre las dos pasadas de NISAR), saturando laderas y morrenas.',
+      },
+      {
+        title: 'Sin comparación oficial',
+        text: 'NASA no ha publicado imagen NISAR de este evento: el resultado es solo nuestro. Lo marcado es una caída fuerte de la señal, no daño confirmado; habría que validarlo con las capas de EMSR927 o con imágenes ópticas.',
+      },
+    ],
+    who: [
+      { title: 'Protección civil (NDRRMA)', text: 'Identificar en horas qué tramos de la carretera Pasang Lhamu (0,6 km afectados directamente) y aldeas como Syaphrubesi quedan aislados bajo las nubes.' },
+      { title: 'Vigilancia glaciar (ICIMOD)', text: 'Detectar avalanchas de roca y hielo y vaciados de lagos glaciares sin esperar al fin del monzón.' },
+      { title: 'Hidroeléctricas y cuencas', text: 'Evaluar la avenida de lodo y bloques en el corredor del Trishuli, donde viven unas 2.880 personas a menos de 1 km del cauce.' },
+      { title: 'Cooperación transfronteriza', text: 'El río cruza la frontera dos veces: compartir vigilancia radar de la cabecera entre Nepal y China.' },
+    ],
+  },
+  lorca: {
     short: 'Lorca',
     region: 'Murcia',
     order: 3,
     place: 'Alto Guadalentín · Lorca (Murcia)',
     dateLabel: 'jun–oct 2026',
-    headline: 'Lorca: el valle que se hunde',
-    summary:
-      'Décadas de bombeo para regadío han vaciado el acuífero del Alto Guadalentín y el suelo se compacta: es uno de los hundimientos más rápidos de Europa. Sumando 8 interferogramas NISAR de 12 días (25 jun → 11 oct), el punto que más baja, en el llano al sureste de Lorca, se aleja 6 cm del satélite en 108 días. La recta ajustada a la serie da unos 16 cm/año, en línea con los máximos publicados (10–16 cm/año), con un ruido de fondo de ±1,2 cm.',
+    headline: 'Lorca: meses de cambio, días de lluvia',
+    summary: '¿Cómo cambia un mismo territorio durante meses mientras experimenta episodios breves de lluvia? Comparamos una serie preliminar de desplazamiento en línea de visión con precipitación diaria estimada para el Alto Guadalentín.',
     why: [
-      { title: 'Agua que sale, suelo que baja', text: 'Al bajar el nivel del agua, las arcillas del acuífero pierden presión y se compactan sin vuelta atrás. El radar no ve el agua: ve el suelo bajar, centímetro a centímetro.' },
-      { title: 'Sumar pares limpia la atmósfera', text: 'Cada interferograma de 12 días lleva el retraso atmosférico de sus dos fechas. Al encadenarlos, las fechas intermedias se cancelan y solo quedan la primera y la última, mientras el hundimiento real se acumula.' },
-      { title: 'La forma del valle', text: 'La cubeta roja es alargada de suroeste a noreste, como el valle del Guadalentín. La bibliografía sitúa el máximo de 2006–2011 unos 4 km al suroeste de Lorca; NISAR lo ve algo más al este, en los cultivos del llano.' },
-      { title: 'Una lección de método', text: 'La corrección ionosférica que trae el producto añadía ruido en una escena tan pequeña: con ella el ruido acumulado era de 4,7 cm y la cubeta no se veía. Sin ella, 2,4 cm y la cubeta aparece. Comprobar cada paso importa tanto como el dato.' },
+      { title: 'Qué mide el radar', text: 'La interferometría mide cambios en la línea de visión del satélite, no directamente el movimiento vertical. Los resultados mostrados son preliminares y necesitan una auditoría de los productos originales.' },
+      { title: 'Dos escalas distintas', text: 'Las pasadas delimitan intervalos de 12 o 24 días; la precipitación es una estimación diaria de una celda de reanálisis, no una observación puntual.' },
+      { title: 'Coincidencia no es causa', text: 'El bombeo, las variaciones del acuífero, los retardos y otros factores pueden influir. La serie no permite atribuir una causa al desplazamiento.' },
     ],
-    who: [
-      { title: 'Confederación Hidrográfica del Segura', text: 'Ver, cada 12 días, si las restricciones de bombeo frenan el hundimiento.' },
-      { title: 'Urbanismo y protección civil', text: 'Un valle que baja cambia por dónde corre el agua en una riada: más zonas inundables.' },
-      { title: 'Infraestructuras', text: 'Carreteras, tuberías y vías que cruzan el valle sufren asientos diferenciales.' },
-    ],
+    who: [{ title: 'Investigación y gestión del agua', text: 'Comparar señales ayuda a plantear preguntas para contrastar con piezómetros y observaciones independientes.' }],
   },
   lapalma: {
     short: 'La Palma',
@@ -196,6 +251,65 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Ingeniería', text: 'La coherencia también revela daños: los edificios que colapsan dejan de devolver la misma señal.' },
     ],
   },
+  // ---- NISAR en el mundo: eventos difundidos por NASA/JPL, procesados con nuestro pipeline ----
+  venezuela: {
+    short: 'Yaracuy · La Guaira',
+    region: 'Venezuela',
+    order: 7,
+    place: 'San Felipe (Yaracuy) · Catia La Mar (La Guaira)',
+    dateLabel: '24 jun 2026',
+    headline: 'Venezuela: el doblete Mw 7,2 y 7,5 que rompió la costa en 32 segundos',
+    summary:
+      'El 24 de junio de 2026 un doblete sísmico superficial (10 km de profundidad, USGS) rompió el límite entre las placas del Caribe y Sudamérica: el Mw 7,2 se registró a las 18:04:31 HLV (22:04:31 UTC) 20 km al este de San Felipe, Yaracuy (10,371° N, 68,556° O), y 32 segundos después, a las 18:05:03 HLV (22:05:03 UTC), el sismo principal de Mw 7,5 golpeó 17 km al oeste de Catia La Mar, La Guaira (10,622° N, 67,194° O). Apenas 12 horas más tarde, la pasada 162 ascendente de NISAR cubrió los dos epicentros; con las pasadas 54, 61 y 126, cuatro interferogramas muestran desplazamientos en la línea de visión de hasta −37,9 y +32,7 cm y más de 102.000 ha que se mueven por encima del ruido. NASA publicó su propio mapa (hasta ~60 cm hacia el oeste junto al aeropuerto de Maiquetía): visto con la mirada inclinada del radar, ese movimiento horizontal equivale a unos 33–42 cm, justo lo que mide nuestro procesado independiente.',
+    passes: {
+      from: '2026-06-12',
+      to: '2026-07-05',
+      event: ['2026-06-24T22:04', '2026-06-24T23:00'],
+      list: [
+        { date: '2026-06-13T10:06', sensor: 'NISAR' },
+        { date: '2026-06-17T23:02', sensor: 'NISAR' },
+        { date: '2026-06-18T09:58', sensor: 'NISAR' },
+        { date: '2026-06-22T22:54', sensor: 'NISAR' },
+        { date: '2026-06-25T10:06', sensor: 'NISAR' },
+        { date: '2026-06-29T23:02', sensor: 'NISAR' },
+        { date: '2026-06-30T09:58', sensor: 'NISAR' },
+        { date: '2026-07-04T22:54', sensor: 'NISAR' },
+      ],
+    },
+    notes: [{ date: '2026-06-24', label: 'Mw 7,2 + 7,5' }],
+    officialClaim: 'Hasta ~60 cm de desplazamiento, sobre todo horizontal y hacia el oeste, junto al aeropuerto internacional al norte de Caracas.',
+    why: [
+      {
+        title: 'Signos opuestos = desgarre horizontal dextral',
+        text: 'En una órbita ascendente el radar mira hacia el este; en una descendente, hacia el oeste. En la costa del Mw 7,5 (Chichiriviche–Catia La Mar), las pasadas ascendentes 162 y 61 miden −32,3 y −37,9 cm (el suelo se aleja), mientras la descendente 126 mide +32,7 cm (se acerca). Esa inversión indica un movimiento horizontal dextral (lateral derecho) a lo largo de la falla de San Sebastián.',
+      },
+      {
+        title: 'Cómo cuadra con el mapa de NASA',
+        text: 'El radar solo ve la parte del movimiento que va en su línea de visión, inclinada entre 33° y 47°. Un desplazamiento horizontal de ~60 cm hacia el oeste, como el de JPL, se proyecta en unos 33–42 cm: el mismo orden que nuestras cuatro pasadas, procesadas sin usar su mapa.',
+      },
+      {
+        title: 'La traza de la falla de Morón, al descubierto',
+        text: 'En el extremo occidental (Mw 7,2, San Felipe–Morón), el interferograma corta de este a oeste la costa del Golfo Triste: el bloque norte avanza hacia el oeste (+30,5 cm en la pasada 162 ascendente; −23,7 cm en la 54 descendente) frente al bloque sur, sumando un salto relativo de más de medio metro a través de la falla.',
+      },
+      {
+        title: 'Banda L frente a la selva nublada costera',
+        text: 'La Cordillera de la Costa (Henri Pittier, Sierra de Aroa y El Ávila, hasta 2.765 m) está cubierta de selva tropical densa donde la banda C pierde coherencia en días. La longitud de onda de 23,8 cm de NISAR penetra el dosel y permite contar franjas completas de 11,9 cm sin saltos de fase.',
+      },
+      {
+        title: '12 horas de respuesta y corrección ionosférica',
+        text: 'La pasada 162 ascendente sobrevoló Venezuela a las 10:06 UTC del 25 de junio, solo 12 horas después del doblete. A 10° N y en una escena de 235 km, aplicar la pantalla ionosférica de espectro dividido (split-spectrum) del producto GUNW ayuda a aislar la deformación tectónica.',
+      },
+      {
+        title: 'Sin datos en el mar',
+        text: 'El agua cambia en cada instante y el radar no puede comparar dos pasadas sobre ella. El epicentro del Mw 7,5 está en el mar: el movimiento se mide en tierra, en la franja costera entre Catia La Mar y La Guaira.',
+      },
+    ],
+    who: [
+      { title: 'FUNVISIS y USGS', text: 'Invertir el deslizamiento cosísmico en las fallas de Morón y San Sebastián combinando las cuatro geometrías ascendentes y descendentes.' },
+      { title: 'Protección Civil y puertos', text: 'Identificar los tramos costeros con mayor sacudida, subsidencia y licuefacción en Puerto Cabello, Morón, Catia La Mar y La Guaira.' },
+      { title: 'Infraestructuras críticas', text: 'Inspeccionar el aeropuerto de Maiquetía, las autopistas Caracas–La Guaira y Valencia–Puerto Cabello, las refinerías costeras y los taludes de la Cordillera de la Costa.' },
+    ],
+  },
   alora: {
     short: 'Álora',
     region: 'Málaga',
@@ -215,42 +329,6 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Adif', text: 'Vigilar milímetro a milímetro los taludes reparados y priorizar los que se mueven.' },
       { title: 'IGME', text: 'Inventario nacional de movimientos del terreno actualizado desde el espacio.' },
       { title: 'Viajeros y economía', text: 'Tres meses sin AVE directo Málaga–Madrid: prevenir sale más barato.' },
-    ],
-  },
-  // ---- NISAR en el mundo: eventos difundidos por NASA/JPL, procesados con nuestro pipeline ----
-  venezuela: {
-    short: 'Caracas',
-    region: 'Venezuela',
-    order: 7,
-    place: 'Caracas · La Guaira (Venezuela)',
-    dateLabel: '24 jun 2026',
-    headline: 'Venezuela: la costa que se movió medio metro',
-    summary:
-      'El 24 de junio dos terremotos sacudieron el norte de Venezuela: un M7,2 y, medio minuto después, un M7,5 frente a Catia La Mar (USGS). Tres interferogramas NISAR de tres pasadas distintas ven la franja costera de La Guaira moverse hasta 59 cm en la línea de visión del satélite. NASA publicó su propio mapa con los mismos datos (hasta ~60 cm hacia el oeste junto al aeropuerto); nuestro procesado, hecho de forma independiente, llega al mismo orden de magnitud.',
-    notes: [{ date: '2026-06-24', label: 'M7,5' }],
-    officialClaim: 'Hasta ~60 cm de desplazamiento, sobre todo horizontal y hacia el oeste, junto al aeropuerto internacional al norte de Caracas.',
-    why: [
-      {
-        title: 'Una falla de desgarre',
-        text: 'La falla de San Sebastián corre paralela a la costa, bajo el mar. En un desgarre los bloques se deslizan en horizontal, uno junto al otro: por eso el movimiento se concentra en la franja costera.',
-      },
-      {
-        title: 'Dos miradas, dos colores',
-        text: 'Las pasadas ascendentes miran hacia el este y las descendentes hacia el oeste. Un mismo movimiento horizontal se ve como «alejarse» en unas y «acercarse» en otras: la costa sale roja en las pasadas 162 y 61 y azul en buena parte de la 126.',
-      },
-      {
-        title: 'Sin datos en el mar',
-        text: 'El agua cambia en cada instante y el radar no puede comparar dos pasadas sobre ella. El epicentro del M7,5 está en el mar: el máximo lo medimos en tierra, en la costa entre Maiquetía y La Guaira.',
-      },
-      {
-        title: 'Sin rampa ni corrección de relieve',
-        text: 'En Granada o Lorca quitamos una rampa y la atmósfera ligada al relieve. Aquí la deformación ocupa casi toda la escena y esas correcciones borrarían señal real: fijamos el cero en el interior, a ~20 km de la costa, y nada más. El precio es más ruido atmosférico (±6 cm), pequeño frente a 59 cm.',
-      },
-    ],
-    who: [
-      { title: 'Emergencias', text: 'Un mapa de qué tramos de costa se movieron más, en días y aunque haya nubes.' },
-      { title: 'Sismología', text: 'Con pasadas ascendentes y descendentes se separa el movimiento horizontal del vertical para modelar la falla.' },
-      { title: 'Infraestructuras', text: 'El aeropuerto de Maiquetía, el puerto de La Guaira y la autopista a Caracas están en la franja que más se movió.' },
     ],
   },
   krasheninnikov: {
@@ -357,40 +435,6 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Protección civil', text: 'Un terreno que baja cambia por dónde corre el agua en las inundaciones.' },
     ],
   },
-  nepal: {
-    short: 'Rasuwa',
-    region: 'Nepal',
-    order: 11,
-    place: 'Bhote Koshi – Trishuli · Rasuwa (Nepal)',
-    dateLabel: '26 ago 2026',
-    headline: 'Rasuwa: la riada que nació en un glaciar',
-    summary:
-      'El 26 de agosto, a las 8:37 hora local, se desplomó la cara norte del Langtang Lirung: una avalancha de roca y hielo a unos 5300 m que se convirtió en un flujo de derrubios, represó el río Lhende en la frontera con el Tíbet y bajó 72 km por el Bhote Koshi–Trishuli. Más de 1400 muertos y miles de desaparecidos; viviendas, puentes, carreteras y 12 centrales hidroeléctricas dañadas. NISAR pasó 7 días antes y 5 después: el agua ya se había ido, pero en 385 ha del fondo del valle la señal radar cambia más de 3 dB. El origen, la ladera que se movía antes de romperse, está en el caso «Langtang Lirung».',
-    notes: [{ date: '2026-08-26', label: 'Riada' }],
-    why: [
-      {
-        title: 'El agua se va, la cicatriz se queda',
-        text: 'Como en la DANA, una riada relámpago en un valle encajado drena en horas. Lo que el radar sí ve es el cauce cambiado: sedimento y bloques nuevos, márgenes comidas, vegetación de ribera arrancada. Eso altera HH y HV aunque no quede agua.',
-      },
-      {
-        title: 'Solo en el fondo del valle',
-        text: 'En el Himalaya las laderas son tan empinadas que el radar ve zonas en sombra o plegadas sobre sí mismas (layover), con cambios que no son reales. Por eso buscamos cambios solo a menos de 300 m de los ríos de OpenStreetMap (303 km de cauce).',
-      },
-      {
-        title: 'Sin comparación oficial',
-        text: 'Es el único caso mundial sin imagen NISAR publicada por NASA: el resultado es solo nuestro. Lo marcado es «cambio fuerte», no daño confirmado; habría que validarlo con imágenes ópticas o datos sobre el terreno.',
-      },
-      {
-        title: 'No fue un lago glaciar',
-        text: 'Al principio se habló de un desbordamiento de lago glaciar (GLOF). Los análisis posteriores (sismogramas del USGS, imágenes ópticas) apuntan a un colapso de roca y hielo que represó temporalmente el Lhende, cuyo vaciado alimentó la riada.',
-      },
-    ],
-    who: [
-      { title: 'Gestión de desastres (NDRRMA)', text: 'Qué tramos del valle cambiaron más, aunque el monzón tape a los satélites ópticos.' },
-      { title: 'Hidroeléctricas y carreteras', text: 'Priorizar inspecciones de presas, puentes y de la carretera a la frontera de Rasuwagadhi.' },
-      { title: 'Cooperación transfronteriza', text: 'El río cruza la frontera dos veces: compartir vigilancia radar de la cabecera entre Nepal y China.' },
-    ],
-  },
   langtang: {
     short: 'Langtang Lirung',
     region: 'Nepal',
@@ -445,7 +489,7 @@ const STORY_ES = [
   },
   {
     title: 'Todo el año: el suelo que se mueve',
-    text: 'Con interferometría NISAR mide centímetros. En Lorca el valle se hunde unos 16 cm al año por el bombeo del acuífero. En Granada, La Palma y Álora el radar acota lo que no se movió: un terremoto de magnitud 5,2 que no deformó el suelo más de 1 cm, una colada que ya casi no se asienta y un talud de AVE estable tras su reparación.',
+    text: 'Con interferometría NISAR mide centímetros. En Lorca una serie preliminar muestra movimiento en la línea de visión del satélite; sus causas requieren estudio. En Granada, La Palma y Álora el radar acota lo que no se movió: un terremoto de magnitud 5,2 que no deformó el suelo más de 1 cm, una colada que ya casi no se asienta y un talud de AVE estable tras su reparación.',
     target: 'lorca',
   },
   {
@@ -497,24 +541,42 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Space agencies', text: 'Coordinate NISAR, Sentinel-1 and other missions so no gap is left during the event.' },
       { title: 'Rail operators', text: 'With enough revisits: flooded track sections to prioritise inspections.' },
     ],
-  },  lorca: {
+  },
+  rasuwa: {
+    ...CONTENT_ES.rasuwa,
+    place: 'Langtang Lirung · Lhende River · Rasuwa (Nepal)',
+    dateLabel: '26 Aug 2026',
+    headline: 'Rasuwa: the mountain that came down, seen through the monsoon',
+    summary:
+      'At 8:37 local time on 26 August 2026, at the height of the monsoon, the north face of Langtang Lirung gave way: a rock–ice avalanche at about 5,300 m turned into a debris flow, dammed the Lhende River on the Tibet border and, when the dam broke, ran 72 km down the Bhote Koshi–Trishuli. Over 1,400 dead and thousands missing; homes, bridges, roads and 12 hydropower plants damaged (Copernicus EMSR927 activation). While clouds blinded optical satellites for five weeks, NISAR (ascending track 98, 19 → 31 Aug) mapped 633 ha of debris tongue and scoured gorge, with a −3.4 dB mean HV drop where the surge stripped the forest. The slope that was moving before it failed is in the “Langtang Lirung” case.',
+    notes: [{ date: '2026-08-26', label: 'Collapse and flood' }],
+    why: [
+      { title: 'Seeing through five weeks of monsoon', text: 'Between 24 August and 28 September every Sentinel-2 optical pass had 49% to 97% cloud cover; the first clear view arrived on 1 October. NISAR mapped the full extent five days after the collapse.' },
+      { title: 'Debris tongue and scoured gorge', text: 'The HV drop (−3.4 dB on average) traces both the detachment lobe below the north face (211 ha of bare rock and ice) and the 254 ha of subalpine and riparian forest stripped along the canyon down towards Syaphrubesi.' },
+      { title: 'Not a glacial lake', text: 'Copernicus EMS activated its mapping as a glacial lake outburst flood (GLOF), and that is how it was first reported. Later analyses (USGS seismograms, optical imagery) point to a rock–ice collapse that temporarily dammed the Lhende, whose release fed the flood.' },
+      { title: 'Geometry in 5,000 m canyons', text: 'In deep Himalayan gorges viewing geometry is critical: ascending track 98 (40 MHz DHDH mode) covers 100% of the valley seamlessly, whereas descending track 48 on 28 August left a sub-swath gap across the headwall.' },
+      { title: 'Rain every day before the failure', text: 'ERA5 reanalysis records rain every day from 15 August to 5 September (323 mm in total, 125.5 mm between the two NISAR passes alone), saturating slopes and moraines.' },
+      { title: 'No official comparison', text: 'NASA has not published a NISAR image of this event: the result is ours alone. What is flagged is a strong signal drop, not confirmed damage; it should be checked against the EMSR927 layers or optical imagery.' },
+    ],
+    who: [
+      { title: 'Disaster response (NDRRMA)', text: 'Pinpoint within hours which sections of the Pasang Lhamu Highway (0.6 km directly hit) and settlements such as Syaphrubesi are cut off under monsoon cloud.' },
+      { title: 'Glacier monitoring (ICIMOD)', text: 'Detect rock–ice avalanches and glacial lake outbursts without waiting for the monsoon to end.' },
+      { title: 'Hydropower and river basins', text: 'Assess boulder and sediment surges along the Trishuli corridor, where about 2,880 people live within 1 km of the channel.' },
+      { title: 'Cross-border cooperation', text: 'The river crosses the border twice: share radar monitoring of the headwaters between Nepal and China.' },
+    ],
+  },
+  lorca: {
     ...CONTENT_ES.lorca,
     place: 'Alto Guadalentín · Lorca (Murcia, Spain)',
     dateLabel: 'Jun–Oct 2026',
-    headline: 'Lorca: the sinking valley',
-    summary:
-      'Decades of pumping for irrigation have drained the Alto Guadalentín aquifer and the ground is compacting: one of the fastest subsidence areas in Europe. Adding up 8 NISAR 12-day interferograms (25 Jun → 11 Oct), the fastest spot, on the plain south-east of Lorca, moves 6 cm away from the satellite in 108 days. A line fitted to the series gives about 16 cm/yr, in line with the published maxima (10–16 cm/yr), with ±1.2 cm background noise.',
+    headline: 'Lorca: months of change, days of rain',
+    summary: 'How does one place change over months while experiencing short spells of rain? Compare a preliminary line-of-sight displacement series with estimated daily precipitation in Alto Guadalentín.',
     why: [
-      { title: 'Water out, ground down', text: 'As the water table drops, the aquifer clays lose pressure and compact for good. Radar does not see the water: it sees the ground going down, centimetre by centimetre.' },
-      { title: 'Adding pairs cleans the atmosphere', text: 'Each 12-day interferogram carries the atmospheric delay of its two dates. Chaining them cancels the dates in between, leaving only the first and last, while the real subsidence adds up.' },
-      { title: 'The shape of the valley', text: 'The red bowl is elongated south-west to north-east, like the Guadalentín valley. Studies place the 2006–2011 maximum about 4 km south-west of Lorca; NISAR sees it somewhat further east, in the farmland on the plain.' },
-      { title: 'A lesson in method', text: 'The ionospheric correction shipped with the product added noise in such a small scene: with it the cumulative noise was 4.7 cm and the bowl vanished. Without it, 2.4 cm and the bowl appears. Checking each step matters as much as the data.' },
+      { title: 'What radar measures', text: 'Interferometry measures change along the satellite line of sight, not vertical motion directly. These preliminary results require an audit of the original products.' },
+      { title: 'Two different timescales', text: 'Satellite passes define intervals of 12 or 24 days; precipitation is a daily reanalysis grid estimate, not a point observation.' },
+      { title: 'Timing is not causation', text: 'Pumping, aquifer variations, delays and other factors may contribute. This series cannot establish the cause of displacement.' },
     ],
-    who: [
-      { title: 'Segura river basin authority', text: 'See every 12 days whether pumping limits slow the subsidence.' },
-      { title: 'Planning and civil protection', text: 'A sinking valley changes where flood water runs: more flood-prone land.' },
-      { title: 'Infrastructure', text: 'Roads, pipes and railways crossing the valley suffer uneven settlement.' },
-    ],
+    who: [{ title: 'Research and water management', text: 'Comparing signals helps frame questions to test against groundwater gauges and independent observations.' }],
   },
   lapalma: {
     ...CONTENT_ES.lapalma,
@@ -555,6 +617,29 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Engineering', text: 'Coherence also reveals damage: collapsed buildings stop returning the same signal.' },
     ],
   },
+  venezuela: {
+    ...CONTENT_ES.venezuela,
+    place: 'San Felipe (Yaracuy) · Catia La Mar (La Guaira, Venezuela)',
+    dateLabel: '24 Jun 2026',
+    headline: 'Venezuela: the Mw 7.2 and 7.5 doublet that broke the coast in 32 seconds',
+    summary:
+      'On 24 June 2026 a shallow earthquake doublet (10 km depth, USGS) ruptured the Caribbean–South American plate boundary: an Mw 7.2 struck at 18:04:31 local time (22:04:31 UTC) 20 km east of San Felipe, Yaracuy (10.371° N, 68.556° W), followed 32 seconds later, at 18:05:03 local time (22:05:03 UTC), by the Mw 7.5 mainshock 17 km west of Catia La Mar, La Guaira (10.622° N, 67.194° W). Just 12 hours later NISAR ascending track 162 covered both epicentres; with tracks 54, 61 and 126, four interferograms show line-of-sight displacements of up to −37.9 and +32.7 cm and over 102,000 ha moving above the noise. NASA published its own map (up to ~60 cm westward next to Maiquetía airport): seen through the radar’s slanted look, that horizontal motion amounts to about 33–42 cm, just what our independent processing measures.',
+    notes: [{ date: '2026-06-24', label: 'Mw 7.2 + 7.5' }],
+    officialClaim: 'Up to ~60 cm of displacement, mostly horizontal and westward, next to the international airport north of Caracas.',
+    why: [
+      { title: 'Opposite signs = right-lateral strike-slip', text: 'In an ascending orbit the radar looks east; in a descending orbit it looks west. Along the Mw 7.5 coast (Chichiriviche–Catia La Mar), ascending tracks 162 and 61 measure −32.3 and −37.9 cm (moving away from the satellite), while descending track 126 measures +32.7 cm (moving towards it). That sign reversal points to horizontal right-lateral (dextral) motion along the San Sebastián fault.' },
+      { title: 'How it matches NASA’s map', text: 'Radar only sees the part of the motion along its line of sight, tilted 33° to 47°. A ~60 cm westward horizontal shift, as in JPL’s map, projects to about 33–42 cm: the same range as our four tracks, processed without using their map.' },
+      { title: 'The Morón fault trace exposed', text: 'In the western rupture zone (Mw 7.2, San Felipe–Morón), the interferogram slices east–west across the Golfo Triste coast: the northern block shifts westwards (+30.5 cm on ascending track 162; −23.7 cm on descending track 54) relative to the southern block, over half a metre of relative offset across the fault.' },
+      { title: 'L-band through tropical cloud forest', text: 'The Cordillera de la Costa (Henri Pittier, Sierra de Aroa and El Ávila, up to 2,765 m) is covered in dense cloud forest where C-band loses coherence within days. NISAR’s 23.8 cm wavelength penetrates the canopy and resolves full 11.9 cm fringes without phase jumps.' },
+      { title: '12-hour response and ionospheric screen', text: 'Ascending track 162 flew over Venezuela at 10:06 UTC on 25 June, only 12 hours after the doublet. At 10° N across a 235 km scene, the split-spectrum ionospheric screen in the GUNW product helps isolate the tectonic signal.' },
+      { title: 'No data over the sea', text: 'Water changes from moment to moment and radar cannot compare two passes over it. The Mw 7.5 epicentre is offshore, so the motion is measured on land, on the coastal strip between Catia La Mar and La Guaira.' },
+    ],
+    who: [
+      { title: 'FUNVISIS & USGS', text: 'Invert coseismic slip on the Morón and San Sebastián faults by combining all four ascending and descending viewing geometries.' },
+      { title: 'Civil protection & ports', text: 'Pinpoint coastal sectors with the strongest shaking, subsidence and liquefaction around Puerto Cabello, Morón, Catia La Mar and La Guaira.' },
+      { title: 'Critical infrastructure', text: 'Prioritise inspections of Maiquetía airport, the Caracas–La Guaira and Valencia–Puerto Cabello highways, coastal refineries and steep mountain slopes.' },
+    ],
+  },
   alora: {
     ...CONTENT_ES.alora,
     place: 'Álora (Málaga) · Córdoba–Málaga high-speed line',
@@ -572,27 +657,6 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Rail infrastructure manager', text: 'Watch repaired slopes millimetre by millimetre and prioritise the ones that move.' },
       { title: 'Geological survey', text: 'A national landslide inventory updated from space.' },
       { title: 'Travellers and the economy', text: 'Three months without direct Málaga–Madrid trains: prevention is cheaper.' },
-    ],
-  },
-  venezuela: {
-    ...CONTENT_ES.venezuela,
-    place: 'Caracas · La Guaira (Venezuela)',
-    dateLabel: '24 Jun 2026',
-    headline: 'Venezuela: the coast that moved half a metre',
-    summary:
-      'On 24 June two earthquakes shook northern Venezuela: an M7.2 and, half a minute later, an M7.5 offshore Catia La Mar (USGS). Three NISAR interferograms from three different tracks see the La Guaira coastal strip move up to 59 cm along the satellite line of sight. NASA published its own map from the same data (up to ~60 cm westward next to the airport); our independent processing reaches the same order of magnitude.',
-    notes: [{ date: '2026-06-24', label: 'M7.5' }],
-    officialClaim: 'Up to ~60 cm of displacement, mostly horizontal and westward, next to the international airport north of Caracas.',
-    why: [
-      { title: 'A strike-slip fault', text: 'The San Sebastián fault runs parallel to the coast, under the sea. In a strike-slip quake the blocks slide past each other horizontally, so the motion concentrates on the coastal strip.' },
-      { title: 'Two views, two colours', text: 'Ascending tracks look east and descending tracks look west. The same horizontal motion reads as “away” in one and “towards” in the other: the coast is red in tracks 162 and 61 and blue over much of track 126.' },
-      { title: 'No data over the sea', text: 'Water changes from moment to moment and radar cannot compare two passes over it. The M7.5 epicentre is offshore, so we measure the maximum on land, on the coast between Maiquetía and La Guaira.' },
-      { title: 'No ramp, no height correction', text: 'In Granada or Lorca we remove a ramp and height-related atmosphere. Here the deformation fills almost the whole scene and those corrections would erase real signal: we set zero inland, ~20 km from the coast, and nothing more. The cost is more atmospheric noise (±6 cm), small next to 59 cm.' },
-    ],
-    who: [
-      { title: 'Emergency services', text: 'A map of which stretches of coast moved most, within days and through clouds.' },
-      { title: 'Seismology', text: 'Ascending and descending tracks together separate horizontal from vertical motion to model the fault.' },
-      { title: 'Infrastructure', text: 'Maiquetía airport, the port of La Guaira and the motorway to Caracas sit in the strip that moved most.' },
     ],
   },
   krasheninnikov: {
@@ -660,26 +724,6 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Civil protection', text: 'Sinking ground changes where water runs during floods.' },
     ],
   },
-  nepal: {
-    ...CONTENT_ES.nepal,
-    place: 'Bhote Koshi – Trishuli · Rasuwa (Nepal)',
-    dateLabel: '26 Aug 2026',
-    headline: 'Rasuwa: the flood that started in a glacier',
-    summary:
-      'At 8:37 local time on 26 August the north face of Langtang Lirung gave way: a rock–ice avalanche at about 5,300 m turned into a debris flow, dammed the Lhende River on the Tibet border and ran 72 km down the Bhote Koshi–Trishuli. Over 1,400 dead and thousands missing; homes, bridges, roads and 12 hydropower plants damaged. NISAR passed 7 days before and 5 after: the water was gone, but over 385 ha of valley floor the radar signal changes by more than 3 dB. The source, the slope that was moving before it failed, is in the “Langtang Lirung” case.',
-    notes: [{ date: '2026-08-26', label: 'Flood' }],
-    why: [
-      { title: 'The water leaves, the scar stays', text: 'As in the Valencia storm, a flash flood in a deep valley drains within hours. What radar does see is the changed channel: new sediment and boulders, eroded banks, stripped riverside vegetation. That alters HH and HV even with no water left.' },
-      { title: 'Only on the valley floor', text: 'Himalayan slopes are so steep that radar sees areas in shadow or folded onto themselves (layover), with changes that are not real. So we only look for change within 300 m of OpenStreetMap rivers (303 km of channel).' },
-      { title: 'No official comparison', text: 'This is the only world case without a NISAR image published by NASA: the result is ours alone. What is flagged is “strong change”, not confirmed damage; it should be checked against optical imagery or field data.' },
-      { title: 'Not a glacial lake', text: 'Early reports spoke of a glacial lake outburst (GLOF). Later analyses (USGS seismograms, optical imagery) point to a rock–ice collapse that temporarily dammed the Lhende, whose release fed the flood.' },
-    ],
-    who: [
-      { title: 'Disaster management (NDRRMA)', text: 'Which stretches of the valley changed most, even when the monsoon blinds optical satellites.' },
-      { title: 'Hydropower and roads', text: 'Prioritise inspections of dams, bridges and the road to the Rasuwagadhi border crossing.' },
-      { title: 'Cross-border cooperation', text: 'The river crosses the border twice: share radar monitoring of the headwaters between Nepal and China.' },
-    ],
-  },
   langtang: {
     ...CONTENT_ES.langtang,
     place: 'North face of Langtang Lirung · Rasuwa (Nepal)',
@@ -706,7 +750,7 @@ const STORY_EN = [
   { title: 'Gelida, 20 January 2026', text: 'After days of heavy rain, a retaining wall gives way under water pressure and falls onto the Rodalies commuter line near Barcelona. A trainee driver dies and the Catalan rail network grinds to a halt. Water, fire, terrain and infrastructure: risks that can be watched from space.', target: null as string | null },
   { title: 'Summer: fire', text: '2026 is Spain’s second-worst wildfire year of the century. In Niebla (Huelva) NISAR measures about 32,000 ha burned through the smoke, with 89% agreement with the official European perimeter.', target: 'niebla' },
   { title: 'Autumn: the water nobody saw', text: 'Storm “Adam” dumps hundreds of litres on La Safor on the night of 18–19 October. No radar passed during the storm: by the time they came back, the water was gone.', target: 'dana' },
-  { title: 'All year round: ground on the move', text: 'With interferometry NISAR measures centimetres. In Lorca the valley sinks about 16 cm a year from aquifer pumping. In Granada, La Palma and Álora radar bounds what did not move: a magnitude 5.2 earthquake that deformed the ground less than 1 cm, a lava flow that has almost stopped settling and a high-speed rail slope that is stable after repair.', target: 'lorca' },
+  { title: 'All year round: ground on the move', text: 'With interferometry NISAR measures centimetres. In Lorca a preliminary series shows motion along the satellite line of sight; its causes need study. In Granada, La Palma and Álora radar bounds what did not move: a magnitude 5.2 earthquake that deformed the ground less than 1 cm, a lava flow that has almost stopped settling and a high-speed rail slope that is stable after repair.', target: 'lorca' },
   { title: 'What NISAR can do', text: 'NISAR sees day and night, through clouds and smoke, and tells fire from harvest thanks to its polarizations. Combined with other radars and tasked in time, it can become a warning system for decision-makers.', target: null },
 ]
 

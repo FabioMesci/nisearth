@@ -239,6 +239,11 @@ def main():
         mask = valid & near & (s_hh_d > lv["min_db"]) & (s_hv_d > lv["min_db"])
         delta, color = d_hh, (255, 196, 40)
         extra = {"rule": f"dHH>{lv['min_db']} & dHV>{lv['min_db']} dB (media 5x5), a menos de {lv['radius_km']} km del cráter"}
+    elif case["kind"] == "landslide":
+        s_hv_d = smooth(d_hv, 9)
+        mask = valid & (s_hv_d < -1.3) & (d_hv < -1.5)
+        delta, color = d_hv, (163, 230, 53)
+        extra = {"rule": "dHV<-1.5 & media9x9(dHV)<-1.3"}
     else:
         s_hv_d, s_hh_d = smooth(d_hv, 15), smooth(d_hh, 15)
         mask = valid & (s_hv_d < -0.6) & (s_hh_d > -1.2)
@@ -246,7 +251,7 @@ def main():
         extra = {"rule": "dHV<-0.6 & dHH>-1.2 (media 15x15)"}
     mask = binary_opening(mask, disk(1))
     mask = binary_closing(mask, disk(2))
-    mask = remove_small_objects(mask, max_size=30 if case.get("change") in ("lava", "debris") else 40 if case["kind"] == "flood" else 500)
+    mask = remove_small_objects(mask, max_size=30 if case.get("change") in ("lava", "debris") else 40 if case["kind"] == "flood" else 60 if case["kind"] == "landslide" else 500)
 
     px_km2 = pixel_area_km2(case["bbox"], mask.shape)
     area_km2 = float(mask.sum() * px_km2)
@@ -293,6 +298,9 @@ def main():
         if case.get("change") == "lava" else
         [{"id": "area_debris", "label": "Cauce con cambio fuerte de señal (radar)", "value": round(area_km2 * 100), "unit": "ha"}]
         if case.get("change") == "debris" else
+        [{"id": "area", "label": "Superficie deslizada / GLOF (radar)", "value": round(area_km2 * 100), "unit": "ha"},
+         {"id": "hvdrop", "label": "Caída media de HV", "value": round(float(np.nanmean(d_hv[mask])), 1), "unit": "dB"}]
+        if case["kind"] == "landslide" else
         [{"id": "area", "label": "Superficie quemada (radar)", "value": round(area_km2 * 100), "unit": "ha"},
          {"id": "hvdrop", "label": "Caída media de HV", "value": round(float(np.nanmean(d_hv[mask])), 1), "unit": "dB"}]
     )

@@ -112,7 +112,8 @@
  ],
  "layers": {
   "mask": "mask.png",
-  "change": "change.webp"
+  "change": "change.webp",
+  "flood_t100": "flood-t100.png"
  },
  "series": {
   "dates": [
@@ -256,177 +257,134 @@
   ]
  },
  "risk": {
+  "scenario": "snczi_t100_limited",
   "generated": "2026-11-15",
-  "model": "risk = (hazard x exposure x vulnerability)^(1/3), INFORM-style geometric mean, 0-1 per cell",
+  "model": "screening = (fraction T100 * exposure * physical susceptibility)^(1/3)",
   "cell_m": [
    440,
    553
   ],
-  "cells": 1189,
+  "cells": 776,
   "classes": [
    {
     "cls": "very_low",
-    "cells": 847,
-    "area_ha": 20622,
-    "population": 7398
+    "cells": 163,
+    "area_ha": 3969,
+    "population": 2299
    },
    {
     "cls": "low",
-    "cells": 337,
-    "area_ha": 8205,
-    "population": 23045
+    "cells": 240,
+    "area_ha": 5843,
+    "population": 27722
    },
    {
     "cls": "medium",
-    "cells": 5,
-    "area_ha": 122,
-    "population": 555
+    "cells": 219,
+    "area_ha": 5332,
+    "population": 21713
    },
    {
     "cls": "high",
-    "cells": 0,
-    "area_ha": 0,
-    "population": 0
+    "cells": 136,
+    "area_ha": 3311,
+    "population": 20344
    },
    {
     "cls": "very_high",
-    "cells": 0,
-    "area_ha": 0,
-    "population": 0
+    "cells": 18,
+    "area_ha": 438,
+    "population": 3458
    }
   ],
-  "pop_high": 0,
+  "pop_high": 23802,
   "pop_high_range": [
-   0,
-   0
+   20962,
+   24827
   ],
-  "pop_expected": 921,
-  "roads_high_km": 0.0,
-  "rail_high_km": 0.0,
-  "critical_high": 0,
   "components": {
-   "hazard": 0.36,
-   "exposure": 0.42,
-   "vulnerability": 0.37
+   "hazard": 0.64,
+   "exposure": 0.41,
+   "vulnerability": 0.57
   },
   "drivers": {
    "exposure": {
-    "population": 0.7,
-    "built": 0.22,
-    "infrastructure": 0.29,
-    "critical": 0.0
+    "population": 0.44,
+    "built": 0.21,
+    "land": 0.52
    },
    "vulnerability": {
-    "physical": 0.26,
-    "social": 0.49,
-    "coping": 0.42
+    "physical": 0.57
    }
   },
-  "dependent_age_pct": 24.5,
   "hotspots": [
    {
-    "place": "Lorca",
-    "lon": -1.6525,
-    "lat": 37.5675,
-    "risk": 0.451,
-    "class": "medium",
-    "hazard": 0.564,
-    "exposure": 0.401,
-    "vulnerability": 0.404,
-    "population": 21.2
+    "place": "37.6025, -1.6775",
+    "lon": -1.6775,
+    "lat": 37.6025,
+    "risk": 0.725,
+    "class": "very_high",
+    "population": 46.7
    },
    {
-    "place": "Puerto Lumbreras",
-    "lon": -1.7575,
-    "lat": 37.5675,
-    "risk": 0.378,
-    "class": "medium",
-    "hazard": 0.267,
-    "exposure": 0.491,
-    "vulnerability": 0.412,
-    "population": 159.7
+    "place": "37.6075, -1.6675",
+    "lon": -1.6675,
+    "lat": 37.6075,
+    "risk": 0.72,
+    "class": "very_high",
+    "population": 34.2
    },
    {
-    "place": "Puerto Lumbreras",
-    "lon": -1.7575,
-    "lat": 37.5725,
-    "risk": 0.36,
-    "class": "medium",
-    "hazard": 0.333,
-    "exposure": 0.394,
-    "vulnerability": 0.354,
-    "population": 148.8
+    "place": "37.6075, -1.6475",
+    "lon": -1.6475,
+    "lat": 37.6075,
+    "risk": 0.704,
+    "class": "very_high",
+    "population": 36.9
    },
    {
-    "place": "Puerto Lumbreras",
-    "lon": -1.7475,
-    "lat": 37.5725,
-    "risk": 0.353,
-    "class": "medium",
-    "hazard": 0.281,
-    "exposure": 0.447,
-    "vulnerability": 0.352,
-    "population": 121.4
+    "place": "37.5825, -1.7775",
+    "lon": -1.7775,
+    "lat": 37.5825,
+    "risk": 0.701,
+    "class": "very_high",
+    "population": 164.9
    },
    {
-    "place": "Puerto Lumbreras",
-    "lon": -1.7625,
-    "lat": 37.5625,
-    "risk": 0.353,
-    "class": "medium",
-    "hazard": 0.348,
-    "exposure": 0.359,
-    "vulnerability": 0.351,
-    "population": 103.5
+    "place": "37.6225, -1.6725",
+    "lon": -1.6725,
+    "lat": 37.6225,
+    "risk": 0.699,
+    "class": "very_high",
+    "population": 84.4
    }
   ],
-  "cascade": {
-   "type": "subsidence_flooding",
-   "sinking_flat_ha": 1392,
-   "flat_deg": 2,
-   "cells": 23,
-   "roads_km": 1.6,
-   "rail_km": 0.0
-  },
   "stability": {
    "runs": 300,
    "spread_pct": 25,
-   "stable_high_pct": null,
-   "mean_pct": 97
+   "mean_pct": 96
   },
-  "kind": "subsidence",
   "weights": {
-   "hazard": {
-    "w_ref_only": 1.0,
-    "w_radar_only": 1.0,
-    "edge_m": 500,
-    "w_edge": 0.25,
-    "intensity_floor": 1.0
-   },
    "exposure": {
     "population": 0.4,
     "built": 0.15,
-    "infrastructure": 0.15,
-    "critical": 0.15
+    "land": 0.15
    },
-   "vulnerability": {
-    "physical": 0.4,
-    "social": 0.3,
-    "coping": 0.3
-   },
-   "class_edges": [
-    0.2,
-    0.35,
-    0.5,
-    0.65
-   ]
+   "physical_susceptibility": {
+    "tree": 0.3,
+    "shrub": 0.3,
+    "grass": 0.3,
+    "crop": 0.7,
+    "built": 0.9,
+    "bare": 0.2,
+    "water": 0.0,
+    "wetland": 0.1
+   }
   },
   "sources": [
-   "NISAR L2 GUNW interferometry, 108-day cumulative displacement (this pipeline)",
-   "WorldPop 2020 population (100 m) and age structure (1 km)",
-   "ESA WorldCover 2021 (10 m)",
-   "OpenStreetMap roads, railways, hospitals, schools, fire stations (ODbL)",
-   "Copernicus DEM GLO-30"
+   "MITECO SNCZI T100 fluvial (WFS, escenario modelado)",
+   "WorldPop 2020 población (100 m)",
+   "ESA WorldCover 2021 (10 m)"
   ],
   "files": {
    "geojson": "risk.geojson",

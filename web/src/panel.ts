@@ -1,3 +1,4 @@
+import { lorcaHtml, drawLorca } from './lorca'
 import { Chart, LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler } from 'chart.js'
 import { RISK_COLORS, type DetailView, type ViewMode, type Pol } from './detail'
 import type { Manifest } from './types'
@@ -31,6 +32,8 @@ export class Panel {
 
   /** Pinta el panel a partir del estado de la vista (los valores por defecto de cada caso los fija DetailView.open) */
   render(m: Manifest) {
+    const oldLorca = this.el.querySelector<HTMLCanvasElement>('#lorca-chart')
+    if (oldLorca) Chart.getChart(oldLorca)?.destroy()
     this.m = m
     const c = CONTENT[m.id]
     const meta = KIND_META[m.kind]
@@ -53,6 +56,7 @@ export class Panel {
           <button data-v="timeline">${t('timeline')}</button>
           <button data-v="change">${t('change')}</button>
         </div>
+        ${m.layers.flood_t100 ? `<div class="seg" id="seg-flood"><button data-v="flood">${t('floodCompare')}</button></div>` : ''}
         ${m.s1 ? `<div class="seg" id="seg-sensor">
           <button data-v="L" title="NISAR · 24 cm">${t('bandL')}</button>
           <button data-v="C" title="Sentinel-1 · 5.5 cm">${t('bandC')}</button>
@@ -63,7 +67,7 @@ export class Panel {
             <button data-v="hv" title="${t('titleHV')}">HV</button>
             ${m.frames[0]?.rgb ? `<button data-v="rgb" title="${t('titleRGB')}">RGB</button>` : ''}
           </div>
-          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.change === 'debris' ? t('maskDebris') : m.kind === 'flood' ? t('maskWater') : m.kind === 'volcano' ? t('maskLava') : t('maskBurn')}</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.change === 'debris' ? t('maskDebris') : m.kind === 'flood' ? t('maskWater') : m.kind === 'landslide' ? t('maskSlide') : m.kind === 'volcano' ? t('maskLava') : t('maskBurn')}</span></label>
         </div>
         <div class="row toggles">
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${m.insar ? t('railOsm') : t('infra')}</span></label>` : ''}
@@ -80,10 +84,11 @@ export class Panel {
         <div class="legend-scale" id="legend-scale"></div>
         <label class="opacity"><span>${t('opacity')}</span><input type="range" id="opacity" min="0" max="1" step="0.05" value="${v.sarOpacity}" /></label>
         <p class="hint" id="mode-hint"></p>
+        <p class="hint" id="layer-error" role="status"></p>
       </section>
 
       <section class="metrics">
-        ${m.metrics.map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${lang === 'en' ? ({ 'cm/año': 'cm/yr', 'hab.': 'people' } as Record<string, string>)[x.unit] ?? x.unit : x.unit}</small></b><span>${metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
+        ${m.metrics.filter((x) => m.id !== 'lorca' || !['insar_rate', 'insar_area'].includes(x.id)).map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${lang === 'en' ? ({ 'cm/año': 'cm/yr', 'hab.': 'people' } as Record<string, string>)[x.unit] ?? x.unit : x.unit}</small></b><span>${m.id === 'lorca' && x.id === 'insar_cum' ? (lang === 'es' ? 'Desplazamiento LOS preliminar en el punto seleccionado' : 'Preliminary LOS displacement at selected point') : metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
       </section>
 
       ${m.risk ? riskCard(m) : ''}
@@ -92,10 +97,10 @@ export class Panel {
 
       ${m.official ? officialCard(m) : ''}
 
-      <section class="sec">
+      ${m.id === 'lorca' ? lorcaHtml(m) : `<section class="sec">
         <div class="label">${m.insar ? t('chartInsar')(m.insar.mode === 'pairs') : t('chart')}</div>
         <div class="chart-box"><canvas id="chart"></canvas></div>
-      </section>
+      </section>`}
 
       ${m.daily ? `<section class="sec">
         <div class="label">${m.daily.kind === 'rain' ? t('rainChart')(m.daily.place ?? '') : t('firmsChart')}</div>
@@ -114,14 +119,20 @@ export class Panel {
       </section>
 
       <footer class="src">
-        ${m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '', m.insar.detrend === 'offset') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
+        ${m.id === 'lorca' ? (lang === 'es' ? 'Fuentes y limitaciones en la comparación anterior.' : 'Sources and limitations are listed in the comparison above.') : m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '', m.insar.detrend === 'offset') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
       </footer>
     `
+    this.view.onLayerError = () => {
+      const status = this.el.querySelector<HTMLElement>('#layer-error')
+      if (status) status.textContent = lang === 'es' ? 'No se pudo cargar una capa del mapa. Comprueba la conexión o prueba otra vista.' : 'A map layer could not be loaded. Check the connection or try another view.'
+    }
+    if (this.view.layerError) this.view.onLayerError()
     this.bind(m)
     // las dos casillas de riesgo (controles y tarjeta) reflejan el estado de la vista
     this.el.querySelectorAll<HTMLInputElement>('#chk-risk, #chk-risk2').forEach((c) => (c.checked = v.showRisk))
     this.sync()
-    this.drawChart(m)
+    if (m.id === 'lorca') { this.chart?.destroy(); this.chart = undefined; void drawLorca(m, this.el) }
+    else this.drawChart(m)
     this.drawDaily(m)
   }
 
@@ -135,6 +146,11 @@ export class Panel {
       v.setMode(b.dataset.v as ViewMode)
       this.sync()
     }
+    this.el.querySelector<HTMLElement>('#seg-flood')?.addEventListener('click', () => {
+      this.stop()
+      v.setMode('flood')
+      this.sync()
+    })
     const segSensor = this.el.querySelector<HTMLElement>('#seg-sensor')
     if (segSensor)
       segSensor.onclick = (e) => {
@@ -200,6 +216,7 @@ export class Panel {
   private sync() {
     const v = this.view
     this.el.querySelectorAll<HTMLButtonElement>('#seg-mode button').forEach((b) => b.classList.toggle('on', b.dataset.v === v.mode))
+    this.el.querySelector<HTMLButtonElement>('#seg-flood button')?.classList.toggle('on', v.mode === 'flood')
     const ins = this.m?.insar && v.sensor === 'L' ? this.m.insar : undefined
     this.el.querySelectorAll<HTMLButtonElement>('#seg-pol button').forEach((b) => {
       b.classList.toggle('on', b.dataset.v === v.pol)
@@ -217,7 +234,7 @@ export class Panel {
     })
     const lg = this.el.querySelector<HTMLElement>('#legend-scale')
     if (lg) {
-      const show = ins ? (v.mode === 'change' ? 'hh' : v.pol) : null
+      const show = ins ? (v.mode === 'change' || v.mode === 'flood' ? 'hh' : v.pol) : null
       const n = (x: number) => fmtDec(x, 1)
       lg.innerHTML = !ins || !show ? ''
         : show === 'hh' ? `<div class="ls-bar disp"></div><div class="ls-ticks"><span>−${n(ins.vmax_cm)} cm</span><span>0</span><span>+${n(ins.vmax_cm)} cm</span></div><div class="ls-ticks sub"><span>${t('legendAway')}</span><span>${t('legendToward')}</span></div>`
@@ -225,10 +242,10 @@ export class Panel {
         : `<div class="ls-bar coh"></div><div class="ls-ticks"><span>0</span><span>${t('legendCoh')}</span><span>1</span></div>`
     }
     this.el.querySelectorAll<HTMLButtonElement>('#seg-sensor button').forEach((b) => b.classList.toggle('on', b.dataset.v === v.sensor))
-    this.el.querySelector<HTMLElement>('#seg-pol')!.classList.toggle('disabled', v.mode === 'change')
+    this.el.querySelector<HTMLElement>('#seg-pol')!.classList.toggle('disabled', v.mode === 'change' || v.mode === 'flood')
     const hints: Record<ViewMode, string> = ins
-      ? { compare: t('hintCompareI'), timeline: t('hintTimelineI'), change: t('hintChangeI') }
-      : { compare: t('hintCompare'), timeline: t('hintTimeline'), change: t('hintChange') }
+      ? { compare: t('hintCompareI'), timeline: t('hintTimelineI'), change: t('hintChangeI'), flood: t('floodHint') }
+      : { compare: t('hintCompare'), timeline: t('hintTimeline'), change: t('hintChange'), flood: t('floodHint') }
     this.el.querySelector('#mode-hint')!.textContent = hints[v.mode]
     if (v.mode !== 'timeline') this.el.querySelector('#frame-date')!.textContent = ''
   }
@@ -391,15 +408,16 @@ function riskCard(m: Manifest) {
   const idx = (name: string) => r.classes.findIndex((c) => c.cls === name)
   const c = r.cascade
   const km = (v: number) => v.toLocaleString(locale())
-  const cascade =
-    c.type === 'post_fire_runoff' ? t('riskCascadeFire')(fmt(c.burned_steep_ha ?? 0), km(c.roads_km))
+  const cascade = !c ? ''
+    : c.type === 'post_fire_runoff' ? t('riskCascadeFire')(fmt(c.burned_steep_ha ?? 0), km(c.roads_km))
     : c.type === 'bank_undercutting' ? t('riskCascadeDebris')(fmt(c.steep_bank_ha ?? 0), km(c.roads_km))
     : c.type === 'subsidence_flooding' ? t('riskCascadeSubsidence')(fmt(c.sinking_flat_ha ?? 0), km(c.roads_km), km(c.rail_km))
     : c.cells === 0 ? t('riskCascadeFlat')(fmt(c.rain_mm ?? 0))
     : t('riskCascadeFlood')(fmt(c.rain_mm ?? 0), km(c.roads_km), km(c.rail_km))
   return `<section class="sec risk">
     <div class="label">${t('riskTitle')}</div>
-    <p class="risk-lead"><b>${fmt(r.pop_high)}</b> ${t('riskPop')(fmt(r.pop_high_range[0]), fmt(r.pop_high_range[1]))}</p>
+    ${r.scenario === 'snczi_t100_limited' ? `<p class="hint">${lang === 'es' ? 'Escenario fluvial T100 del SNCZI: peligrosidad modelada, no inundación observada. El índice clasifica celdas para exploración; no predice daños ni es comparable directamente con Valencia. Sin color no significa ausencia de riesgo. Versión reducida: usa población, suelo construido y cultivos como exposición y solo susceptibilidad física de cobertura como vulnerabilidad. No incluye edad, vías ni servicios. Los pesos son supuestos.' : 'SNCZI T100 river scenario: modelled hazard, not an observed flood. This screening index ranks cells; it does not predict damage and is not directly comparable with Valencia. No colour does not mean no risk. Limited version: exposure uses population, built land and cropland; vulnerability uses only physical land-cover susceptibility. Age, roads and services are omitted. Weights are assumed.'}</p>` : ''}
+    <p class="risk-lead"><b>${fmt(r.pop_high)}</b> ${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `personas estimadas viven en celdas clasificadas como altas o muy altas (${fmt(r.pop_high_range[0])}–${fmt(r.pop_high_range[1])} al variar los pesos de exposición). No son personas afectadas observadas.` : `estimated people live in cells classified high or very high (${fmt(r.pop_high_range[0])}–${fmt(r.pop_high_range[1])} when exposure weights vary). They are not observed flood victims.`) : t('riskPop')(fmt(r.pop_high_range[0]), fmt(r.pop_high_range[1]))}</p>
     <div class="lc-bar" role="img" aria-label="${rows.map((c) => `${names[c.i]} ${fmt(c.area_ha)} ha`).join(', ')}">
       ${rows.map((c) => `<i style="flex:${Math.max(c.area_ha / total, 0.01)};background:${RISK_COLORS[c.i]}" title="${names[c.i]}: ${fmt(c.area_ha)} ha"></i>`).join('')}
     </div>
@@ -416,13 +434,13 @@ function riskCard(m: Manifest) {
       <p class="hint">${t('riskHot')}</p>
       ${hot.map((h) => `<div><span>${t('riskNear')(h.place)}</span><b style="color:${RISK_COLORS[idx(h.class)]}">${names[idx(h.class)]} · ${fmtDec(h.risk)}</b></div>`).join('')}
     </div>
-    <p class="hint">${cascade}</p>
-    <p class="hint">${t('riskStable')(r.stability.mean_pct, r.stability.runs, r.stability.spread_pct)}</p>
+    ${r.cascade ? `<p class="hint">${cascade}</p>` : ''}
+    <p class="hint">${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `Estabilidad media de clase: ${r.stability.mean_pct} % en ${r.stability.runs} simulaciones variando ±${r.stability.spread_pct} % los pesos de exposición; escenario T100 y vulnerabilidad física fijos.` : `Mean class stability: ${r.stability.mean_pct}% in ${r.stability.runs} simulations varying exposure weights by ±${r.stability.spread_pct}%; T100 scenario and physical vulnerability held fixed.`) : t('riskStable')(r.stability.mean_pct, r.stability.runs, r.stability.spread_pct)}</p>
     <div class="risk-dl">
       <a class="btn ghost" href="/data/${m.id}/${r.files.csv}" download="${m.id}_risk.csv">CSV</a>
       <a class="btn ghost" href="/data/${m.id}/${r.files.geojson}" download="${m.id}_risk.geojson">GeoJSON</a>
     </div>
-    <p class="hint src-inline">${t('riskMethod')(r.cell_m[0], r.cell_m[1])}</p>
+    <p class="hint src-inline">${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `Rejilla de ${r.cell_m[0]} × ${r.cell_m[1]} m. Fuentes: SNCZI T100, WorldPop 2020 y ESA WorldCover 2021.` : `${r.cell_m[0]} × ${r.cell_m[1]} m grid. Sources: SNCZI T100, WorldPop 2020 and ESA WorldCover 2021.`) : t('riskMethod')(r.cell_m[0], r.cell_m[1])}</p>
   </section>`
 }
 
@@ -435,14 +453,15 @@ const LC_COLORS: Record<string, string> = {
 function landcoverCard(m: Manifest) {
   const lc = m.landcover!
   const fire = m.kind === 'fire'
+  const slide = m.kind === 'landslide'
   const names = t('lc')
   const rows = lc.inside.filter((r) => r.pct >= 0.5)
   const fmt = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: 0 })
   const crop = lc.outside_ref?.find((r) => r.cls === 'crop')
   const ex = m.exposure
-  const pop = ex ? (fire ? t('lcPop')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : t('lcPopFlood')(fmt(ex.pop_inside))) : ''
+  const pop = ex ? (fire ? t('lcPop')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : slide ? t('lcPopSlide')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : t('lcPopFlood')(fmt(ex.pop_inside))) : ''
   return `<section class="sec">
-    <div class="label">${t('lcTitle')(fire)}</div>
+    <div class="label">${t('lcTitle')(m.kind)}</div>
     <div class="lc-bar" role="img" aria-label="${rows.map((r) => `${names[r.cls] ?? r.cls} ${r.pct}%`).join(', ')}">
       ${rows.map((r) => `<i style="flex:${r.pct};background:${LC_COLORS[r.cls] ?? LC_COLORS.other}" title="${names[r.cls] ?? r.cls}: ${fmt(r.ha)} ha"></i>`).join('')}
     </div>

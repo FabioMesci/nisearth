@@ -49,7 +49,7 @@ export interface Manifest {
   coordinates: [[number, number], [number, number], [number, number], [number, number]]
   pair: { before: string; after: string }
   frames: Frame[]
-  layers: { mask?: string; change?: string }
+  layers: { mask?: string; change?: string; flood_t100?: string }
   series: { dates: string[]; hh: number[]; hv: number[] }
   metrics: Metric[]
   overlays: { rail?: string; roads?: string; effis?: string; ems?: string; firms?: string; risk?: string; events?: string; ref?: string }
@@ -99,6 +99,7 @@ export interface InsarInfo {
 export interface RiskSummary {
   generated: string
   model: string
+  scenario?: 'snczi_t100_limited'
   cell_m: [number, number]
   cells: number
   classes: { cls: string; cells: number; area_ha: number; population: number }[]
@@ -111,7 +112,7 @@ export interface RiskSummary {
   components: { hazard: number; exposure: number; vulnerability: number }
   drivers: { exposure: Record<string, number>; vulnerability: Record<string, number> }
   hotspots: { place: string; lon: number; lat: number; risk: number; class: string; population: number }[]
-  cascade: {
+  cascade?: {
     type: 'post_fire_runoff' | 'rain_slope_failure' | 'bank_undercutting' | 'subsidence_flooding'
     cells: number; roads_km: number; rail_km: number
     burned_steep_ha?: number; rain_mm?: number; steep_bank_ha?: number; sinking_flat_ha?: number

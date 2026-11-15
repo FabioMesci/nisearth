@@ -33,6 +33,7 @@ VIIRS = ("VIIRS_SNPP_NRT", "VIIRS_NOAA20_NRT", "VIIRS_NOAA21_NRT")
 EXTRA = {
     "niebla": {"fire_window": ("2026-08-04", "2026-08-18")},
     "dana": {"rain_point": (38.92, -0.12, "Oliva"), "rain_window": ("2026-10-08", "2026-10-26")},
+    "rasuwa": {"rain_point": (28.21, 85.45, "Langtang · Rasuwa"), "rain_window": ("2026-08-15", "2026-09-05"), "tz": "Asia/Kathmandu"},
 }
 
 
@@ -108,8 +109,9 @@ def fire(cid):
 def rain(cid):
     lat, lon, place = EXTRA[cid]["rain_point"]
     d0, d1 = EXTRA[cid]["rain_window"]
+    tz = EXTRA[cid].get("tz", "Europe/Madrid")
     url = (f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
-           f"&start_date={d0}&end_date={d1}&daily=precipitation_sum&hourly=precipitation&timezone=Europe/Madrid")
+           f"&start_date={d0}&end_date={d1}&daily=precipitation_sum&hourly=precipitation&timezone={tz}")
     js = json.loads(urlopen(url, timeout=60).read())
     days, mm = js["daily"]["time"], [round(v or 0, 1) for v in js["daily"]["precipitation_sum"]]
     hourly = js["hourly"]["precipitation"]

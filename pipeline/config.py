@@ -36,6 +36,20 @@ CASES = {
         "s1_pair": ("2026-07-21", "2026-08-26"),  # Sentinel-1: mismas fechas que NISAR
         "s1_track": 147,  # pasada 147 asc: cubre el 100 % del perímetro EFFIS (la 52 solo el 54 %)
     },
+    "rasuwa": {
+        "title": "Colapso del Langtang Lirung y riada de Rasuwa (Nepal)",
+        "region": "world",
+        "kind": "landslide",
+        "iso3": "NPL",
+        "bbox": (85.25, 28.15, 85.58, 28.36),  # valle de Langtang + garganta Lende Khola / Trishuli
+        "window": ("2026-06-01", "2026-11-14"),
+        "event": "2026-08-26",  # colapso de roca y hielo (cara norte del Langtang Lirung) que represó el Lhende; EMS lo activó como GLOF (EMSR927)
+        "pair": ("2026-08-19", "2026-08-31"),  # misma pasada 98 asc (40 MHz DHDH, 100 % cobertura)
+        "track": 98,
+        "s1_pair": ("2026-08-16", "2026-08-28"),  # Sentinel-1D pasada 85 asc: 2 días después del evento
+        "s1_track": 85,
+        "ems": {"code": "EMSR927", "date": "2026-08-26"},
+    },
     # ---- Casos de interferometría (InSAR, NISAR L2 GUNW): pipeline/08_insar.py ----
     # mode "pairs": cada interferograma es un fotograma independiente (terremoto: varias geometrías)
     # mode "chain": pares consecutivos de 12 días de una pasada, sumados = desplazamiento acumulado
@@ -57,6 +71,45 @@ CASES = {
             "vmax_cm": 4.0,
             "fringe_cm": 2.0,
             "exclude_km": 12,  # radio sin usar para quitar rampa y atmósfera
+        },
+    },
+    "venezuela": {
+        "title": "Doblete sísmico de Venezuela (Yaracuy · La Guaira)",
+        "region": "world",
+        "kind": "earthquake",
+        "iso3": "VEN",
+        "seismic_source": "usgs",
+        "bbox": (-68.90, 10.21, -66.75, 10.85),
+        "window": ("2026-06-01", "2026-07-15"),
+        "event": "2026-06-24",  # Mw 7,2 (22:04:31 UTC, San Felipe) y Mw 7,5 (22:05:03 UTC, Catia La Mar), 32 s después; prof. 10 km
+        "insar": {
+            "mode": "pairs",
+            "pairs": [  # en orden cronológico (fecha posterior al sismo): así los lee la línea de tiempo de la web
+                (162, "2026-06-13", "2026-06-25"),  # ascendente (+12 h tras el sismo): cubre ambos epicentros M7,2 y M7,5
+                (54, "2026-06-17", "2026-06-29"),   # descendente: ruptura occidental y central (Yaracuy - Puerto Cabello - Aragua)
+                (61, "2026-06-18", "2026-06-30"),   # ascendente: ruptura oriental (Catia La Mar - La Guaira - Caracas)
+                (126, "2026-06-22", "2026-07-04"),  # descendente: ruptura central y oriental (Catia La Mar - La Guaira)
+            ],
+            "main_track": 162,  # mapa principal: la única pasada que cubre los dos epicentros
+            # sin "peak": con la 61 (23 % válido) el percentil 0,5 daba −74 cm, más que los ~60 cm horizontales de JPL;
+            # la comparación con JPL se hace por la proyección: 60 cm E-O se ven como ~33-42 cm en la línea de visión
+            "hotspot": (-67.2109, 10.5500),   # zona costera epicentral M7,5 al oeste de Catia La Mar (cubierta por 61, 126 y 162)
+            "hotspot2": (-68.2500, 10.5400),  # traza costera de la falla de Morón / M7,2 San Felipe (cubierta por 54 y 162)
+            "disc_km": 1.2,
+            "iono": True,
+            "detrend": "x_dem",
+            "excl_lat_min": 10.28,
+            "res": 0.0012,
+            "vmax_cm": 40.0,
+            "fringe_cm": 11.9,
+            "exclude_km": 32,
+        },
+        "official": {
+            "url": "https://science.nasa.gov/earth/earth-observatory/where-venezuelas-earthquakes-shifted-the-ground/",
+            "image": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/iotd/2026/where-venezuela’s-earthquakes-shifted-the-ground/venezuela_nisar_20260630.jpg",
+            "credit": "NASA Earth Observatory/Lauren Dauphin; datos: Eric Fielding, equipo científico NISAR (JPL)",
+            "date": "2026-07-10",
+            "claim": "Hasta ~60 cm de desplazamiento hacia el oeste junto al aeropuerto de Maiquetía",
         },
     },
     "lorca": {
@@ -88,38 +141,6 @@ CASES = {
     },
     # ---- NISAR en el mundo: eventos difundidos por NASA/JPL, procesados aquí con el mismo pipeline ----
     # "official": imagen de NASA/JPL para comparar (se muestra con su crédito; la nuestra es independiente)
-    "venezuela": {
-        "title": "Terremotos de Venezuela (Caracas · La Guaira)",
-        "region": "world",
-        "kind": "earthquake",
-        "bbox": (-67.60, 10.35, -66.60, 10.75),
-        "window": ("2026-06-01", "2026-07-15"),
-        "event": "2026-06-24",  # M7,2 (20 km E de San Felipe) y, 33 s después, M7,5 (20 km O de Catia La Mar), USGS
-        "insar": {
-            "mode": "pairs",
-            "pairs": [  # tres pasadas que abarcan el terremoto; la 126 (desc) cubre el 100 % y va al final (mapa principal)
-                (162, "2026-06-13", "2026-06-25"),  # (la 54 desc solo cubre un rincón del oeste: descartada)
-                (61, "2026-06-18", "2026-06-30"),
-                (126, "2026-06-22", "2026-07-04"),
-            ],
-            "hotspot": (-67.048, 10.592),  # costa junto al aeropuerto de Maiquetía, válida en las 3 pasadas (el epicentro M7,5 está en el mar)
-            "ref_box": (-67.60, 10.35, -66.60, 10.42),  # cero: franja interior, lo más lejos posible de la falla costera
-            "res": 0.001,
-            "vmax_cm": 40.0,
-            "fringe_cm": 11.9,  # una franja = media longitud de onda en banda L
-            "exclude_km": 30,
-            "mask_cm": 5.0,
-            "detrend": "offset",
-            "peak": True,  # sin rampa ni relieve: la deformación cubre toda la franja costera
-        },
-        "official": {
-            "url": "https://science.nasa.gov/earth/earth-observatory/where-venezuelas-earthquakes-shifted-the-ground/",
-            "image": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/iotd/2026/where-venezuela’s-earthquakes-shifted-the-ground/venezuela_nisar_20260630.jpg",
-            "credit": "NASA Earth Observatory/Lauren Dauphin; datos: Eric Fielding, equipo científico NISAR (JPL)",
-            "date": "2026-07-10",
-            "claim": "Hasta ~60 cm de desplazamiento hacia el oeste junto al aeropuerto de Maiquetía",
-        },
-    },
     "cdmx": {
         "title": "Subsidencia de Ciudad de México",
         "region": "world",
@@ -179,20 +200,6 @@ CASES = {
             "date": "2026-08-06",
             "claim": "Más de 600 000 desplazados; el radar ve el agua bajo las nubes que tapaban a Sentinel-2",
         },
-    },
-    "nepal": {
-        "title": "Riada del Bhote Koshi–Trishuli (Rasuwa, Nepal)",
-        "region": "world",
-        "iso3": "NPL",  # el tramo chino (Gyirong) queda sin población WorldPop
-        "kind": "flood",
-        "change": "debris",  # riada relámpago en valle encajado: el agua ya no se ve; se buscan cicatrices (sedimento, deslizamientos)
-        "bbox": (85.15, 27.85, 85.45, 28.35),  # de Gyirong (frontera china) a Betrawati por el corredor Bhote Koshi–Trishuli
-        "window": ("2026-07-15", "2026-10-15"),
-        "event": "2026-08-26",
-        "pair": ("2026-08-19", "2026-08-31"),  # pasada 98 asc, 100 %: 7 días antes y 5 después
-        "track": 98,
-        "debris": {"buffer_m": 300, "min_db": 3.0},
-        "official": None,  # NASA no ha publicado imagen NISAR de este evento: solo nuestro procesado
     },
     "langtang": {
         "title": "Colapso del glaciar del Langtang Lirung (Nepal)",

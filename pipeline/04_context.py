@@ -39,18 +39,35 @@ def mask_polygons(path, buffer_px=1):
     return unary_union(polys) if polys else None
 
 
-def osm_lines(bbox, tags, tries=5):
+OVERPASS_URLS = ["https://overpass.kumi.systems/api", "https://overpass-api.de/api"]
+
+
+def osm_lines(bbox, tags, tries=5, cache_file=None):
+    if cache_file and cache_file.exists():
+        from shapely.geometry import LineString
+        data = json.loads(cache_file.read_text(encoding="utf-8")).get("elements", [])
+        k, vals = next(iter(tags.items()))
+        rows = []
+        for e in data:
+            if e.get("type") == "way" and "geometry" in e and e.get("tags", {}).get(k) in vals:
+                pts = [(p["lon"], p["lat"]) for p in e["geometry"]]
+                if len(pts) >= 2:
+                    t = e.get("tags", {})
+                    rows.append({"geometry": LineString(pts), "name": t.get("name"), k: t.get(k), "ref": t.get("ref")})
+        return gpd.GeoDataFrame(rows, geometry="geometry", crs=4326) if rows else gpd.GeoDataFrame(geometry=[], crs=4326)
     lon0, lat0, lon1, lat1 = bbox
+    ox.settings.requests_timeout = 45
     for i in range(tries):
+        ox.settings.overpass_url = OVERPASS_URLS[i % len(OVERPASS_URLS)]
         try:
             gdf = ox.features_from_bbox((lon0, lat0, lon1, lat1), tags)
             break
         except ox._errors.InsufficientResponseError:
-            print(f"   OSM: no hay elementos {tags} en el bbox")
+            print(f"   OSM: no hay elementos {tags} en el bbox", flush=True)
             return gpd.GeoDataFrame(geometry=[], crs=4326)
         except Exception as e:  # Overpass saturado (429/504): esperar y reintentar
-            wait = 10 * 2**i
-            print(f"   OSM ocupado ({type(e).__name__}); reintento en {wait}s")
+            wait = 5 * (i + 1)
+            print(f"   OSM ocupado ({type(e).__name__}); reintento en {wait}s", flush=True)
             time.sleep(wait)
     else:
         raise SystemExit("Overpass no responde; vuelve a intentarlo en unos minutos")
@@ -81,8 +98,9 @@ def main():
         area = area.intersection(effis.union_all())
     area_gdf = gpd.GeoDataFrame(geometry=[area], crs=4326)
 
-    rail = osm_lines(case["bbox"], {"railway": ["rail", "light_rail", "narrow_gauge"]})
-    roads = osm_lines(case["bbox"], {"highway": ["motorway", "trunk", "primary", "secondary", "tertiary"]})
+    osm_cache = RAW / "osm" / f"{cid}_risk.json"
+    rail = osm_lines(case["bbox"], {"railway": ["rail", "light_rail", "narrow_gauge"]}, cache_file=osm_cache)
+    roads = osm_lines(case["bbox"], {"highway": ["motorway", "trunk", "primary", "secondary", "tertiary"]}, cache_file=osm_cache)
     print(f"[osm] {len(rail)} vías, {len(roads)} carreteras en el bbox")
 
     rail_hit = gpd.clip(rail, area_gdf) if not rail.empty else rail
@@ -144,12 +162,18 @@ def main():
                                             "nisar_in_ems_pct": round(float(100 * (m & e).sum() / max(m.sum(), 1)), 1)})
         man["metrics"] = [x for x in man["metrics"] if x["id"] != "ems_seen"] + [
             {"id": "ems_seen", "label": "De la inundación vista por Copernicus EMS, aún visible para NISAR", "value": round(float(seen)), "unit": "%"}]
-    lab = "en zona inundada" if case["kind"] == "flood" else "en zona quemada confirmada"
-    new = [
-        {"id": "rail", "label": f"Vía férrea {lab}", "value": rail_km, "unit": "km"},
-        {"id": "roads", "label": f"Carreteras {lab}", "value": roads_km, "unit": "km"},
-    ]
-    if rail_dist_km is not None and rail_km == 0:
+    elif case.get("ems"):
+        man.setdefault("stats", {}).update({"ems_code": case["ems"]["code"], "ems_date": case["ems"]["date"]})
+    lab = (
+        "en zona inundada" if case["kind"] == "flood" else
+        "en zona deslizada / GLOF" if case["kind"] == "landslide" else
+        "en zona quemada confirmada"
+    )
+    new = []
+    if len(rail) > 0 or case["kind"] != "landslide":
+        new.append({"id": "rail", "label": f"Vía férrea {lab}", "value": rail_km, "unit": "km"})
+    new.append({"id": "roads", "label": f"Carreteras y senderos {lab}" if case["kind"] == "landslide" else f"Carreteras {lab}", "value": roads_km, "unit": "km"})
+    if rail_dist_km is not None and rail_km == 0 and new and new[0]["id"] == "rail":
         new[0] = {"id": "rail", "label": "Distancia de la vía férrea a la zona quemada", "value": rail_dist_km, "unit": "km"}
     ids = {m["id"] for m in new}
     man["metrics"] = [m for m in man["metrics"] if m["id"] not in ids] + new

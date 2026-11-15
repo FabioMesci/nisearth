@@ -232,10 +232,17 @@ def correct(unw, coh, cc, iono, dem, X, Y, excl, detrend="ramp"):
         if ref.any():
             d = d - np.nanmedian(d[ref])
     elif fit.sum() > 200:
-        A = np.column_stack([np.ones(fit.sum()), X[fit], Y[fit], dem[fit] / 1000])
-        coef, *_ = np.linalg.lstsq(A, d[fit], rcond=None)
-        model = coef[0] + coef[1] * X + coef[2] * Y + coef[3] * np.nan_to_num(dem) / 1000
+        if detrend == "x_dem":  # escena alargada E-O: rampa solo en X (en Y la falla costera ocupa todo)
+            A = np.column_stack([np.ones(fit.sum()), X[fit], dem[fit] / 1000])
+            coef, *_ = np.linalg.lstsq(A, d[fit], rcond=None)
+            model = coef[0] + coef[1] * X + coef[2] * np.nan_to_num(dem) / 1000
+        else:
+            A = np.column_stack([np.ones(fit.sum()), X[fit], Y[fit], dem[fit] / 1000])
+            coef, *_ = np.linalg.lstsq(A, d[fit], rcond=None)
+            model = coef[0] + coef[1] * X + coef[2] * Y + coef[3] * np.nan_to_num(dem) / 1000
         d = d - model
+    elif fit.sum() > 20:
+        d = d - np.nanmedian(d[fit])
     elif good.any():
         d = d - np.nanmedian(d[good])
     return d.astype("float32"), good
@@ -331,6 +338,11 @@ def cmd_process(cid):
     elif hot:
         hx, hy = kx(hot[0]), ky(hot[1])
         excl = (X - hx) ** 2 + (Y - hy) ** 2 <= ins["exclude_km"] ** 2
+        if ins.get("hotspot2"):
+            hx2, hy2 = kx(ins["hotspot2"][0]), ky(ins["hotspot2"][1])
+            excl |= (X - hx2) ** 2 + (Y - hy2) ** 2 <= ins["exclude_km"] ** 2
+        if ins.get("excl_lat_min"):
+            excl |= Y >= ky(ins["excl_lat_min"])
         done = run(excl)
     else:
         done = run(np.zeros_like(X, bool))
@@ -362,17 +374,26 @@ def cmd_process(cid):
         frames_d = [np.where((valid >= need) & ~jump, s, np.nan) for s in stack]
     else:
         frames_d = [d for p, d, good, coh in done]
-        final = frames_d[-1]
+        # mapa principal: la pasada "main_track" si se indica (los pares van en orden cronológico), si no la última
+        mi = next((i for i, (p, *_) in enumerate(done) if p["track"] == ins.get("main_track")), len(done) - 1)
+        final = frames_d[mi].copy()
+        for i, ((p, *_), d) in enumerate(zip(done, frames_d)):
+            if i != mi and p["dir"] == done[mi][0]["dir"]:
+                ov = np.isfinite(final) & np.isfinite(d)
+                off = float(np.nanmedian(final[ov] - d[ov])) if ov.sum() > 50 else 0.0
+                final = np.where(np.isfinite(final), final, d + off)
     cohs = [coh for p, d, good, coh in done]
 
     # 3) imágenes
     out = WEB_DATA / cid
     out.mkdir(parents=True, exist_ok=True)
     for old in [*out.glob("*.webp"), *out.glob("*.png")]:
-        old.unlink()
+        if old.name != "flood-t100.png":
+            old.unlink()
     vmax, cyc = ins["vmax_cm"], ins["fringe_cm"]
     frames, series_d, series_c = [], [], []
     hx, hy = kx(hot[0]), ky(hot[1])
+    r_disc = ins.get("disc_km", 0.4)
     # zona de interés para la serie: la colada (ref.geojson) o el trazado del AVE (rail.geojson), frente a un anillo alrededor
     region = None
     from rasterio.features import rasterize
@@ -396,7 +417,10 @@ def cmd_process(cid):
         if region is not None:
             series_d.append(round(float(np.nanmedian(d[region]) - np.nanmedian(d[ring])), 2))
         else:
-            series_d.append(round(disc_mean(d, X, Y, hx, hy, 0.4), 2))
+            val = disc_mean(d, X, Y, hx, hy, r_disc)
+            if not np.isfinite(val) and ins.get("hotspot2"):
+                val = disc_mean(d, X, Y, kx(ins["hotspot2"][0]), ky(ins["hotspot2"][1]), r_disc)
+            series_d.append(round(val, 2))
         series_c.append(round(float(np.nanmean(c)), 2))
     save_web(colorize_disp(final, vmax), out / "change.webp")
     with rasterio.open(work / "insar_final.tif", "w", driver="GTiff", width=w, height=h, count=2, dtype="float32",
@@ -410,25 +434,31 @@ def cmd_process(cid):
     sm = uniform_filter(np.nan_to_num(final), 3)
     moving = np.isfinite(final) & (np.abs(sm) > thr)
     if ins["mode"] == "pairs":
-        # pares independientes: solo cuenta lo que se repite con el mismo signo en todas las pasadas
-        # de un mismo sentido (dos descendentes deben ver lo mismo); lo demás es atmósfera
+        # pares independientes: cuenta lo que se repite con el mismo signo en todas las pasadas que cubren el píxel
+        # de un mismo sentido, o lo confirmado a la vez en geometría ascendente y descendente; lo demás es atmósfera
         moving = np.zeros_like(moving)
         for dr in {p["dir"] for p, *_ in done}:
             ds_ = [uniform_filter(np.nan_to_num(d), 3) for (p, *_), d in zip(done, frames_d) if p["dir"] == dr]
+            v_ = [np.isfinite(d) for (p, *_), d in zip(done, frames_d) if p["dir"] == dr]
             if len(ds_) < 2:
                 continue
-            st = np.stack(ds_)
-            moving |= (np.all(st > thr, 0) | np.all(st < -thr, 0))
+            st, vt = np.stack(ds_), np.stack(v_)
+            both = vt.sum(0) >= 2
+            moving |= ((np.all(np.where(vt, st > thr, True), 0) | np.all(np.where(vt, st < -thr, True), 0)) & both)
+        asc_m = [np.isfinite(d) & (np.abs(uniform_filter(np.nan_to_num(d), 3)) > thr) for (p, *_), d in zip(done, frames_d) if p["dir"] == "A"]
+        desc_m = [np.isfinite(d) & (np.abs(uniform_filter(np.nan_to_num(d), 3)) > thr) for (p, *_), d in zip(done, frames_d) if p["dir"] == "D"]
+        if asc_m and desc_m:
+            moving |= (np.any(asc_m, axis=0) & np.any(desc_m, axis=0))
     moving &= binary_dilation(moving, iterations=1)
     rgba = np.zeros((h, w, 4), "uint8")
     rgba[moving] = (217, 70, 239, 200)
     Image.fromarray(rgba, "RGBA").save(out / "mask.png", optimize=True)
     px_ha = (abs(tr.a) * 111320 * np.cos(np.radians(lat0))) * (abs(tr.e) * 110570) / 1e4
 
-    first = date.fromisoformat(done[0][0]["ref"])
-    last = date.fromisoformat(done[-1][0]["sec"])
+    first = min(date.fromisoformat(p["ref"]) for p, *_ in done)
+    last = max(date.fromisoformat(p["sec"]) for p, *_ in done)
     days = (last - first).days
-    hot_val = series_d[-1] if region is not None else disc_mean(final, X, Y, hx, hy, 0.4)
+    hot_val = series_d[-1] if region is not None else disc_mean(final, X, Y, hx, hy, r_disc)
     peak = float(np.nanpercentile(final, 0.5)) if np.nanmedian(final) <= hot_val else float(np.nanpercentile(final, 99.5))
     metrics = []
     rate = float("nan")
@@ -478,14 +508,16 @@ def cmd_process(cid):
             "vmax_cm": vmax, "fringe_cm": cyc, "hotspot": [round(hot[0], 4), round(hot[1], 4)],
             "noise_cm": round(noise, 2), "rate_cm_yr": round(rate, 1) if np.isfinite(rate) else None, "series": "region" if region is not None else "point", "threshold_cm": round(thr, 2), "days": days,
             "detrend": ins.get("detrend", "ramp"),
-            "start": done[0][0]["ref"], "end": done[-1][0]["sec"],
+            "start": first.isoformat(), "end": last.isoformat(),
             "pairs": [{"track": p["track"], "dir": p["dir"], "ref": p["ref"], "sec": p["sec"]} for p, *_ in done],
         },
     }
     # conservar lo que añaden otros pasos (contexto, Sentinel-1, eventos) si ya existía
     if man_path.exists():
         old = json.loads(man_path.read_text())
-        for k in ("overlays", "s1", "stats", "daily", "refLabel", "risk"):  # risk: vuelve a correr 07_risk.py si cambia la máscara
+        if old.get("layers", {}).get("flood_t100"):
+            manifest["layers"]["flood_t100"] = old["layers"]["flood_t100"]
+        for k in ("overlays", "s1", "stats", "daily", "refLabel", "risk"):
             if k in old and old[k]:
                 manifest[k] = old[k]
     man_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=1))
@@ -512,11 +544,25 @@ def overpass(q):
 
 
 def emsc_events(case):
-    """Terremotos del catálogo EMSC dentro del bbox (±40 días alrededor del evento)."""
+    """Terremotos del catálogo EMSC o USGS dentro del bbox (±40 días alrededor del evento)."""
     import urllib.request
-    from datetime import timedelta
+    from datetime import datetime, timedelta, timezone
     x0, y0, x1, y1 = case["bbox"]
     ev = date.fromisoformat(case["event"])
+    if case.get("seismic_source") == "usgs":
+        url = ("https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=2.0"
+               f"&starttime={ev - timedelta(days=40)}&endtime={ev + timedelta(days=40)}"
+               f"&minlatitude={y0 - 0.05}&maxlatitude={y1 + 0.06}&minlongitude={x0 - 0.05}&maxlongitude={x1 + 0.05}&limit=2000")
+        d = json.loads(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60).read())
+        feats = []
+        for f in d["features"]:
+            p = f["properties"]
+            c = f["geometry"]["coordinates"]
+            t_iso = datetime.fromtimestamp(p["time"] / 1000, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+            feats.append({"type": "Feature", "geometry": {"type": "Point", "coordinates": [round(float(c[0]), 4), round(float(c[1]), 4)]},
+                          "properties": {"mag": p["mag"], "magtype": p.get("magType"), "time": t_iso, "depth": c[2], "place": p.get("place")}})
+        feats.sort(key=lambda f: f["properties"]["mag"])
+        return {"type": "FeatureCollection", "features": feats}
     url = ("https://www.seismicportal.eu/fdsnws/event/1/query?format=json&minmag=2.0"
            f"&starttime={ev - timedelta(days=40)}&endtime={ev + timedelta(days=40)}"
            f"&minlat={y0}&maxlat={y1}&minlon={x0}&maxlon={x1}&limit=2000")
@@ -568,8 +614,9 @@ def cmd_context(cid):
         (out / "events.geojson").write_text(json.dumps(ev))
         man["overlays"]["events"] = "events.geojson"
         big = [f for f in ev["features"] if f["properties"]["mag"] >= 4.5]
-        print(f"[emsc] {len(ev['features'])} sismos, {len(big)} de M4,5 o más")
-        man["refLabel"] = "Sismicidad: EMSC (seismicportal.eu)"
+        src_lbl = "USGS (earthquake.usgs.gov)" if case.get("seismic_source") == "usgs" else "EMSC (seismicportal.eu)"
+        print(f"[quakes] {len(ev['features'])} sismos, {len(big)} de M4,5 o más ({src_lbl})")
+        man["refLabel"] = f"Sismicidad: {src_lbl}"
     if ctx.get("osm_relation"):
         poly, gj = osm_relation_polygon(ctx["osm_relation"])
         (out / "ref.geojson").write_text(json.dumps(gj))

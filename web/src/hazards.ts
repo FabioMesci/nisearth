@@ -49,7 +49,7 @@ export const HAZARDS: Hazard[] = [
   },
   {
     id: 'earthquake',
-    caseId: 'granada',
+    caseId: 'venezuela',
     icon: ICON.earthquake,
     color: '#f472b6',
     name: 'Earthquake',
@@ -62,7 +62,7 @@ export const HAZARDS: Hazard[] = [
   },
   {
     id: 'landslide',
-    caseId: 'alora',
+    caseId: 'rasuwa',
     icon: ICON.landslide,
     color: '#a3e635',
     name: 'Landslide',

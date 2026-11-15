@@ -133,7 +133,7 @@ async function main() {
   const list = $('case-list')
   const renderList = () => {
     // dos grupos: cambios de la superficie (antes/después) y movimiento del terreno (interferometría)
-    const surface = (k: string) => k === 'fire' || k === 'flood'
+    const surface = (c: CaseIndexItem) => c.kind === 'fire' || c.kind === 'flood' || c.id === 'rasuwa'
     const row = (c: CaseIndexItem) => {
       const meta = KIND_META[c.kind]
       const ct = CONTENT[c.id]
@@ -141,8 +141,8 @@ async function main() {
     }
     const es = cases.filter((c) => c.region !== 'world')
     const groups = [
-      { label: t('groupSurface'), items: es.filter((c) => surface(c.kind)) },
-      { label: t('groupGround'), items: es.filter((c) => !surface(c.kind)) },
+      { label: t('groupSurface'), items: es.filter((c) => surface(c)) },
+      { label: t('groupGround'), items: es.filter((c) => !surface(c)) },
       { label: t('groupWorld'), items: cases.filter((c) => c.region === 'world') },
     ].filter((g) => g.items.length)
     list.innerHTML = groups.map((g) => `<li class="grp">${g.label}</li>${g.items.map(row).join('')}`).join('')

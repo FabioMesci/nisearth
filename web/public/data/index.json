@@ -60,17 +60,6 @@
   "event": "2021-09-19"
  },
  {
-  "id": "venezuela",
-  "title": "Terremotos de Venezuela (Caracas · La Guaira)",
-  "kind": "earthquake",
-  "center": [
-   -67.1,
-   10.55
-  ],
-  "event": "2026-06-24",
-  "region": "world"
- },
- {
   "id": "krasheninnikov",
   "title": "Volcán Krasheninnikov (Kamchatka)",
   "kind": "volcano",
@@ -104,17 +93,6 @@
   "region": "world"
  },
  {
-  "id": "nepal",
-  "title": "Riada del Bhote Koshi–Trishuli (Rasuwa, Nepal)",
-  "kind": "flood",
-  "center": [
-   85.30000000000001,
-   28.1
-  ],
-  "event": "2026-08-26",
-  "region": "world"
- },
- {
   "id": "langtang",
   "title": "Colapso del glaciar del Langtang Lirung (Nepal)",
   "kind": "landslide",
@@ -123,6 +101,28 @@
    28.27
   ],
   "event": "2026-08-26",
+  "region": "world"
+ },
+ {
+  "id": "rasuwa",
+  "title": "Colapso del Langtang Lirung y riada de Rasuwa (Nepal)",
+  "kind": "landslide",
+  "center": [
+   85.41499999999999,
+   28.255
+  ],
+  "event": "2026-08-26",
+  "region": "world"
+ },
+ {
+  "id": "venezuela",
+  "title": "Doblete sísmico de Venezuela (Yaracuy · La Guaira)",
+  "kind": "earthquake",
+  "center": [
+   -67.825,
+   10.530000000000001
+  ],
+  "event": "2026-06-24",
   "region": "world"
  }
 ]

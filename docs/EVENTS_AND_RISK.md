@@ -100,7 +100,7 @@ hazard  = max(direct, 0.25 × edge)
 - `edge`: decays linearly from 1 at the footprint border to 0 at 1000 m (fire: embers, smoke,
   evacuation of the wildland-urban interface) or 250 m (flood: the extent is uncertain because the
   peak was not observed). Cells outside the footprint never exceed a hazard of 0.25.
-- **Debris flood** (Rasuwa): edge 300 m with weight 0.35, for bank erosion and deposits beside the
+- **Debris flood** (no published case today): edge 300 m with weight 0.35, for bank erosion and deposits beside the
   scoured channel.
 - **Subsidence** (Lorca, Mexico City): each sinking pixel is weighted by
   `max(rate / 20 cm/yr, gradient / 10 cm/yr per km)`, capped at 1. The rate is the cumulative InSAR
@@ -184,26 +184,32 @@ How to read it:
 
 Results for the cases added on 15 November 2026:
 
-| | Limpopo flood | Rasuwa debris flood | Lorca subsidence | Mexico City subsidence |
+| | Limpopo flood | Rasuwa collapse and flood | Lorca subsidence (superseded, see below) | Mexico City subsidence |
 |---|---|---|---|---|
-| Cells with hazard | 3,443 | 201 | 1,189 | 2,706 |
-| Medium risk | 11,877 ha, 17,070 people | 217 ha, 2,080 people | 122 ha, 555 people | 14,597 ha, 1.61 M people |
-| High risk | 671 ha, 1,365 people | 27 ha, 790 people | none | 12,217 ha, 1.74 M people |
+| Cells with hazard | 3,443 | 226 | 1,189 | 2,706 |
+| Medium risk | 11,877 ha, 17,070 people | 54 ha, 493 people | 122 ha, 555 people | 14,597 ha, 1.61 M people |
+| High risk | 671 ha, 1,365 people | 27 ha, 540 people | none | 12,217 ha, 1.74 M people |
 | Very high risk | none | none | none | 17,151 ha, 2.92 M people |
-| People in high cells, 5-95 % range | 289 to 2,724 | 0 to 790 | 0 | 4.30 M to 4.73 M |
-| Mean hazard / exposure / vulnerability (medium and above) | 0.73 / 0.22 / 0.54 | 0.36 / 0.48 / 0.43 | 0.36 / 0.42 / 0.37 | 0.55 / 0.86 / 0.47 |
-| Highest-risk cells near | Macarretane, Chókwè | Uttargaya (Betrawati) | Lorca, Puerto Lumbreras | Aragón, Nezahualcóyotl |
-| Cells keeping their class under ±25 % weights | 94 % | 97 % | 97 % | 91 % |
+| People in high cells, 5-95 % range | 289 to 2,724 | 513 to 540 | 0 | 4.30 M to 4.73 M |
+| Mean hazard / exposure / vulnerability (medium and above) | 0.73 / 0.22 / 0.54 | 0.46 / 0.40 / 0.54 | 0.36 / 0.42 / 0.37 | 0.55 / 0.86 / 0.47 |
+| Highest-risk cells near | Macarretane, Chókwè | Syaphrubesi | Lorca, Puerto Lumbreras | Aragón, Nezahualcóyotl |
+| Cells keeping their class under ±25 % weights | 94 % | 94 % | 97 % | 91 % |
 
 - **Limpopo.** New water covers 325 km² of floodplain, mostly cropland. Risk concentrates where the
   flood reaches the irrigation villages around Chókwè. Only 29 % of the high cells keep their class in
   at least 80 % of the runs: the 1,365 people are a central value inside a wide range.
-- **Rasuwa.** The radar scars follow the river, but the people live on the terraces above it, so most
-  cells are low. The one high cell at Uttargaya (the Trishuli–Bhote Koshi confluence) is not robust.
-  The Chinese part of the valley (Gyirong) has no WorldPop data and counts zero people.
+- **Rasuwa.** Case `rasuwa` (kind `landslide`, track 98): the footprint is a strong HV drop
+  (dHV < −1.5 dB, 9×9 mean < −1.3 dB), which traces the debris tongue below Langtang Lirung and the
+  scoured gorge down to Syaphrubesi (633 ha). Landslide hazard: edge 500 m with weight 0.30;
+  susceptibility tree 0.6, shrub 0.7, grass 0.6, crop 0.8, built 0.95, bare 0.4. The high cells at
+  Syaphrubesi are robust. An earlier `nepal` case (river-bed change along the whole Bhote Koshi–Trishuli
+  corridor, `change: "debris"`) was dropped in favour of this one: its mask was much noisier. The
+  `debris` model stays in `07_risk.py` for future cases.
 - **Lorca.** The fastest sinking (about −16 cm/yr) lies under irrigated orchards south-west of the town,
   so the risk stays medium at most. This is the expected result: Alto Guadalentín subsidence threatens
   wells, canals and farm buildings more than the town.
+  The published Lorca risk layer is now a different model: the SNCZI 100-year river-flood scenario
+  (`11_lorca_risk.py`), which replaced this subsidence run when the branches were merged.
 - **Mexico City.** The sinking lake bed is also the most densely populated part of the metropolis
   (Iztapalapa, Nezahualcóyotl, Aragón, Chalco). Exposure saturates and the result is robust: 4.3 to
   4.7 million people in high or very high cells whatever the weights.
@@ -253,7 +259,8 @@ where the secondary hazard is physically plausible, not that it will happen.
 |---|---|---|---|
 | Fire | Post-fire runoff and erosion | direct hazard × slope factor (slope / 25°, capped at 1) | 14,576 ha burned on slopes steeper than 15°; 835 cells flagged, crossed by 11.2 km of main roads |
 | Flood | Rain-triggered slope failure onto infrastructure | rain factor (event rain / 200 mm) × slope factor × network density | DANA: 78.6 mm of rain; 4 cells flagged, with 5.6 km of main roads and 0.8 km of railway. Limpopo: 342.6 mm (Open-Meteo ERA5, between the passes) on a plain, no cell flagged |
-| Debris flood | Bank undercutting: landslides from the scoured banks onto the valley road | max(direct hazard, edge) × slope factor | 2,989 ha of slopes steeper than 15° within 300 m of the scars; 73 cells flagged, with 9.1 km of main roads |
+| Debris flood | Bank undercutting: landslides from the scoured banks onto the valley road | max(direct hazard, edge) × slope factor | Not used by a published case today |
+| Landslide (Rasuwa) | Rain-triggered slope failure, as for floods | rain factor × slope factor × network density | 125.5 mm between the passes; 28 cells flagged, with 34.7 km of roads |
 | Subsidence | Sinking flat ground ponds more rainwater each year | direct hazard × flatness (1 below 2°, 0 above 5°) | Lorca: 1,392 ha sinking on flat ground, 1.6 km of roads in flagged cells. Mexico City: 35,399 ha, 1,908 km of main roads and 56 km of railway |
 
 Slope comes from the Copernicus DEM GLO-30. It is a surface model, so tree canopy adds some noise
@@ -324,7 +331,8 @@ python -m venv .venv && .venv/bin/pip install numpy scipy rasterio shapely pillo
 cd pipeline
 ../.venv/bin/python 07_risk.py niebla
 ../.venv/bin/python 07_risk.py dana
-for c in mozambique nepal lorca cdmx; do ../.venv/bin/python 07_risk.py $c; done
+for c in mozambique rasuwa cdmx; do ../.venv/bin/python 07_risk.py $c; done
+../.venv/bin/python 11_lorca_risk.py   # Lorca: SNCZI T100 flood scenario
 ```
 
 Run `07_risk.py` after `03_process.py` / `08_insar.py`: they keep the `risk` block, but it goes stale

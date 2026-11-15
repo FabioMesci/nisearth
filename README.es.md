@@ -20,11 +20,13 @@ huecos, para que quien gestiona una emergencia sepa cuándo puede contar con él
 | Caso | Técnica | Qué muestra el radar |
 |---|---|---|
 | 🔥 **Incendio de Niebla (Huelva), agosto 2026** | Cambio de retrodispersión (HH/HV) | Cicatriz del fuego medida a través del humo: **~32.100 ha**, **89 %** dentro del perímetro oficial EFFIS; el **94 %** de los focos de NASA FIRMS cae dentro. Regla física: el fuego hace caer HV (volumen de hojas y ramas) pero no HH; la cosecha hace caer las dos. Ardieron 28.300 ha de bosque, matorral y pasto; 720 personas viven a menos de 1 km del borde. |
-| ⬇️ **Subsidencia del Alto Guadalentín (Lorca)** | InSAR, 8 pares NISAR GUNW encadenados (jun–oct) | El llano se hunde **6 cm en 108 días** (~**16 cm/año**, ajuste lineal; ruido ±1,2 cm), en línea con los máximos publicados (10–16 cm/año). Una detección real. |
+| ⬇️ **Subsidencia del Alto Guadalentín (Lorca)** | InSAR, 8 pares NISAR GUNW encadenados (jun–oct) | Serie preliminar en línea de visión y precipitación diaria ERA5 para el mismo periodo; [método y limitaciones](docs/LORCA_RAIN.md). |
 | 🌋 **Colada del Tajogaite (La Palma)** | InSAR, 9 interferogramas | La colada de 2021 baja **~0,4 cm** frente a su entorno, por debajo del ruido (±1,7 cm): casi ha dejado de asentarse. La lava es muy coherente (0,86). |
 | 〰️ **Serie sísmica de Granada (M5,2, 14 ago)** | InSAR, 3 pasadas | Ninguna deformación por encima de ~1 cm. Las dos pasadas descendentes discrepan (+1,3 frente a −0,2 cm): es la atmósfera, no el terremoto. Un límite superior útil. |
 | ⛰️ **Talud del AVE en Álora (4 feb)** | InSAR + Sentinel-1 | NISAR no tenía datos hasta junio; Sentinel-1 pasó la víspera y 5 días después. Desde junio la vía reparada se mueve **<1 mm** frente a su entorno. |
 | 💧 **DANA Adam, La Safor (Valencia), octubre 2026** | Cambio de retrodispersión + Copernicus EMS | Lo que el radar **no** vio: ningún radar pasó durante la tormenta (4,5 días sin datos). Tres días después del mapa óptico de Copernicus EMS, NISAR solo veía el **5 %** de las 885 ha inundadas. Argumento para coordinar constelaciones radar en emergencias. |
+| ⛰️ **Derrumbe y GLOF de Rasuwa — Langtang (Nepal), 26 ago 2026** | Cambio de retrodispersión (NISAR banda L + Sentinel-1 banda C) | En pleno monzón del Himalaya (5 semanas con nubes del 49–97 % en Sentinel-2 y 323,5 mm de lluvia en 22 días), la pasada 98 ascendente de NISAR cartografía **633 ha** de avalancha glaciar y garganta arrasada (GLOF, EMSR927) con **−3,4 dB** de caída media en HV, **0,6 km** de carretera afectados y **2.884 personas** expuestas en el corredor (<1 km). |
+| 〰️ **Doblete sísmico de Venezuela (Yaracuy · La Guaira), 24 jun 2026** | InSAR, 4 pasadas NISAR GUNW (2 asc. + 2 desc.) + USGS | El doblete de **Mw 7,2** (San Felipe, 22:04:31 UTC) y **Mw 7,5** (Catia La Mar, 22:05:03 UTC, prof. 10 km) fue captado apenas **12 horas después** por la pasada 162 ascendente de NISAR: desplazamientos en línea de visión de hasta **−37,9 cm** (asc.) y **+32,7 cm** (desc.), inversión de signo que demuestra desgarre dextral en las fallas de Morón y San Sebastián, y **102.325 ha** con deformación coherente. |
 
 ## NISAR en el mundo
 
@@ -75,11 +77,9 @@ coordinadores de emergencias (saber *cuándo* pasará el radar, y cuándo no).
   ΔHH > −1,2 dB. Umbrales calibrados con el perímetro EFFIS de este incendio (recall 65 %, precisión 89 %, IoU 0,60).
   Sin la condición de HH la precisión cae al 57 %: los campos cosechados se confunden con el fuego.
 - **Inundación:** agua nueva = HH(después) < umbral de Otsu **y** ΔHH < −3 dB.
-- **InSAR:** interferogramas GUNW de 12 días encadenados en una serie acumulada (los retrasos atmosféricos de las
-  fechas intermedias se cancelan); se eliminan la rampa y la atmósfera correlada con el relieve excluyendo la zona que
-  se deforma; convenio de signo −fase·λ/4π (positivo = hacia el satélite, comprobado en Lorca). La corrección
-  ionosférica del producto *añadía* ruido en escenas tan pequeñas (4,7 cm frente a 2,4 cm en Lorca), así que va
-  desactivada por defecto.
+- **InSAR:** pares GUNW encadenados, con ajustes de plano y relieve por escena. El convenio de signo del código y
+  la referencia espacial de Lorca requieren validación. Hay intervalos de 12 y 24 días y la cadena admite píxeles con
+  pares ausentes; véase [método y limitaciones de Lorca](docs/LORCA_RAIN.md).
 - **Infraestructuras:** líneas de OpenStreetMap (`railway=rail`, carreteras principales) dentro de la máscara.
   En incendios solo se cuenta la zona quemada confirmada (radar ∩ EFFIS).
 - **Exposición:** ESA WorldCover 2021 (10 m) bajo la máscara y población WorldPop 2020 (100 m).
@@ -148,8 +148,10 @@ for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c;
 for c in venezuela cdmx langtang; do ../.venv/bin/python 08_insar.py all $c; done
 ../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
 ../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
-../.venv/bin/python 02_extract.py nepal --track 98 && ../.venv/bin/python 03_process.py nepal
-for c in mozambique nepal lorca cdmx; do ../.venv/bin/python 07_risk.py $c; done
+../.venv/bin/python 02_extract.py rasuwa --track 98 && ../.venv/bin/python 03_process.py rasuwa && ../.venv/bin/python 04_context.py rasuwa \
+  && ../.venv/bin/python 06_exposure.py rasuwa && ../.venv/bin/python 05_external.py rasuwa
+for c in mozambique rasuwa cdmx; do ../.venv/bin/python 07_risk.py $c; done
+../.venv/bin/python 11_lorca_risk.py
 ../.venv/bin/python 09_world.py                     # NASA/JPL image + "world" region (after processing)
 ../.venv/bin/python 05_external.py watch            # panel «Vigilancia España»: repetir justo antes de la demo
 ```

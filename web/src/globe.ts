@@ -46,7 +46,7 @@ export class GlobeView {
         m.dataset.id = c.id
         m.setAttribute('aria-label', CONTENT[c.id]?.place ?? c.title)
         m.style.setProperty('--c', meta.color)
-        m.innerHTML = `<span class="dot">${meta.icon}</span><span class="tag"><b>${CONTENT[c.id]?.short ?? c.title} <em>${CONTENT[c.id]?.region ?? ''}</em></b><i>${meta.label} · ${CONTENT[c.id]?.dateLabel ?? ''}</i></span>`
+        m.innerHTML = `<span class="dot">${meta.icon}</span><span class="tag"><b>${CONTENT[c.id]?.short ?? c.title} <em>${CONTENT[c.id]?.region ?? ''}</em></b><i>${CONTENT[c.id]?.kindLabel ?? meta.label} · ${CONTENT[c.id]?.dateLabel ?? ''}</i></span>`
         m.onclick = (e) => {
           e.stopPropagation()
           onSelect(c.id)

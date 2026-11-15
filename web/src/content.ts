@@ -14,6 +14,8 @@ export interface CaseContent {
   /** Nombre corto y provincia para la lista y el globo */
   short: string
   region: string
+  /** Sustituye al tipo de peligro en la lista y el globo (p. ej. «Antes del colapso») */
+  kindLabel?: string
   dateLabel: string
   headline: string
   summary: string
@@ -135,8 +137,9 @@ const CONTENT_ES: Record<string, CaseContent> = {
     ],
   },
   rasuwa: {
-    short: 'Rasuwa · Langtang',
+    short: 'Rasuwa',
     region: 'Nepal',
+    kindLabel: 'Colapso y riada',
     order: 11,
     place: 'Langtang Lirung · río Lhende · Rasuwa (Nepal)',
     dateLabel: '26 ago 2026',
@@ -438,6 +441,7 @@ const CONTENT_ES: Record<string, CaseContent> = {
   langtang: {
     short: 'Langtang Lirung',
     region: 'Nepal',
+    kindLabel: 'Antes del colapso',
     order: 12,
     place: 'Cara norte del Langtang Lirung · Rasuwa (Nepal)',
     dateLabel: 'may–ago 2026',
@@ -544,6 +548,7 @@ const CONTENT_EN: Record<string, CaseContent> = {
   },
   rasuwa: {
     ...CONTENT_ES.rasuwa,
+    kindLabel: 'Collapse and flood',
     place: 'Langtang Lirung · Lhende River · Rasuwa (Nepal)',
     dateLabel: '26 Aug 2026',
     headline: 'Rasuwa: the mountain that came down, seen through the monsoon',
@@ -726,6 +731,7 @@ const CONTENT_EN: Record<string, CaseContent> = {
   },
   langtang: {
     ...CONTENT_ES.langtang,
+    kindLabel: 'Before the collapse',
     place: 'North face of Langtang Lirung · Rasuwa (Nepal)',
     dateLabel: 'May–Aug 2026',
     headline: 'Langtang Lirung: did the glacier warn before it fell?',

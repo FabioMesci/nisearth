@@ -137,7 +137,7 @@ async function main() {
     const row = (c: CaseIndexItem) => {
       const meta = KIND_META[c.kind]
       const ct = CONTENT[c.id]
-      return `<li><button data-id="${c.id}" style="--c:${meta.color}" title="${ct?.place ?? c.title}"><span class="ic">${meta.icon}</span><span class="txt"><b>${ct?.short ?? c.title}<span class="rg">${ct?.region ?? ''}</span></b><i>${meta.label} · ${ct?.dateLabel ?? ''}</i></span></button></li>`
+      return `<li><button data-id="${c.id}" style="--c:${meta.color}" title="${ct?.place ?? c.title}"><span class="ic">${meta.icon}</span><span class="txt"><b>${ct?.short ?? c.title}<span class="rg">${ct?.region ?? ''}</span></b><i>${ct?.kindLabel ?? meta.label} · ${ct?.dateLabel ?? ''}</i></span></button></li>`
     }
     const es = cases.filter((c) => c.region !== 'world')
     const groups = [

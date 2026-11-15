@@ -11,6 +11,29 @@ Chart.register(LineController, LineElement, PointElement, BarController, BarElem
 const fmtDate = (d: string) => fmtDay(d, { day: 'numeric', month: 'short', year: 'numeric' })
 const fmtNum = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: Math.abs(v) >= 1000 ? 0 : 1 })
 
+// ---------- textos derivados del manifest, compartidos con el informe PDF (report.ts) ----------
+export const unitLabel = (u: string) => (lang === 'en' ? ({ 'cm/año': 'cm/yr', 'hab.': 'people' } as Record<string, string>)[u] ?? u : u)
+/** En Lorca la velocidad y el área no se muestran: la serie es preliminar */
+export const visibleMetrics = (m: Manifest) => m.metrics.filter((x) => m.id !== 'lorca' || !['insar_rate', 'insar_area'].includes(x.id))
+export const metricName = (m: Manifest, x: Manifest['metrics'][number]) =>
+  m.id === 'lorca' && x.id === 'insar_cum' ? (lang === 'es' ? 'Desplazamiento LOS preliminar en el punto seleccionado' : 'Preliminary LOS displacement at selected point') : metricLabel(x.id, m.kind, x.label)
+export const maskLabel = (m: Manifest) =>
+  m.insar ? t('maskMove') : m.change === 'debris' ? t('maskDebris') : m.kind === 'flood' ? t('maskWater') : m.kind === 'landslide' ? t('maskSlide') : m.kind === 'volcano' ? t('maskLava') : t('maskBurn')
+/** Línea de fuentes del pie del panel */
+export const sourceLine = (m: Manifest) =>
+  (m.insar
+    ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '', m.insar.detrend === 'offset')
+    : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')) +
+  (m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : '')
+/** Población expuesta (WorldPop) en una frase */
+export function exposureText(m: Manifest) {
+  const ex = m.exposure
+  if (!ex) return ''
+  const fmt = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: 0 })
+  const ring = fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)
+  return m.kind === 'fire' ? t('lcPop')(fmt(ex.pop_inside), ring) : m.kind === 'landslide' ? t('lcPopSlide')(fmt(ex.pop_inside), ring) : t('lcPopFlood')(fmt(ex.pop_inside))
+}
+
 export class Panel {
   private el: HTMLElement
   private chart?: Chart
@@ -45,6 +68,7 @@ export class Panel {
         <h2>${c.headline}</h2>
         <div class="meta"><span class="chip">${meta.icon}${meta.label}</span><span>${c.place}</span><span class="mono">${c.dateLabel}</span></div>
         ${m.mock ? `<div class="mock">${t('mock')}</div>` : ''}
+        <button class="btn ghost pdf-btn" id="pdf-btn" type="button">${ICON.download}<span>${t('pdfCase')}</span></button>
       </div>
       <p class="summary">${c.summary}</p>
       ${c.passes ? `<section class="sec"><div class="label">${t('passes')}</div>${passesSvg(c.passes)}<div class="legend"><span><i class="nisar"></i>${t('legendL')}</span><span><i class="s1"></i>${t('legendC')}</span><span><i class="ev"></i>${t('legendEv')}</span></div></section>` : ''}
@@ -67,7 +91,7 @@ export class Panel {
             <button data-v="hv" title="${t('titleHV')}">HV</button>
             ${m.frames[0]?.rgb ? `<button data-v="rgb" title="${t('titleRGB')}">RGB</button>` : ''}
           </div>
-          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.change === 'debris' ? t('maskDebris') : m.kind === 'flood' ? t('maskWater') : m.kind === 'landslide' ? t('maskSlide') : m.kind === 'volcano' ? t('maskLava') : t('maskBurn')}</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${maskLabel(m)}</span></label>
         </div>
         <div class="row toggles">
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${m.insar ? t('railOsm') : t('infra')}</span></label>` : ''}
@@ -88,7 +112,7 @@ export class Panel {
       </section>
 
       <section class="metrics">
-        ${m.metrics.filter((x) => m.id !== 'lorca' || !['insar_rate', 'insar_area'].includes(x.id)).map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${lang === 'en' ? ({ 'cm/año': 'cm/yr', 'hab.': 'people' } as Record<string, string>)[x.unit] ?? x.unit : x.unit}</small></b><span>${m.id === 'lorca' && x.id === 'insar_cum' ? (lang === 'es' ? 'Desplazamiento LOS preliminar en el punto seleccionado' : 'Preliminary LOS displacement at selected point') : metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
+        ${visibleMetrics(m).map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${unitLabel(x.unit)}</small></b><span>${metricName(m, x)}</span></div>`).join('')}
       </section>
 
       ${m.risk ? riskCard(m) : ''}
@@ -119,7 +143,7 @@ export class Panel {
       </section>
 
       <footer class="src">
-        ${m.id === 'lorca' ? (lang === 'es' ? 'Fuentes y limitaciones en la comparación anterior.' : 'Sources and limitations are listed in the comparison above.') : m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '', m.insar.detrend === 'offset') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
+        ${m.id === 'lorca' ? (lang === 'es' ? 'Fuentes y limitaciones en la comparación anterior.' : 'Sources and limitations are listed in the comparison above.') : sourceLine(m)}
       </footer>
     `
     this.view.onLayerError = () => {
@@ -185,6 +209,8 @@ export class Panel {
       this.sync()
     }
     $('#play').onclick = () => (this.timer ? this.stop() : this.play())
+    const pdfBtn = $<HTMLButtonElement>('#pdf-btn')
+    pdfBtn.onclick = () => runExport(pdfBtn, t('pdfCase'), (p) => import('./report').then((r) => r.exportCasePdf(m, p)))
     v.onFrame = (f, i) => {
       $<HTMLInputElement>('#frame').value = String(i)
       const ev = new Date(f.date) > new Date(m.event)
@@ -393,31 +419,67 @@ export class Panel {
   }
 }
 
-/** Risk index summary: classes, the three factors, hotspots, cascade, robustness and downloads */
-function riskCard(m: Manifest) {
+/** Ejecuta una exportación a PDF mostrando el progreso en el propio botón; ignora clics mientras trabaja */
+export async function runExport(btn: HTMLButtonElement, idle: string, job: (progress: (s: string) => void) => Promise<void>) {
+  if (btn.getAttribute('aria-busy') === 'true') return
+  const label = btn.querySelector('span') ?? btn
+  btn.setAttribute('aria-busy', 'true')
+  label.textContent = t('pdfBusy')('')
+  try {
+    await job((s) => (label.textContent = t('pdfBusy')(s)))
+    label.textContent = idle
+  } catch (e) {
+    console.error('[report]', e)
+    label.textContent = t('pdfError')
+    window.setTimeout(() => (label.textContent = idle), 5000)
+  } finally {
+    btn.removeAttribute('aria-busy')
+  }
+}
+
+/** Textos del índice de riesgo, compartidos por la tarjeta del panel y el informe PDF (sin HTML) */
+export function riskTexts(m: Manifest) {
   const r = m.risk!
   const fmt = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: 0 })
-  const names = t('riskClasses')
-  const drv = t('riskDriverNames')
-  const top = (o: Record<string, number>) => Object.entries(o).sort((a, b) => b[1] - a[1])[0][0]
-  const total = r.classes.reduce((s, c) => s + c.area_ha, 0) || 1
-  const rows = r.classes.map((c, i) => ({ ...c, i })).filter((c) => c.cells > 0)
-  const bar = (label: string, v: number) => `<div class="rp-row"><span>${label}</span><i><b style="width:${Math.round(v * 100)}%"></b></i><em>${fmtDec(v)}</em></div>`
-  const seen = new Set<string>()
-  const hot = r.hotspots.filter((h) => !seen.has(h.place) && seen.add(h.place)).slice(0, 3)
-  const idx = (name: string) => r.classes.findIndex((c) => c.cls === name)
-  const c = r.cascade
   const km = (v: number) => v.toLocaleString(locale())
+  const t100 = r.scenario === 'snczi_t100_limited'
+  const c = r.cascade
   const cascade = !c ? ''
     : c.type === 'post_fire_runoff' ? t('riskCascadeFire')(fmt(c.burned_steep_ha ?? 0), km(c.roads_km))
     : c.type === 'bank_undercutting' ? t('riskCascadeDebris')(fmt(c.steep_bank_ha ?? 0), km(c.roads_km))
     : c.type === 'subsidence_flooding' ? t('riskCascadeSubsidence')(fmt(c.sinking_flat_ha ?? 0), km(c.roads_km), km(c.rail_km))
     : c.cells === 0 ? t('riskCascadeFlat')(fmt(c.rain_mm ?? 0))
     : t('riskCascadeFlood')(fmt(c.rain_mm ?? 0), km(c.roads_km), km(c.rail_km))
+  return {
+    note: t100 ? (lang === 'es' ? 'Escenario fluvial T100 del SNCZI: peligrosidad modelada, no inundación observada. El índice clasifica celdas para exploración; no predice daños ni es comparable directamente con Valencia. Sin color no significa ausencia de riesgo. Versión reducida: usa población, suelo construido y cultivos como exposición y solo susceptibilidad física de cobertura como vulnerabilidad. No incluye edad, vías ni servicios. Los pesos son supuestos.' : 'SNCZI T100 river scenario: modelled hazard, not an observed flood. This screening index ranks cells; it does not predict damage and is not directly comparable with Valencia. No colour does not mean no risk. Limited version: exposure uses population, built land and cropland; vulnerability uses only physical land-cover susceptibility. Age, roads and services are omitted. Weights are assumed.') : '',
+    popHigh: fmt(r.pop_high),
+    lead: t100 ? (lang === 'es' ? `personas estimadas viven en celdas clasificadas como altas o muy altas (${fmt(r.pop_high_range[0])}–${fmt(r.pop_high_range[1])} al variar los pesos de exposición). No son personas afectadas observadas.` : `estimated people live in cells classified high or very high (${fmt(r.pop_high_range[0])}–${fmt(r.pop_high_range[1])} when exposure weights vary). They are not observed flood victims.`) : t('riskPop')(fmt(r.pop_high_range[0]), fmt(r.pop_high_range[1])),
+    cascade,
+    stable: t100 ? (lang === 'es' ? `Estabilidad media de clase: ${r.stability.mean_pct} % en ${r.stability.runs} simulaciones variando ±${r.stability.spread_pct} % los pesos de exposición; escenario T100 y vulnerabilidad física fijos.` : `Mean class stability: ${r.stability.mean_pct}% in ${r.stability.runs} simulations varying exposure weights by ±${r.stability.spread_pct}%; T100 scenario and physical vulnerability held fixed.`) : t('riskStable')(r.stability.mean_pct, r.stability.runs, r.stability.spread_pct),
+    method: t100 ? (lang === 'es' ? `Rejilla de ${r.cell_m[0]} × ${r.cell_m[1]} m. Fuentes: SNCZI T100, WorldPop 2020 y ESA WorldCover 2021.` : `${r.cell_m[0]} × ${r.cell_m[1]} m grid. Sources: SNCZI T100, WorldPop 2020 and ESA WorldCover 2021.`) : t('riskMethod')(r.cell_m[0], r.cell_m[1]),
+  }
+}
+
+/** Factor que más pesa en cada componente del riesgo */
+export const topDriver = (o: Record<string, number>) => Object.entries(o).sort((a, b) => b[1] - a[1])[0]?.[0] ?? ''
+
+/** Risk index summary: classes, the three factors, hotspots, cascade, robustness and downloads */
+function riskCard(m: Manifest) {
+  const r = m.risk!
+  const rt = riskTexts(m)
+  const fmt = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: 0 })
+  const names = t('riskClasses')
+  const drv = t('riskDriverNames')
+  const total = r.classes.reduce((s, c) => s + c.area_ha, 0) || 1
+  const rows = r.classes.map((c, i) => ({ ...c, i })).filter((c) => c.cells > 0)
+  const bar = (label: string, v: number) => `<div class="rp-row"><span>${label}</span><i><b style="width:${Math.round(v * 100)}%"></b></i><em>${fmtDec(v)}</em></div>`
+  const seen = new Set<string>()
+  const hot = r.hotspots.filter((h) => !seen.has(h.place) && seen.add(h.place)).slice(0, 3)
+  const idx = (name: string) => r.classes.findIndex((c) => c.cls === name)
   return `<section class="sec risk">
     <div class="label">${t('riskTitle')}</div>
-    ${r.scenario === 'snczi_t100_limited' ? `<p class="hint">${lang === 'es' ? 'Escenario fluvial T100 del SNCZI: peligrosidad modelada, no inundación observada. El índice clasifica celdas para exploración; no predice daños ni es comparable directamente con Valencia. Sin color no significa ausencia de riesgo. Versión reducida: usa población, suelo construido y cultivos como exposición y solo susceptibilidad física de cobertura como vulnerabilidad. No incluye edad, vías ni servicios. Los pesos son supuestos.' : 'SNCZI T100 river scenario: modelled hazard, not an observed flood. This screening index ranks cells; it does not predict damage and is not directly comparable with Valencia. No colour does not mean no risk. Limited version: exposure uses population, built land and cropland; vulnerability uses only physical land-cover susceptibility. Age, roads and services are omitted. Weights are assumed.'}</p>` : ''}
-    <p class="risk-lead"><b>${fmt(r.pop_high)}</b> ${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `personas estimadas viven en celdas clasificadas como altas o muy altas (${fmt(r.pop_high_range[0])}–${fmt(r.pop_high_range[1])} al variar los pesos de exposición). No son personas afectadas observadas.` : `estimated people live in cells classified high or very high (${fmt(r.pop_high_range[0])}–${fmt(r.pop_high_range[1])} when exposure weights vary). They are not observed flood victims.`) : t('riskPop')(fmt(r.pop_high_range[0]), fmt(r.pop_high_range[1]))}</p>
+    ${rt.note ? `<p class="hint">${rt.note}</p>` : ''}
+    <p class="risk-lead"><b>${rt.popHigh}</b> ${rt.lead}</p>
     <div class="lc-bar" role="img" aria-label="${rows.map((c) => `${names[c.i]} ${fmt(c.area_ha)} ha`).join(', ')}">
       ${rows.map((c) => `<i style="flex:${Math.max(c.area_ha / total, 0.01)};background:${RISK_COLORS[c.i]}" title="${names[c.i]}: ${fmt(c.area_ha)} ha"></i>`).join('')}
     </div>
@@ -428,23 +490,23 @@ function riskCard(m: Manifest) {
     <div class="risk-factors">
       <p class="hint">${t('riskMean')}</p>
       ${bar(t('riskH'), r.components.hazard)}${bar(t('riskE'), r.components.exposure)}${bar(t('riskV'), r.components.vulnerability)}
-      <p class="hint">${t('riskDrivers')(drv[top(r.drivers.exposure)], drv[top(r.drivers.vulnerability)])}</p>
+      <p class="hint">${t('riskDrivers')(drv[topDriver(r.drivers.exposure)], drv[topDriver(r.drivers.vulnerability)])}</p>
     </div>
     <div class="risk-hot">
       <p class="hint">${t('riskHot')}</p>
       ${hot.map((h) => `<div><span>${t('riskNear')(h.place)}</span><b style="color:${RISK_COLORS[idx(h.class)]}">${names[idx(h.class)]} · ${fmtDec(h.risk)}</b></div>`).join('')}
     </div>
-    ${r.cascade ? `<p class="hint">${cascade}</p>` : ''}
-    <p class="hint">${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `Estabilidad media de clase: ${r.stability.mean_pct} % en ${r.stability.runs} simulaciones variando ±${r.stability.spread_pct} % los pesos de exposición; escenario T100 y vulnerabilidad física fijos.` : `Mean class stability: ${r.stability.mean_pct}% in ${r.stability.runs} simulations varying exposure weights by ±${r.stability.spread_pct}%; T100 scenario and physical vulnerability held fixed.`) : t('riskStable')(r.stability.mean_pct, r.stability.runs, r.stability.spread_pct)}</p>
+    ${rt.cascade ? `<p class="hint">${rt.cascade}</p>` : ''}
+    <p class="hint">${rt.stable}</p>
     <div class="risk-dl">
       <a class="btn ghost" href="/data/${m.id}/${r.files.csv}" download="${m.id}_risk.csv">CSV</a>
       <a class="btn ghost" href="/data/${m.id}/${r.files.geojson}" download="${m.id}_risk.geojson">GeoJSON</a>
     </div>
-    <p class="hint src-inline">${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `Rejilla de ${r.cell_m[0]} × ${r.cell_m[1]} m. Fuentes: SNCZI T100, WorldPop 2020 y ESA WorldCover 2021.` : `${r.cell_m[0]} × ${r.cell_m[1]} m grid. Sources: SNCZI T100, WorldPop 2020 and ESA WorldCover 2021.`) : t('riskMethod')(r.cell_m[0], r.cell_m[1])}</p>
+    <p class="hint src-inline">${rt.method}</p>
   </section>`
 }
 
-const LC_COLORS: Record<string, string> = {
+export const LC_COLORS: Record<string, string> = {
   tree: '#2f7d4a', shrub: '#8fae3c', grass: '#d8c35a', crop: '#e39b4a', built: '#c4484a',
   bare: '#9a8f84', water: '#3a8fd6', wetland: '#5cc7c0', other: '#55617a',
 }
@@ -452,14 +514,11 @@ const LC_COLORS: Record<string, string> = {
 /** Barra apilada de cobertura del suelo + nota de población */
 function landcoverCard(m: Manifest) {
   const lc = m.landcover!
-  const fire = m.kind === 'fire'
-  const slide = m.kind === 'landslide'
   const names = t('lc')
   const rows = lc.inside.filter((r) => r.pct >= 0.5)
   const fmt = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: 0 })
   const crop = lc.outside_ref?.find((r) => r.cls === 'crop')
-  const ex = m.exposure
-  const pop = ex ? (fire ? t('lcPop')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : slide ? t('lcPopSlide')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : t('lcPopFlood')(fmt(ex.pop_inside))) : ''
+  const pop = exposureText(m)
   return `<section class="sec">
     <div class="label">${t('lcTitle')(m.kind)}</div>
     <div class="lc-bar" role="img" aria-label="${rows.map((r) => `${names[r.cls] ?? r.cls} ${r.pct}%`).join(', ')}">

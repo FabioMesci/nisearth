@@ -9,7 +9,8 @@
 > What did radar see in Spain's 2026 disasters, and what did it miss?
 
 NISAR (NASA-ISRO, L-band) sees day and night, through clouds and smoke, and measures ground motion to the
-centimetre. We took its first months of public data over Spain and followed six real 2026 events. Every number in
+centimetre. We took its first months of public data over Spain and followed six real 2026 events, then applied the
+same pipeline to five events around the world. Every number in
 the app is produced by our own pipeline from NISAR and Sentinel-1 data and checked against independent references
 (EFFIS, Copernicus EMS, NASA FIRMS, published subsidence rates). Where radar saw nothing, we say so and explain why.
 The point is not only to show what the satellite can do. It is also to show where the gaps are, so that emergency
@@ -25,21 +26,18 @@ managers know when they can rely on it.
 | 〰️ **Granada earthquake series (M5.2, 14 Aug)** | InSAR, 3 tracks | No deformation above ~1 cm. The two descending tracks disagree (+1.3 vs −0.2 cm): that is the atmosphere, not the earthquake. A useful upper bound. |
 | ⛰️ **High-speed rail slope at Álora (4 Feb)** | InSAR + Sentinel-1 | NISAR had no data until June; Sentinel-1 passed the day before and 5 days after. Since June the repaired line moves **<1 mm** relative to its surroundings. |
 | 💧 **Storm "Adam", La Safor (Valencia), Oct 2026** | Backscatter change + Copernicus EMS | What radar **did not** see: no radar passed during the storm (4.5 days without data). Three days after the optical map from Copernicus EMS, NISAR still saw only **5 %** of the 885 ha flooded. A case for coordinating radar constellations in emergencies. |
-| ⛰️ **Rasuwa landslide & GLOF — Langtang (Nepal), 26 Aug 2026** | Backscatter change (NISAR L-band + Sentinel-1 C-band) | At the height of the Himalayan monsoon (5 weeks of 49–97 % cloud cover on Sentinel-2 and 323.5 mm of rain in 22 days), NISAR ascending track 98 maps **633 ha** of glacial avalanche tongue and scoured canyon (GLOF, EMSR927) with a **−3.4 dB** mean HV drop, **0.6 km** of highway hit and **2,884 people** exposed along the corridor (<1 km). |
-| 〰️ **Venezuela earthquake doublet (Yaracuy · La Guaira), 24 Jun 2026** | InSAR, 4 NISAR GUNW tracks (2 asc. + 2 desc.) + USGS | The **Mw 7.2** (San Felipe, 22:04:31 UTC) and **Mw 7.5** (Catia La Mar, 22:05:03 UTC, 10 km depth) doublet was captured just **12 hours later** by NISAR ascending track 162: line-of-sight displacements up to **−37.9 cm** (asc.) and **+32.7 cm** (desc.), sign reversal proving right-lateral strike-slip along the Morón and San Sebastián faults, and **102,325 ha** of coherent ground deformation. |
 
 ## NISAR around the world
 
-The same pipeline, applied to six events abroad. For four of them NASA/JPL published its own NISAR image; the app shows it next to ours, with credit, so judges can compare (ours is processed independently from the same public ASF data).
+The same pipeline, applied to five events abroad. For four of them NASA/JPL published its own NISAR image; the app shows it next to ours, with credit, so judges can compare (ours is processed independently from the same public ASF data).
 
 | Case | Technique | What radar shows | NASA/JPL says |
 |---|---|---|---|
-| 〰️ **Venezuela earthquakes (M7.2 + M7.5, 24 Jun 2026)** | InSAR, 3 tracks (2 asc, 1 desc) | Up to **−59 cm** along the line of sight on the La Guaira coast. No ramp or height fit (deformation fills the scene); zero set inland. | ~60 cm westward next to the airport |
-| 🌋 **Krasheninnikov volcano (Kamchatka)** | Backscatter change, 11 dates | New bright lobes at the NE front of the flow (13 Jul → 23 Sep); HH over them rises from −14 dB (Jun) to −4.5 dB (18 Aug), then levels off. Part of the flagged area is melting snow patches. | 17-frame time-lapse, Dec 2025 – Aug 2026 |
+| 〰️ **Venezuela earthquake doublet (Yaracuy · La Guaira), 24 Jun 2026** | InSAR, 4 NISAR GUNW tracks (2 asc. + 2 desc.) | The **Mw 7.2** (San Felipe, 22:04:31 UTC) and **Mw 7.5** (Catia La Mar, 22:05:03 UTC, 10 km deep) were covered just **12 hours later** by ascending track 162. Line-of-sight displacement up to **−37.9 cm** and **+32.7 cm**; **102,325 ha** move above the noise (±6.2 cm). | ~60 cm westward next to the airport, which in the radar's slanted look is about 33–42 cm: what we measure |
+| 🌋 **Krasheninnikov volcano (Kamchatka)** | Backscatter change, 11 dates | **161 ha** of new or brighter lava at the NE front of the flow (13 Jul → 23 Sep), with a mean HH rise of **+6.9 dB**. Part of the flagged area is melting snow patches. | 17-frame time-lapse, Dec 2025 – Aug 2026 |
 | 💧 **Limpopo floods (Mozambique, Jan 2026)** | Backscatter change, 4 dates | **325 km²** of new water between 5 and 17 Jan (threshold −14 dB at the histogram valley); 5.4 km of railway and 19 km of roads under water (OSM). | Before/after, >600,000 displaced |
-| ⬇️ **Mexico City subsidence** | InSAR, 10 chained pairs (Oct–Feb) | ~37,500 ha of the old lakebed sink; **−22 cm in 120 days** at Chalco. Ramp and height fitted on the hills only (> 2,280 m). | > 2 cm/month |
-| 🌊 **Rasuwa flood (Nepal, 26 Aug 2026)** | Backscatter change, 6 dates | Triggered by the rock–ice collapse of Langtang Lirung's north face (>1,400 dead). Water gone by the next pass; **385 ha** of valley floor (within 300 m of OSM rivers) change by > 3 dB. Not validated. | — (no NASA image) |
-| 🧊 **Langtang Lirung collapse — before (Nepal)** | InSAR, 6 chained pairs (27 May → 19 Aug) | The failing ice itself is incoherent and dropped by the GUNW. On the slope 1.7 km away: **+4.5 cm** (noise ±2.8 cm), 2.4 cm in the last 24 days; 9 other patches move > 5 cm in the same window. NISAR saw the mountain moving, not which part would fail. | — (ICIMOD: up to 30 cm; *Remote Sensing* 18:3727) |
+| ⬇️ **Mexico City subsidence** | InSAR, 10 chained pairs (Oct–Feb) | **~37,500 ha** of the old lakebed sink; **−21.9 cm in 120 days** at Chalco. Ramp and height fitted on the hills only (> 2,280 m). | > 2 cm/month |
+| ⛰️ **Langtang Lirung collapse and Rasuwa flood (Nepal), 26 Aug 2026** | Backscatter change (NISAR track 98 asc., 13 dates, + Sentinel-1) and pre-collapse InSAR | The rock–ice collapse of Langtang Lirung's north face dammed the Lhende River; the outburst ran 72 km downstream (>1,400 dead, Copernicus EMSR927). Through five weeks of monsoon cloud, NISAR (19 → 31 Aug) maps **633 ha** of debris tongue and scoured gorge with a **−3.4 dB** mean HV drop, 0.6 km of roads and **2,884 people** in the corridor (<1 km). *Before the collapse* (InSAR, 6 chained pairs, 27 May → 19 Aug) the slope 1.7 km away moved **+4.5 cm** (noise ±2.8 cm), but 9 other patches moved > 5 cm in the same window: NISAR saw the mountain moving, not which part would fail. | — (no NASA image; ICIMOD: up to 30 cm; *Remote Sensing* 18:3727) |
 
 ## What the app does
 
@@ -50,10 +48,32 @@ A 3D globe (globe.gl / three.js) opens onto a detailed map (MapLibre) for each c
 - change masks, cumulative InSAR displacement and coherence;
 - affected roads and railways (OpenStreetMap), land cover and exposed population;
 - validation against EFFIS, Copernicus EMS and NASA FIRMS;
-- a risk index per grid cell for the fire, the floods and the subsidence cases (hazard × exposure × vulnerability, [method](docs/EVENTS_AND_RISK.md));
+- a risk index per grid cell (hazard × exposure × vulnerability, [method](docs/EVENTS_AND_RISK.md)) for Niebla, the
+  DANA, the Limpopo, Rasuwa and Mexico City, and an SNCZI 100-year flood screening index for Lorca;
 - a "Spain watch" panel: active Iberian fires today (NASA FIRMS) and the next NISAR pass over each;
 - a hazard guide (fire, flood, earthquake, landslide, volcano, subsidence): what each one looks like to radar;
+- **PDF reports** of every incident (see below);
 - a guided story mode, and a full Spanish / English interface.
+
+## PDF reports
+
+Each incident panel has a **Download PDF report** button, and the incident list has **PDF report of all incidents**
+(one file with a cover, a linked table of contents and PDF bookmarks per case and section). The report is built in
+the browser from the same `manifest.json` and texts the app shows, in the interface language, so it needs no server:
+
+- overview (dates, tracks, acquisitions, centre, study area, sensors) and key figures;
+- situation map on Esri World Imagery with the radar mask, official perimeters (EFFIS / Copernicus EMS), affected
+  roads and rail, FIRMS hotspots, earthquakes, scale bar and legend;
+- radar-pass timeline around the event, before/after images, change map and a thumbnail of every acquisition;
+- InSAR: total motion with its colour scale, fringes, coherence and the table of interferograms;
+- charts: HH/HV or displacement series, daily rain or hotspots, L-band vs C-band, and Lorca's displacement vs ERA5 rain;
+- land cover, exposed population, the full risk index (cell map, classes, factors, highest-risk cells), the
+  NASA/JPL comparison image, the case texts, processing parameters, sources and links to the open data.
+
+A single case takes 2–6 s; the full report (11 cases, ~84 pages, ~18 MB) about 45 s. The code is in
+`web/src/report.ts` and uses [jsPDF](https://github.com/parallax/jsPDF), loaded only when a button is pressed. The
+standard PDF fonts are Latin-1, so a few symbols are written in plain text (`→` as `->`, `−` as `-`). Without network
+access to the Esri tiles the maps are drawn without the satellite background, and the caption says so.
 
 ## Who it helps
 
@@ -113,12 +133,23 @@ pipeline/            Data processing (Python)
   07_risk.py         Risk index per grid cell, cascades, CSV/GeoJSON export
   08_insar.py        NISAR L2 GUNW interferometry: remote subset, ramp and atmosphere correction,
                      cumulative series, EMSC catalogue, lava flow and rail from OSM, Sentinel-1
+  09_world.py        "NISAR around the world": official NASA/JPL image and region for each case
+  09_lorca_rain.py   Lorca: daily ERA5 precipitation (Open-Meteo)
+  10_lorca_flood.py  Lorca: SNCZI 100-year flood layer (MITECO WMS)
+  11_lorca_risk.py   Lorca: SNCZI T100 flood screening index
   make_mock.py       Mock data in the same format (to develop the web without data)
 web/                 App (Vite + TypeScript + globe.gl + MapLibre + Chart.js)
-  public/data/       Pipeline output (all the web needs)
+  public/data/       Pipeline output (all the web needs): manifest.json, images, GeoJSON, CSV per case
+  src/main.ts        Globe, incident list, story mode, hazard guide
+  src/detail.ts      Detail map (MapLibre): radar layers, masks, overlays
+  src/panel.ts       Side panel of each case: controls, figures, charts, risk card
+  src/report.ts      PDF reports (one case or all), loaded on demand
   src/content.ts     Narrative text for each case (ES / EN)
   src/i18n.ts        Interface strings (ES / EN)
-docs/                EVENTS_AND_RISK.md: events, hazard interactions and the risk index
+docs/
+  EVENTS_AND_RISK.md Events, hazard interactions and the risk index
+  LORCA_RAIN.md      Lorca: displacement vs rain, T100 flood layer and screening index
+  WORLD_CANDIDATES.md How the "NISAR around the world" cases were chosen
 ```
 
 ## Reproduce
@@ -168,12 +199,13 @@ npm run build                            # static site in web/dist
 - Sentinel-1 — Copernicus/ESA, processed with [ASF HyP3](https://hyp3-docs.asf.alaska.edu)
 - Fire perimeters — [EFFIS](https://effis.jrc.ec.europa.eu)
 - Storm flood map — [Copernicus EMS Rapid Mapping EMSR935](https://rapidmapping.emergency.copernicus.eu/EMSR935)
+- Flood hazard (Lorca) — [MITECO SNCZI](https://www.miteco.gob.es/es/cartografia-y-sig/ide/directorio_datos_servicios/agua.html), 100-year scenario
 - Earthquakes — [EMSC](https://www.emsc-csem.org) catalogue
 - Land cover — [ESA WorldCover 2021](https://esa-worldcover.org) (CC BY 4.0)
 - Population — [WorldPop](https://www.worldpop.org) 2020, Spain, 100 m constrained (CC BY 4.0)
 - Active fires — [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov) (VIIRS) · Rain — [Open-Meteo](https://open-meteo.com) / ERA5
 - Roads, railways and the 2021 lava flow — © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL)
-- Basemap — Esri World Imagery; globe textures — three-globe (NASA Blue Marble)
+- Basemap (app and PDF maps) — Esri World Imagery; globe textures — three-globe (NASA Blue Marble)
 
 ## License
 

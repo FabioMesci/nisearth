@@ -15,6 +15,7 @@ export const ICON = {
   prev: svg('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
   next: svg('<path d="M5 12h14M13 6l6 6-6 6"/>'),
   story: svg('<circle cx="12" cy="12" r="8.5"/><path d="M10.5 9v6l4.5-3-4.5-3Z" fill="currentColor"/>'),
+  download: svg('<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M5 19h14"/>'),
   close: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
   drag: svg('<path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/>'),
 }

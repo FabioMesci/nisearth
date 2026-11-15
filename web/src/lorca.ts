@@ -20,6 +20,9 @@ const copy = () => lang === 'es' ? {
   axisD: 'LOS displacement (cm)', axisR: 'Precipitation (mm/day)', reference: 'Time reference', obs: 'Acquisition', map: 'Transparent map areas may indicate missing coverage or filtered data; they do not mean there was no movement.',
 }
 
+/** Textos del caso Lorca, también para el informe PDF */
+export const lorcaCopy = copy
+
 type Rain = { dates: string[]; values: (number | null)[]; unit: string }
 export function lorcaHtml(m: Manifest) {
   const s = copy()

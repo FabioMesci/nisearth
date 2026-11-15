@@ -159,6 +159,7 @@ high and very high cells.
 | `web/public/data/<case>/risk.geojson` | One polygon per cell with risk, class, the three factors and the underlying values. Shown as a map layer; click a cell to read it. |
 | `web/public/data/<case>/risk.csv` | Same cells as a table, sorted by risk, for GIS or spreadsheet use. |
 | `manifest.json` → `risk` | Summary shown in the side panel: classes, factor means, drivers, hotspots, cascade, stability, weights, sources. |
+| PDF report (web app) | The case report (`web/src/report.ts`) prints the whole `risk` block: a map of the cells over satellite imagery, class table, factor bars, drivers, weights, the ten highest-risk cells, cascade, stability, method and sources. |
 
 ### 2.7 Results of the current run
 
@@ -209,7 +210,11 @@ Results for the cases added on 15 November 2026:
   so the risk stays medium at most. This is the expected result: Alto Guadalentín subsidence threatens
   wells, canals and farm buildings more than the town.
   The published Lorca risk layer is now a different model: the SNCZI 100-year river-flood scenario
-  (`11_lorca_risk.py`), which replaced this subsidence run when the branches were merged.
+  (`11_lorca_risk.py`), which replaced this subsidence run when the branches were merged. Current result
+  of that screening index: 23,802 people in high or very high cells (20,962 to 24,827 when the exposure
+  weights vary ±25 %), 3,749 ha in those classes, mean hazard / exposure / physical susceptibility
+  0.64 / 0.41 / 0.57, and 96 % mean class stability. It ranks cells inside a modelled scenario; it is not
+  an observed flood and is not comparable with Valencia. Method and limits: [LORCA_RAIN.md](LORCA_RAIN.md).
 - **Mexico City.** The sinking lake bed is also the most densely populated part of the metropolis
   (Iztapalapa, Nezahualcóyotl, Aragón, Chalco). Exposure saturates and the result is robust: 4.3 to
   4.7 million people in high or very high cells whatever the weights.
@@ -221,7 +226,7 @@ Cases without a risk index, and why:
 | Krasheninnikov (Kamchatka) | No permanent population or infrastructure near the lava field: exposure is zero everywhere. |
 | Granada, La Palma, Álora | NISAR saw no deformation above the noise, so there is no hazard footprint. |
 | Venezuela (earthquake) | Coseismic displacement is not the hazard to people; shaking is. It needs the USGS ShakeMap as hazard. |
-| Langtang Lirung | The hazard is the collapse runout downstream, which the pre-collapse InSAR does not map. Rasuwa covers it. |
+| Langtang Lirung (pre-collapse InSAR, now a section of the Rasuwa case) | The hazard is the collapse runout downstream, which the pre-collapse InSAR does not map. The Rasuwa risk index covers it. |
 
 ---
 

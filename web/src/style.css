@@ -388,6 +388,10 @@ body.in-detail #lang { right: 436px; }
 
 /* ---------- hazard guide ---------- */
 #hazards-btn { margin-top: 6px; width: 100%; }
+#pdf-all-btn { margin-top: 6px; width: 100%; }
+.pdf-btn { margin-top: 14px; height: 34px; font-size: 13px; max-width: 100%; }
+#pdf-all-btn span, .pdf-btn span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.btn[aria-busy="true"] { cursor: progress; opacity: 0.75; }
 #hazards { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3, 5, 10, 0.72); backdrop-filter: blur(6px); overscroll-behavior: contain; }
 /* dvh: en móvil 100vh incluye la barra del navegador y cortaría la parte de abajo */
 .hz-card { background: var(--surface-solid); border: 1px solid var(--line-2); border-radius: var(--r-lg); width: min(980px, 100%); max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow-y: auto; overscroll-behavior: contain; padding: 0 22px 20px; scrollbar-width: thin; }

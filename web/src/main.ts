@@ -1,7 +1,7 @@
 import './style.css'
 import { GlobeView } from './globe'
 import { DetailView } from './detail'
-import { Panel } from './panel'
+import { Panel, runExport } from './panel'
 import { CONTENT, KIND_META, getStory } from './content'
 import { lang, setLang, onLang, t, locale } from './i18n'
 import { ICON } from './icons'
@@ -248,6 +248,10 @@ async function main() {
   }
   const closeHazards = () => hz.classList.add('hidden')
   $('hazards-btn').onclick = () => (renderHazards(), hz.classList.remove('hidden'))
+
+  // ---------- informe PDF de todos los incidentes (report.ts se carga bajo demanda) ----------
+  const pdfAll = $<HTMLButtonElement>('pdf-all-btn')
+  pdfAll.onclick = () => runExport(pdfAll, t('pdfAll'), (p) => import('./report').then((r) => r.exportAllPdf(cases.map((c) => c.id), getManifest, p)))
   hz.onclick = (e) => e.target === hz && closeHazards()
   window.addEventListener('keydown', (e) => e.key === 'Escape' && closeHazards())
   onLang(() => !hz.classList.contains('hidden') && renderHazards())

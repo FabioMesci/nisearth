@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NISEarth Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07090d;
+  --panel: #0e121a;
+  --panel-2: #131824;
+  --line: rgba(220, 226, 238, 0.10);
+  --line-2: rgba(220, 226, 238, 0.20);
+  --text: #f2efe8;
+  --text-2: #cfd2d9;
+  --muted: #8e95a4;
+  --signal: #a9d6ff;
+  --fire: #ff8a3d;
+  --flood: #5cb8f2;
+  --ground: #c084fc;
+  --quake: #ff7aa8;
+  --ok: #8fe3a7;
+  --danger: #ff6b6b;
+  --s1: #e0b0ff;
+  --sans: 'Geist', system-ui, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, monospace;
+}
+@page { size: 1920px 1080px; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+.slide {
+  position: relative; width: 1920px; height: 1080px; overflow: hidden;
+  padding: 84px 104px 76px; background: var(--bg);
+  page-break-after: always; break-after: page;
+  display: flex; flex-direction: column;
+}
+.slide:last-child { page-break-after: auto; break-after: auto; }
+.slide > * { position: relative; }
+
+.top { display: flex; justify-content: space-between; align-items: baseline; font: 500 18px/1 var(--mono); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 34px; }
+.top b { color: var(--signal); font-weight: 500; }
+h1 { font: 600 62px/1.12 var(--sans); letter-spacing: -0.025em; max-width: 1712px; }
+h1 em { font-style: normal; font-weight: 400; color: var(--signal); }
+.lede { font: 400 28px/1.42 var(--sans); color: var(--text-2); max-width: 1500px; margin-top: 20px; }
+.lede strong { color: var(--text); font-weight: 600; }
+.muted { color: var(--muted); }
+.foot { position: absolute; left: 104px; right: 104px; bottom: 34px; display: flex; justify-content: space-between; gap: 40px; font: 400 16px/1.2 var(--mono); color: var(--muted); }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; }
+.tag { display: inline-flex; align-items: center; gap: 8px; font: 500 16px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--text-2); }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.img { border-radius: 18px; overflow: hidden; border: 1px solid var(--line-2); background: #000; }
+.img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cap { font: 400 15px/1.3 var(--mono); color: var(--muted); margin-top: 10px; }
+
+/* ---------- 1 cover ---------- */
+.cover { padding: 0; }
+.cover .globe { position: absolute; right: -150px; top: 20px; width: 1040px; height: 1040px; border-radius: 50%; overflow: hidden; }
+.cover .globe img { width: 100%; height: 100%; object-fit: cover; }
+.cover .shade { position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 38%, rgba(7,9,13,.55) 60%, transparent 80%); }
+.cover .content { position: absolute; left: 104px; top: 92px; width: 1060px; }
+.cover .brand { font: 600 132px/0.95 var(--sans); letter-spacing: -0.04em; }
+.cover .brand2 { font: 300 96px/1.05 var(--sans); letter-spacing: -0.035em; color: var(--signal); margin-top: 8px; }
+.cover .q { font: 400 34px/1.35 var(--sans); color: var(--text-2); margin-top: 40px; max-width: 900px; }
+.cover .q strong { color: var(--text); font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px; }
+.stat { padding: 22px 22px 20px; }
+.stat .n { font: 600 58px/1 var(--sans); letter-spacing: -0.03em; }
+.stat .l { font: 400 19px/1.3 var(--sans); color: var(--muted); margin-top: 10px; }
+.cover .meta { position: absolute; left: 104px; bottom: 72px; font: 400 20px/1.6 var(--mono); color: var(--muted); }
+.cover .meta b { color: var(--text); font-weight: 500; }
+
+/* ---------- 2 problem ---------- */
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 44px; }
+.pill-n { font: 500 18px/1 var(--mono); color: var(--signal); letter-spacing: .06em; }
+.three .card { padding: 32px 32px 30px; }
+.three h3 { font: 600 34px/1.1 var(--sans); margin: 14px 0 14px; letter-spacing: -0.01em; }
+.three p { font: 400 23px/1.45 var(--sans); color: var(--text-2); }
+.three p strong { color: var(--text); font-weight: 600; }
+.pipe { display: flex; gap: 10px; margin-top: 30px; align-items: stretch; }
+.pipe .step { flex: 1; padding: 16px 16px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--line); }
+.pipe .step .k { font: 500 15px/1 var(--mono); color: var(--muted); }
+.pipe .step .v { font: 500 19px/1.25 var(--sans); margin-top: 8px; }
+.pipe .arr { align-self: center; color: var(--muted); font-size: 22px; }
+
+/* ---------- 3 cases ---------- */
+.cases { display: grid; grid-template-columns: 1fr 470px; gap: 36px; margin-top: 28px; flex: 1; min-height: 0; }
+.group-h { display: flex; align-items: center; gap: 12px; font: 500 17px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.group-h::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
+.cgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+.case { padding: 16px 18px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+.case .t { display: flex; align-items: flex-start; font: 600 21px/1.2 var(--sans); }
+.case .t::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; margin: 7px 10px 0 0; }
+.case .t span { margin-left: auto; padding-left: 8px; font: 400 15px/1.4 var(--mono); color: var(--muted); white-space: nowrap; }
+.case .n { font: 600 36px/1 var(--sans); letter-spacing: -0.02em; margin-top: 10px; color: var(--c); }
+.case .n small { font: 500 19px/1 var(--sans); color: var(--text-2); letter-spacing: 0; }
+.case .d { font: 400 18px/1.35 var(--sans); color: var(--text-2); margin-top: 6px; }
+.case.neg .n { color: var(--text-2); }
+.badge { font: 500 12px/1 var(--mono); color: var(--ok); border: 1px solid rgba(143,227,167,.4); border-radius: 999px; padding: 4px 7px; margin-left: 6px; vertical-align: 3px; letter-spacing: .04em; }
+.side-imgs { display: grid; grid-template-rows: 1fr auto; gap: 14px; min-height: 0; }
+.side-imgs .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: 0; }
+.ui-list { padding: 20px 22px; font: 400 19px/1.5 var(--sans); color: var(--text-2); }
+.ui-list b { color: var(--text); font-weight: 600; }
+
+/* ---------- 4 saw / missed ---------- */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 30px; flex: 1; min-height: 0; }
+.panel { display: grid; grid-template-rows: auto 1fr auto; gap: 16px; min-height: 0; }
+.panel h2 { font: 600 36px/1.1 var(--sans); letter-spacing: -0.015em; display: flex; align-items: center; gap: 14px; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.kpi { padding: 16px 18px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+.kpi .n { font: 600 40px/1 var(--sans); letter-spacing: -0.02em; }
+.kpi .l { font: 400 17px/1.3 var(--sans); color: var(--text-2); margin-top: 8px; }
+.note { font: 400 20px/1.42 var(--sans); color: var(--text-2); margin-top: 12px; }
+.note strong { color: var(--text); }
+.timeline { padding: 18px 22px 10px; display: flex; flex-direction: column; min-height: 0; }
+.timeline svg { flex: 1; min-height: 0; }
+
+/* ---------- 5 risk ---------- */
+.risk { display: grid; grid-template-columns: 1fr 640px; gap: 40px; margin-top: 28px; flex: 1; min-height: 0; }
+.formula { padding: 22px 30px; display: flex; align-items: center; gap: 28px; }
+.formula .f { font: 500 38px/1 var(--mono); letter-spacing: -0.02em; white-space: nowrap; }
+.formula .f .h { color: var(--fire); } .formula .f .e { color: var(--signal); } .formula .f .v { color: var(--ground); }
+.formula p { font: 400 19px/1.4 var(--sans); color: var(--muted); }
+.fac { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+.fac .card { padding: 16px 20px; }
+.fac h4 { font: 600 23px/1.1 var(--sans); color: var(--c); }
+.fac p { font: 400 18px/1.38 var(--sans); color: var(--text-2); margin-top: 6px; }
+table { width: 100%; border-collapse: collapse; margin-top: 14px; font: 400 19px/1.3 var(--sans); }
+th { text-align: left; font: 500 14px/1.2 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding: 0 10px 10px; border-bottom: 1px solid var(--line-2); }
+td { padding: 9px 10px; border-bottom: 1px solid var(--line); color: var(--text-2); vertical-align: top; }
+td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+td.num { font-family: var(--mono); color: var(--text); white-space: nowrap; }
+td .sub { display: block; font: 400 14px/1.3 var(--mono); color: var(--muted); margin-top: 3px; }
+.aside { margin-top: 14px; padding: 14px 18px; border-radius: 14px; border: 1px dashed var(--line-2); font: 400 17px/1.4 var(--sans); color: var(--muted); }
+.aside b { color: var(--text-2); font-weight: 600; }
+
+/* ---------- 6 decisions ---------- */
+.dec { display: grid; grid-template-columns: 1.05fr 1fr; gap: 36px; margin-top: 30px; flex: 1; min-height: 0; }
+.casc { display: grid; gap: 14px; }
+.casc .card { padding: 16px 22px; display: grid; grid-template-columns: 310px 1fr; gap: 22px; align-items: start; }
+.chain { font: 600 23px/1.25 var(--sans); }
+.chain .a { color: var(--c1); } .chain .b { color: var(--c2); }
+.chain .arrow { color: var(--muted); font-weight: 400; }
+.casc .fig { font: 500 17px/1.3 var(--mono); color: var(--muted); margin-top: 10px; }
+.casc .act { font: 400 20px/1.42 var(--sans); color: var(--text-2); }
+.casc .act em { font-style: normal; font: 500 14px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--signal); display: block; margin-bottom: 6px; }
+.who { width: 100%; border-collapse: collapse; margin-top: 0; }
+.who td { font: 400 19px/1.38 var(--sans); padding: 12px 10px; }
+.who td:first-child { width: 250px; white-space: normal; }
+.watch { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 18px; align-items: center; margin-top: 14px; }
+
+/* ---------- 7 close ---------- */
+.close { display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; margin-top: 30px; flex: 1; min-height: 0; }
+.strengths { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-content: start; }
+.strengths .card { padding: 26px 28px; }
+.strengths h4 { font: 600 24px/1.15 var(--sans); display: flex; gap: 12px; align-items: baseline; }
+.strengths h4 span { font: 500 16px/1 var(--mono); color: var(--signal); }
+.strengths p { font: 400 20px/1.42 var(--sans); color: var(--text-2); margin-top: 8px; }
+.listcard { padding: 22px 28px; }
+.listcard h4 { font: 500 16px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.listcard ul { list-style: none; }
+.listcard li { font: 400 19px/1.4 var(--sans); color: var(--text-2); padding: 6px 0 6px 26px; position: relative; }
+.listcard li::before { content: ""; position: absolute; left: 2px; top: 17px; width: 10px; height: 2px; background: var(--c, var(--muted)); }
+.cta { padding: 22px 28px; display: flex; gap: 26px; align-items: center; background: linear-gradient(120deg, rgba(169,214,255,.12), rgba(169,214,255,.03)); border-color: rgba(169,214,255,.3); }
+.cta .url { font: 500 26px/1.2 var(--mono); color: var(--signal); }
+.cta p { font: 400 18px/1.4 var(--sans); color: var(--text-2); margin-top: 8px; }
+#qr { background: #fff; padding: 10px; border-radius: 12px; width: 150px; height: 150px; flex: none; }
+#qr img, #qr canvas { width: 130px !important; height: 130px !important; display: block; }
+</style>
+</head>
+<body>
+
+<!-- ================= 1 · COVER ================= -->
+<section class="slide cover">
+  <div class="globe"><img src="img/globe.jpg" alt=""></div>
+  <div class="shade"></div>
+  <div class="content">
+    <div class="tag"><span class="dot" style="background:var(--signal)"></span>NASA Space Apps 2026 · Dancing with the SARs</div>
+    <div class="brand" style="margin-top:44px">NISEarth</div>
+    <div class="brand2">what the radar saw</div>
+    <p class="q">What did NISAR see in the disasters of 2026 — and <strong>what did it miss?</strong> We turn its first public radar data into evidence that emergency and risk managers can act on.</p>
+    <div class="stats">
+      <div class="card stat"><div class="n">11</div><div class="l">real events, Spain and worldwide</div></div>
+      <div class="card stat"><div class="n">6</div><div class="l">hazard types: fire, flood, quake, landslide, volcano, subsidence</div></div>
+      <div class="card stat"><div class="n">2</div><div class="l">radar bands: NISAR L&#8209;band + Sentinel&#8209;1 C&#8209;band</div></div>
+      <div class="card stat"><div class="n">100<span style="font-size:34px">%</span></div><div class="l">free, open data; own pipeline that runs on a laptop</div></div>
+    </div>
+  </div>
+  <div class="meta"><b>dancing-with-the-sars-spain.vercel.app</b> &nbsp;·&nbsp; interactive web app · ES / EN</div>
+</section>
+
+<!-- ================= 2 · PROBLEM & APPROACH ================= -->
+<section class="slide">
+  <div class="top"><span><b>01</b> · The problem</span><span>NISEarth</span></div>
+  <h1>Disasters happen under clouds, smoke and darkness. <em>Radar sees through them.</em></h1>
+  <p class="lede">NISAR (NASA–ISRO) delivers free L&#8209;band radar data of the whole planet every 12 days — day and night, through clouds and smoke, measuring ground motion to the centimetre. Yet an emergency manager still can't answer: <strong>What can it see? When will it pass? How far can I trust it?</strong> NISEarth answers those three questions, event by event.</p>
+
+  <div class="three">
+    <div class="card">
+      <div class="pill-n">01 · MEASURE</div>
+      <h3>Our own pipeline, from raw NISAR</h3>
+      <p>Backscatter change (HH/HV) for fire, flood and debris; chained <strong>InSAR</strong> for moving ground. Each 1–2 GB file is <strong>read remotely, only the area of interest</strong> — it runs on a laptop.</p>
+    </div>
+    <div class="card">
+      <div class="pill-n">02 · VALIDATE</div>
+      <h3>Checked against independent references</h3>
+      <p>EFFIS perimeters, <strong>Copernicus EMS</strong> flood maps, <strong>NASA FIRMS</strong> hotspots, ERA5 rain, EMSC/USGS quakes — and NASA/JPL's own NISAR images, side by side with ours.</p>
+    </div>
+    <div class="card">
+      <div class="pill-n">03 · DECIDE</div>
+      <h3>From pixels to a risk map</h3>
+      <p>People, buildings, roads, rail and hospitals under each footprint, combined into a <strong>per-cell risk index</strong> with cascade warnings — exported as CSV / GeoJSON.</p>
+    </div>
+  </div>
+
+  <div class="pipe">
+    <div class="step"><div class="k">01</div><div class="v">Search NISAR scenes (ASF)</div></div><div class="arr">→</div>
+    <div class="step"><div class="k">02</div><div class="v">Remote subset + Sentinel&#8209;1 RTC</div></div><div class="arr">→</div>
+    <div class="step"><div class="k">03</div><div class="v">Speckle filter, change &amp; InSAR</div></div><div class="arr">→</div>
+    <div class="step"><div class="k">04</div><div class="v">OSM networks + validation</div></div><div class="arr">→</div>
+    <div class="step"><div class="k">05</div><div class="v">FIRMS hotspots + rainfall</div></div><div class="arr">→</div>
+    <div class="step"><div class="k">06</div><div class="v">Exposure: WorldCover, WorldPop</div></div><div class="arr">→</div>
+    <div class="step" style="border-color:rgba(255,138,61,.45)"><div class="k" style="color:var(--fire)">07</div><div class="v">Risk index + cascades</div></div>
+  </div>
+  <div class="foot"><span>Python pipeline (pipeline/) · Vite + TypeScript, globe.gl, MapLibre, Chart.js (web/)</span><span>2 / 7</span></div>
+</section>
+
+<!-- ================= 3 · CASES ================= -->
+<section class="slide">
+  <div class="top"><span><b>02</b> · Eleven real events</span><span>NISEarth</span></div>
+  <h1>Eleven events, <em>every number from our own processing</em></h1>
+
+  <div class="cases">
+    <div>
+      <div class="group-h">Surface change · backscatter before / after</div>
+      <div class="cgrid">
+        <div class="case" style="--c:var(--fire)"><div class="t">Niebla, Spain <span>fire · Aug</span></div><div class="n">32,097 <small>ha burned</small></div><div class="d">Scar seen through smoke; 89 % inside EFFIS</div></div>
+        <div class="case neg" style="--c:var(--flood)"><div class="t">La Safor, Spain <span>flood · Oct</span></div><div class="n">5 % <small>seen</small><span class="badge">GAP</span></div><div class="d">No radar during the storm; water gone 4 days later</div></div>
+        <div class="case" style="--c:var(--flood)"><div class="t">Limpopo, Mozambique <span>flood · Jan</span></div><div class="n">325 <small>km² new water</small></div><div class="d">5.4 km of rail and 19 km of roads under water</div></div>
+        <div class="case" style="--c:var(--flood)"><div class="t">Rasuwa, Nepal <span>collapse · Aug</span></div><div class="n">633 <small>ha</small></div><div class="d">Rock–ice avalanche and scoured gorge, mapped in full monsoon</div></div>
+        <div class="case" style="--c:var(--danger)"><div class="t">Krasheninnikov <span>lava · Russia</span></div><div class="n">161 <small>ha brighter lava</small></div><div class="d">New lobes on the flow front, HH +6.9 dB; part is melting snow</div></div>
+        <div class="case neg" style="--c:var(--ground)"><div class="t">Langtang Lirung <span>InSAR · before</span></div><div class="n">+4.5 <small>cm</small><span class="badge">NOT A FORECAST</span></div><div class="d">Same event as Rasuwa: the slope moved before it fell — so did 9 other patches</div></div>
+      </div>
+
+      <div class="group-h">Moving ground · interferometry (InSAR)</div>
+      <div class="cgrid" style="margin-bottom:0">
+        <div class="case" style="--c:var(--quake)"><div class="t">Venezuela <span>M7.2 + M7.5 · Jun</span></div><div class="n">−37.9 <small>cm</small></div><div class="d">Line-of-sight motion over 102,325 ha, imaged 12 h after</div></div>
+        <div class="case" style="--c:var(--ground)"><div class="t">Mexico City <span>subsidence</span></div><div class="n">−21.9 <small>cm / 120 days</small></div><div class="d">37,541 ha of the old lake bed sinking (Chalco)</div></div>
+        <div class="case" style="--c:var(--ground)"><div class="t">Lorca, Spain <span>subsidence</span></div><div class="n">−6 <small>cm / 108 days</small></div><div class="d">≈ −16 cm/yr under irrigated orchards (preliminary)</div></div>
+        <div class="case neg" style="--c:var(--danger)"><div class="t">La Palma, Spain <span>2021 lava</span></div><div class="n">−0.4 <small>cm</small><span class="badge">BELOW NOISE</span></div><div class="d">Flow has nearly stopped settling (noise ±1.7 cm)</div></div>
+        <div class="case neg" style="--c:var(--quake)"><div class="t">Granada, Spain <span>M5.2 · Aug</span></div><div class="n">~1 <small>cm max</small><span class="badge">UPPER BOUND</span></div><div class="d">No deformation above noise — a useful limit</div></div>
+        <div class="case neg" style="--c:var(--ok)"><div class="t">Álora, Spain <span>rail slope · Feb</span></div><div class="n">0 <small>cm</small><span class="badge">STABLE</span></div><div class="d">Repaired high-speed line: no motion above ~1 cm noise</div></div>
+      </div>
+    </div>
+
+    <div class="side-imgs">
+      <div class="pair">
+        <div><div class="img" style="height:470px"><img src="img/limpopo.jpg" alt=""></div><div class="cap">Limpopo · before / after slider</div></div>
+        <div><div class="img" style="height:470px"><img src="img/cdmx.jpg" alt=""></div><div class="cap">Mexico City · InSAR sinking</div></div>
+      </div>
+      <div class="card ui-list">
+        <b>In the app:</b> globe → map per event with before/after slider, time series, HH / HV, L vs C band, InSAR, roads, population, validation layers and a guided story mode.
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Badges mark negative results — reported on purpose, with the reason · NISAR L2 GCOV (~20 m), L2 GUNW (80 m) · Sentinel-1 via ASF HyP3</span><span>3 / 7</span></div>
+</section>
+
+<!-- ================= 4 · SAW / MISSED ================= -->
+<section class="slide">
+  <div class="top"><span><b>03</b> · Honest by design</span><span>NISEarth</span></div>
+  <h1>What the radar saw — <em>and what it missed</em></h1>
+
+  <div class="split">
+    <div class="panel">
+      <h2><span class="dot" style="background:var(--fire);width:14px;height:14px"></span>Saw: Niebla wildfire, Aug 2026</h2>
+      <div class="img"><img src="img/app_niebla.jpg" alt="" style="object-position:center 30%"></div>
+      <div>
+        <div class="kpis">
+          <div class="kpi"><div class="n" style="color:var(--fire)">89 %</div><div class="l">of the radar scar inside EFFIS; it finds 65 % of EFFIS</div></div>
+          <div class="kpi"><div class="n" style="color:var(--fire)">94 %</div><div class="l">of NASA FIRMS hotspots fall inside the scar</div></div>
+          <div class="kpi"><div class="n">720</div><div class="l">people live within 1 km of the burn edge</div></div>
+        </div>
+        <p class="note"><strong>A physical rule, not a black box:</strong> fire drops HV (leaves, branches) but not HH; harvest drops both. Without the HH test, precision falls from 89 % to 57 %.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2><span class="dot" style="background:var(--flood);width:14px;height:14px"></span>Missed: storm “Adam”, Valencia, Oct 2026</h2>
+      <div class="card timeline">
+        <svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid meet" font-family="Geist Mono, monospace">
+          <!-- x = 40 + days since 9 Oct 00:00 UTC × 36 -->
+          <rect x="354.8" y="34" width="162.4" height="290" fill="rgba(255,107,107,.10)" stroke="rgba(255,107,107,.6)" stroke-dasharray="6 5"/>
+          <text x="436" y="24" fill="#ff6b6b" font-size="17" text-anchor="middle">4.5 days with no radar pass · 17 Oct 17:53 → 22 Oct 06:09 UTC</text>
+          <text x="40" y="58" fill="#8e95a4" font-size="15">daily rain, Oliva (ERA5)</text>
+          <!-- rain bars, 3 px per mm, baseline 230 -->
+          <g fill="#5cb8f2" opacity=".85">
+            <rect x="335" y="226" width="22" height="4"/>
+            <rect x="371" y="115" width="22" height="115"/>
+            <rect x="407" y="134" width="22" height="96"/>
+            <rect x="443" y="209" width="22" height="21"/>
+          </g>
+          <text x="382" y="107" fill="#cfd2d9" font-size="15" text-anchor="middle">38 mm</text>
+          <text x="418" y="126" fill="#cfd2d9" font-size="15" text-anchor="middle">32 mm</text>
+          <line x1="40" y1="230" x2="770" y2="230" stroke="rgba(220,226,238,.3)"/>
+          <!-- Copernicus EMS optical map, 20 Oct -->
+          <line x1="454" y1="150" x2="454" y2="230" stroke="#f2efe8" stroke-width="2"/>
+          <text x="462" y="166" fill="#f2efe8" font-size="15">Copernicus EMS</text>
+          <text x="462" y="184" fill="#f2efe8" font-size="15">optical map · 20 Oct</text>
+          <!-- passes -->
+          <text x="72" y="263" fill="#a9d6ff" font-size="13" text-anchor="end">NISAR</text>
+          <text x="72" y="293" fill="#e0b0ff" font-size="13" text-anchor="end">S‑1</text>
+          <g fill="#a9d6ff">
+            <circle cx="140.5" cy="258" r="7"/><circle cx="299.6" cy="258" r="7"/><circle cx="320.3" cy="258" r="7"/>
+            <circle cx="572.5" cy="258" r="7"/><circle cx="731.7" cy="258" r="7"/><circle cx="752.3" cy="258" r="7"/>
+          </g>
+          <g fill="#e0b0ff">
+            <circle cx="85.2" cy="288" r="6"/><circle cx="103" cy="288" r="6"/><circle cx="121" cy="288" r="6"/><circle cx="138.8" cy="288" r="6"/>
+            <circle cx="301.2" cy="288" r="6"/><circle cx="319" cy="288" r="6"/><circle cx="337" cy="288" r="6"/><circle cx="354.8" cy="288" r="6"/>
+            <circle cx="517.2" cy="288" r="6"/><circle cx="553" cy="288" r="6"/><circle cx="570.8" cy="288" r="6"/>
+            <circle cx="733.2" cy="288" r="6"/><circle cx="751" cy="288" r="6"/>
+          </g>
+          <g fill="#8e95a4" font-size="14" text-anchor="middle">
+            <text x="130" y="340">11 Oct</text><text x="310" y="340">16 Oct</text><text x="418" y="340">19 Oct</text><text x="562" y="340">23 Oct</text><text x="742" y="340">28 Oct</text>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <div class="kpis">
+          <div class="kpi"><div class="n" style="color:var(--flood)">0</div><div class="l">radar passes (NISAR or Sentinel&#8209;1) during the storm</div></div>
+          <div class="kpi"><div class="n" style="color:var(--flood)">5 %</div><div class="l">of the 885 ha mapped by EMS still visible to NISAR on 23 Oct</div></div>
+          <div class="kpi"><div class="n">78.6</div><div class="l">mm of rain between the two NISAR passes (track 167)</div></div>
+        </div>
+        <p class="note"><strong>The lesson is operational:</strong> radar constellations must be coordinated and tasked for emergencies. A gap is a result too.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Fire: ΔHV &lt; −0.6 dB and ΔHH &gt; −1.2 dB, 21 Jul → 26 Aug, track 23 · Flood: Otsu threshold and ΔHH &lt; −3 dB, track 167</span><span>4 / 7</span></div>
+</section>
+
+<!-- ================= 5 · RISK INDEX ================= -->
+<section class="slide">
+  <div class="top"><span><b>04</b> · Risk management</span><span>NISEarth</span></div>
+  <h1>A risk index that tells you <em>where to look first</em></h1>
+
+  <div class="risk">
+    <div>
+      <div class="card formula">
+        <div class="f">risk = (<span class="h">H</span> × <span class="e">E</span> × <span class="v">V</span>)<sup style="font-size:22px">1/3</sup></div>
+        <p>Per ~440 × 550 m cell, 0–1. Geometric mean as in the EC JRC's INFORM index: if any factor is zero, risk is zero.</p>
+      </div>
+      <div class="fac">
+        <div class="card" style="--c:var(--fire)"><h4>Hazard</h4><p>Radar footprint fused with EFFIS or Copernicus EMS, FIRMS intensity, InSAR rate and gradient.</p></div>
+        <div class="card" style="--c:var(--signal)"><h4>Exposure</h4><p>People (WorldPop), buildings, roads, rail, critical facilities (OSM), forest or cropland.</p></div>
+        <div class="card" style="--c:var(--ground)"><h4>Vulnerability</h4><p>Land-cover susceptibility, people under 5 or over 65, distance to hospital and fire station.</p></div>
+      </div>
+      <table>
+        <thead><tr><th>Event (radar hazard)</th><th>High + very high</th><th>People in those cells</th><th>Hotspots</th><th>Stable</th></tr></thead>
+        <tbody>
+          <tr><td>Mexico City</td><td class="num">29,368 ha</td><td class="num">4.66 M<span class="sub">4.30 – 4.73 M</span></td><td>Aragón, Nezahualcóyotl · 1,290 critical facilities</td><td class="num">91 %</td></tr>
+          <tr><td>Limpopo</td><td class="num">671 ha</td><td class="num">1,365<span class="sub">289 – 2,724</span></td><td>Macarretane, Chókwè</td><td class="num">94 %</td></tr>
+          <tr><td>Rasuwa</td><td class="num">27 ha</td><td class="num">540<span class="sub">513 – 540</span></td><td>Syaphrubesi</td><td class="num">94 %</td></tr>
+          <tr><td>Niebla</td><td class="num">220 ha</td><td class="num">197<span class="sub">190 – 2,853</span></td><td>Valverde del Camino, Villarrasa</td><td class="num">94 %</td></tr>
+          <tr><td>La Safor</td><td class="num">24 ha</td><td class="num">3<span class="sub">0 – 3</span></td><td>The observation gap matters more</td><td class="num">94 %</td></tr>
+        </tbody>
+      </table>
+      <div class="aside"><b>Not radar:</b> Lorca also has a screening layer built on the official SNCZI 100-year river-flood scenario — 23,802 people in high cells, south of the town in the Guadalentín valley.</div>
+    </div>
+    <div style="display:grid;grid-template-rows:1fr auto;gap:14px;min-height:0">
+      <div class="img"><img src="img/niebla_risk.jpg" alt="" style="object-position:30% 50%"></div>
+      <div class="card" style="padding:18px 22px;font:400 19px/1.42 var(--sans);color:var(--text-2)"><b style="color:var(--text)">Robustness built in:</b> every weight moved by up to ±25 % in 300 runs; 91–94 % of cells keep their class. Grey ranges in the table come from these runs. <span class="muted">Map: Niebla, yellow = medium, orange = high.</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>Screening tool: ranks cells within an event — not a damage estimate or a forecast · method in docs/EVENTS_AND_RISK.md</span><span>5 / 7</span></div>
+</section>
+
+<!-- ================= 6 · DECISIONS ================= -->
+<section class="slide">
+  <div class="top"><span><b>05</b> · From map to decision</span><span>NISEarth</span></div>
+  <h1>Reducing future damage: <em>one hazard prepares the next</em></h1>
+
+  <div class="dec">
+    <div>
+      <div class="group-h">Cascade warnings computed for every cell</div>
+      <div class="casc">
+        <div class="card" style="--c1:var(--fire);--c2:var(--flood)">
+          <div><div class="chain"><span class="a">Fire</span> <span class="arrow">→</span> <span class="b">rain &amp; erosion</span></div><div class="fig">Niebla · 14,576 ha burned on slopes &gt; 15° · 835 cells · 11.2 km of roads</div></div>
+          <div class="act"><em>Suggested action</em>Stabilise slopes and drainage on those cells before the rains. The radar already saw the first rain hit the scar (7 Sep).</div>
+        </div>
+        <div class="card" style="--c1:var(--ground);--c2:var(--flood)">
+          <div><div class="chain"><span class="a">Subsidence</span> <span class="arrow">→</span> <span class="b">flooding</span></div><div class="fig">Mexico City · 35,399 ha sinking on flat ground · 1,908 km of roads · 56 km of rail</div></div>
+          <div class="act"><em>Suggested action</em>Target drainage, pumping limits and building checks where sinking is fastest and most uneven.</div>
+        </div>
+        <div class="card" style="--c1:var(--flood);--c2:var(--fire)">
+          <div><div class="chain"><span class="a">Rain</span> <span class="arrow">→</span> <span class="b">slope failure</span></div><div class="fig">Rasuwa · 125.5 mm between passes · 28 cells · 34.7 km of roads</div></div>
+          <div class="act"><em>Suggested action</em>Preventive closures and slope inspection on the flagged stretches of the valley road.</div>
+        </div>
+      </div>
+      <div class="card watch">
+        <div class="img" style="height:150px"><img src="img/watch.jpg" alt=""></div>
+        <div style="font:400 19px/1.45 var(--sans);color:var(--text-2)"><b style="color:var(--text)">Spain watch, live:</b> today's active fires (NASA FIRMS, industrial sources removed) and <b style="color:var(--text)">when NISAR will next pass over each one</b>. In Niebla: FIRMS saw the fire on 6 Aug; NISAR passed on 14 Aug.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="group-h">Who uses it, and for what</div>
+      <table class="who">
+        <tbody>
+          <tr><td style="color:var(--fire)">Forest services &amp; civil protection</td><td>Burn scars through smoke; where to protect slopes before the rains</td></tr>
+          <tr><td style="color:var(--flood)">Emergency coordinators</td><td>When radar will pass — and when it won't — to request other satellites in time</td></tr>
+          <tr><td style="color:var(--ground)">Water authorities</td><td>Sinking rate every 12 days: is pumping control working?</td></tr>
+          <tr><td style="color:var(--ok)">Rail &amp; road managers</td><td>Embankments and cuttings checked for cm-level motion every 12 days</td></tr>
+          <tr><td style="color:var(--quake)">Seismologists &amp; volcano observatories</td><td>Coseismic motion within 12 h; upper bounds when nothing moved</td></tr>
+          <tr><td style="color:var(--signal)">Urban &amp; land planners</td><td>Risk cells as CSV / GeoJSON for any GIS</td></tr>
+        </tbody>
+      </table>
+      <div class="aside" style="font-size:18px;margin-top:18px"><b>Next: overlapping events.</b> A burn scar already raises vulnerability to the next rain (the cascade value). Combining two events' risk, 1 − (1 − r<sub>a</sub>)(1 − r<sub>b</sub>), and counting exposure once are designed but not yet built.</div>
+    </div>
+  </div>
+  <div class="foot"><span>Slope: Copernicus DEM GLO-30 · rain: Open-Meteo ERA5 · networks and facilities: OpenStreetMap</span><span>6 / 7</span></div>
+</section>
+
+<!-- ================= 7 · WHY IT MATTERS ================= -->
+<section class="slide">
+  <div class="top"><span><b>06</b> · Why NISEarth</span><span>NISEarth</span></div>
+  <h1>Know when to count on radar — <em>and act before the next event</em></h1>
+
+  <div class="close">
+    <div class="strengths">
+      <div class="card"><h4><span>01</span>Real data, our own numbers</h4><p>Every figure comes from our pipeline on public NISAR and Sentinel&#8209;1 data.</p></div>
+      <div class="card"><h4><span>02</span>Validated, not assumed</h4><p>EFFIS, Copernicus EMS, NASA FIRMS and NASA/JPL's own NISAR maps, side by side with ours.</p></div>
+      <div class="card"><h4><span>03</span>Honest about gaps</h4><p>La Safor, Granada, La Palma and Langtang show what radar could not see — and why.</p></div>
+      <div class="card"><h4><span>04</span>From pixel to decision</h4><p>Risk index with ranges, cascade warnings and GIS-ready exports.</p></div>
+      <div class="card"><h4><span>05</span>Scales to any event</h4><p>A new event = one config entry + seven scripts. Six hazard types supported.</p></div>
+      <div class="card"><h4><span>06</span>Adds to what exists</h4><p>Copernicus EMS maps an event on request; NISEarth shows what radar adds, when it will pass and where risk concentrates.</p></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card listcard">
+        <h4>Known limits</h4>
+        <ul style="--c:var(--danger)">
+          <li>Only ~4 months of NISAR interferometry: rates are 108–120 day fits</li>
+          <li>Fire thresholds calibrated on the same event's EFFIS perimeter</li>
+          <li>Population is modelled (WorldPop 2020); flood depth is not observed</li>
+          <li>The index ranks cells — it is not a forecast or damage count</li>
+        </ul>
+      </div>
+      <div class="card listcard">
+        <h4>Next steps</h4>
+        <ul style="--c:var(--ok)">
+          <li>Alert: FIRMS fire + next NISAR pass → scar map in hours</li>
+          <li>USGS ShakeMap for quakes; census data for social vulnerability</li>
+          <li>Combined risk for overlapping events</li>
+          <li>Longer NISAR series for multi-year subsidence</li>
+        </ul>
+      </div>
+      <div class="card cta">
+        <div id="qr"></div>
+        <div>
+          <div class="url">dancing-with-the-sars-spain<br>.vercel.app</div>
+          <p>Try it live: globe → any event → before/after, InSAR, risk.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>NASA Space Apps Challenge 2026 · Dancing with the SARs · NISEarth — what the radar saw</span><span>7 / 7</span></div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  try {
+    new QRCode(document.getElementById('qr'), { text: 'https://dancing-with-the-sars-spain.vercel.app', width: 260, height: 260, colorDark: '#07090d', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  } catch (e) { document.getElementById('qr').style.display = 'none'; }
+</script>
+</body>
+</html>

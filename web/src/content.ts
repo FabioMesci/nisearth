@@ -145,7 +145,7 @@ const CONTENT_ES: Record<string, CaseContent> = {
     dateLabel: '26 ago 2026',
     headline: 'Rasuwa: la montaña que se vino abajo, vista a través del monzón',
     summary:
-      'El 26 de agosto de 2026, a las 8:37 hora local y en pleno monzón, se desplomó la cara norte del Langtang Lirung: una avalancha de roca y hielo a unos 5300 m que se convirtió en un flujo de derrubios, represó el río Lhende en la frontera con el Tíbet y, al vaciarse, bajó 72 km por el Bhote Koshi–Trishuli. Más de 1400 muertos y miles de desaparecidos; viviendas, puentes, carreteras y 12 centrales hidroeléctricas dañadas (activación Copernicus EMSR927). Mientras las nubes tapaban a los satélites ópticos durante cinco semanas, NISAR (pasada 98 ascendente, 19 → 31 ago) cartografió 633 ha de lengua de derrubios y garganta arrasada, con una caída media de −3,4 dB en HV allí donde la avenida arrancó el bosque. La ladera que se movía antes de romperse está en el caso «Langtang Lirung».',
+      'El 26 de agosto de 2026, a las 8:37 hora local y en pleno monzón, se desplomó la cara norte del Langtang Lirung: una avalancha de roca y hielo a unos 5300 m que se convirtió en un flujo de derrubios, represó el río Lhende en la frontera con el Tíbet y, al vaciarse, bajó 72 km por el Bhote Koshi–Trishuli. Más de 1400 muertos y miles de desaparecidos; viviendas, puentes, carreteras y 12 centrales hidroeléctricas dañadas (activación Copernicus EMSR927). Mientras las nubes tapaban a los satélites ópticos durante cinco semanas, NISAR (pasada 98 ascendente, 19 → 31 ago) cartografió 633 ha de lengua de derrubios y garganta arrasada, con una caída media de −3,4 dB en HV allí donde la avenida arrancó el bosque. Y antes del colapso, la interferometría de NISAR ya veía moverse la ladera, aunque no solo esa.',
     passes: {
       from: '2026-08-15',
       to: '2026-09-06',
@@ -184,6 +184,10 @@ const CONTENT_ES: Record<string, CaseContent> = {
       {
         title: 'Lluvia continua antes de la rotura',
         text: 'El reanálisis ERA5 registra lluvia todos los días del 15 de agosto al 5 de septiembre (323 mm en total, 125,5 mm solo entre las dos pasadas de NISAR), saturando laderas y morrenas.',
+      },
+      {
+        title: '¿Avisó la montaña antes de caer?',
+        text: 'Con 6 interferogramas NISAR de las 12 semanas anteriores (27 may → 19 ago), la ladera a 1,7 km del punto de rotura se acerca al satélite 4,5 cm, 2,4 de ellos en las últimas tres semanas, apenas por encima del ruido (±2,8 cm). El hielo que se rompió no se puede medir: pierde coherencia y el producto oficial lo descarta. Y en esas mismas semanas otras 9 zonas de la cabecera se mueven más de 5 cm. ICIMOD midió hasta 30 cm en esa ladera con técnicas que sí siguen el hielo. NISAR vio moverse la montaña, no cuál iba a caer: con una imagen cada 12 días aún no es una alerta, pero sí un mapa de dónde mirar.',
       },
       {
         title: 'Sin comparación oficial',
@@ -438,41 +442,6 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Protección civil', text: 'Un terreno que baja cambia por dónde corre el agua en las inundaciones.' },
     ],
   },
-  langtang: {
-    short: 'Langtang Lirung',
-    region: 'Nepal',
-    kindLabel: 'Antes del colapso',
-    order: 12,
-    place: 'Cara norte del Langtang Lirung · Rasuwa (Nepal)',
-    dateLabel: 'may–ago 2026',
-    headline: 'Langtang Lirung: ¿avisó el glaciar antes de caer?',
-    summary:
-      'El 26 de agosto se desplomó la cara norte del Langtang Lirung, la avalancha de roca y hielo que originó la riada de Rasuwa. Miramos las 12 semanas anteriores con 6 interferogramas NISAR (27 may → 19 ago). El hielo que se rompió no se puede medir: pierde coherencia y el producto oficial lo descarta. En la ladera, a 1,7 km, el suelo se acerca al satélite 4,5 cm, 2,4 de ellos en las últimas tres semanas, apenas por encima del ruido (±2,8 cm). Pero en esas mismas tres semanas otras 9 zonas de esta escena se mueven más de 5 cm. NISAR vio moverse la montaña, no cuál iba a caer.',
-    notes: [{ date: '2026-08-19', label: 'Última pasada antes' }],
-    why: [
-      {
-        title: 'El hielo no deja medir',
-        text: 'La interferometría compara la fase de dos pasadas. Sobre un glaciar el hielo se funde, fluye y cambia cada día, la coherencia cae (0,26 junto al punto de rotura) y el desenrollado oficial lo deja fuera. Por eso el máximo lo buscamos en la roca de alrededor.',
-      },
-      {
-        title: 'Lo que dicen otros estudios',
-        text: 'ICIMOD midió con NISAR hasta 30 cm en esa ladera entre el 26 jul y el 19 ago, y un artículo en Remote Sensing (MDPI, 2026) ve 5–6 cm de subida aparente en el flanco norte del valle. Nuestro procesado da el mismo orden en la ladera (+4,5 cm). Los 30 cm probablemente salen de técnicas que sí miden el hielo (correlación de imágenes), que aquí no usamos.',
-      },
-      {
-        title: 'Moverse no es avisar',
-        text: 'Otro estudio encontró 101 zonas más moviéndose ladera abajo en la región, 93 de ellas glaciares. Un glaciar de montaña siempre se mueve: el reto es distinguir el movimiento normal de la aceleración que precede a una rotura. Con una imagen cada 12 días, eso aún no es una alerta.',
-      },
-      {
-        title: 'Qué haría falta',
-        text: 'Las pasadas ascendente y descendente juntas (aquí la 48 desc solo cubre la mitad de la escena), técnicas de seguimiento del hielo y sensores en el terreno. NISAR da el mapa de dónde mirar.',
-      },
-    ],
-    who: [
-      { title: 'Vigilancia glaciar (ICIMOD, DHM)', text: 'Un inventario de laderas y glaciares que se aceleran, renovado cada 12 días.' },
-      { title: 'Hidroeléctricas', text: 'Doce centrales dañadas: saber qué cabeceras vigilar antes de construir o reabrir.' },
-      { title: 'Comunidades del valle', text: 'Sistemas de alerta río abajo, donde unos minutos de aviso salvan vidas.' },
-    ],
-  },
 }
 
 const STORY_ES = [
@@ -553,7 +522,7 @@ const CONTENT_EN: Record<string, CaseContent> = {
     dateLabel: '26 Aug 2026',
     headline: 'Rasuwa: the mountain that came down, seen through the monsoon',
     summary:
-      'At 8:37 local time on 26 August 2026, at the height of the monsoon, the north face of Langtang Lirung gave way: a rock–ice avalanche at about 5,300 m turned into a debris flow, dammed the Lhende River on the Tibet border and, when the dam broke, ran 72 km down the Bhote Koshi–Trishuli. Over 1,400 dead and thousands missing; homes, bridges, roads and 12 hydropower plants damaged (Copernicus EMSR927 activation). While clouds blinded optical satellites for five weeks, NISAR (ascending track 98, 19 → 31 Aug) mapped 633 ha of debris tongue and scoured gorge, with a −3.4 dB mean HV drop where the surge stripped the forest. The slope that was moving before it failed is in the “Langtang Lirung” case.',
+      'At 8:37 local time on 26 August 2026, at the height of the monsoon, the north face of Langtang Lirung gave way: a rock–ice avalanche at about 5,300 m turned into a debris flow, dammed the Lhende River on the Tibet border and, when the dam broke, ran 72 km down the Bhote Koshi–Trishuli. Over 1,400 dead and thousands missing; homes, bridges, roads and 12 hydropower plants damaged (Copernicus EMSR927 activation). While clouds blinded optical satellites for five weeks, NISAR (ascending track 98, 19 → 31 Aug) mapped 633 ha of debris tongue and scoured gorge, with a −3.4 dB mean HV drop where the surge stripped the forest. And before the collapse, NISAR interferometry already saw the slope moving, though not only that one.',
     notes: [{ date: '2026-08-26', label: 'Collapse and flood' }],
     why: [
       { title: 'Seeing through five weeks of monsoon', text: 'Between 24 August and 28 September every Sentinel-2 optical pass had 49% to 97% cloud cover; the first clear view arrived on 1 October. NISAR mapped the full extent five days after the collapse.' },
@@ -561,6 +530,7 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Not a glacial lake', text: 'Copernicus EMS activated its mapping as a glacial lake outburst flood (GLOF), and that is how it was first reported. Later analyses (USGS seismograms, optical imagery) point to a rock–ice collapse that temporarily dammed the Lhende, whose release fed the flood.' },
       { title: 'Geometry in 5,000 m canyons', text: 'In deep Himalayan gorges viewing geometry is critical: ascending track 98 (40 MHz DHDH mode) covers 100% of the valley seamlessly, whereas descending track 48 on 28 August left a sub-swath gap across the headwall.' },
       { title: 'Rain every day before the failure', text: 'ERA5 reanalysis records rain every day from 15 August to 5 September (323 mm in total, 125.5 mm between the two NISAR passes alone), saturating slopes and moraines.' },
+      { title: 'Did the mountain warn before it fell?', text: 'With 6 NISAR interferograms from the 12 weeks before (27 May → 19 Aug), the slope 1.7 km from the failure point moves 4.5 cm towards the satellite, 2.4 of them in the last three weeks, just above the noise (±2.8 cm). The ice that broke cannot be measured: it loses coherence and the official product drops it. And in those same weeks 9 other areas of the headwaters move by more than 5 cm. ICIMOD measured up to 30 cm on that slope with techniques that do track ice. NISAR saw the mountain moving, not which part would fall: with one image every 12 days it is not yet a warning, but it is a map of where to look.' },
       { title: 'No official comparison', text: 'NASA has not published a NISAR image of this event: the result is ours alone. What is flagged is a strong signal drop, not confirmed damage; it should be checked against the EMSR927 layers or optical imagery.' },
     ],
     who: [
@@ -727,27 +697,6 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Water management (CONAGUA)', text: 'See every 12 days where pumping sinks the ground most, to rebalance the wells.' },
       { title: 'Metro and infrastructure', text: 'Uneven subsidence breaks pipes, warps tracks and damages Metro Line 12 and historic buildings.' },
       { title: 'Civil protection', text: 'Sinking ground changes where water runs during floods.' },
-    ],
-  },
-  langtang: {
-    ...CONTENT_ES.langtang,
-    kindLabel: 'Before the collapse',
-    place: 'North face of Langtang Lirung · Rasuwa (Nepal)',
-    dateLabel: 'May–Aug 2026',
-    headline: 'Langtang Lirung: did the glacier warn before it fell?',
-    summary:
-      'On 26 August the north face of Langtang Lirung collapsed: the rock–ice avalanche behind the Rasuwa flood. We look at the 12 weeks before with 6 NISAR interferograms (27 May → 19 Aug). The ice that broke cannot be measured: it loses coherence and the official product drops it. On the slope 1.7 km away the ground moves 4.5 cm towards the satellite, 2.4 of them in the last three weeks, just above the noise (±2.8 cm). But in those same three weeks 9 other areas of this scene move by more than 5 cm. NISAR saw the mountain moving, not which part would fall.',
-    notes: [{ date: '2026-08-19', label: 'Last pass before' }],
-    why: [
-      { title: 'Ice cannot be measured', text: 'Interferometry compares the phase of two passes. On a glacier the ice melts, flows and changes every day, coherence drops (0.26 next to the failure point) and the official unwrapping leaves it out. So we look for the maximum on the surrounding rock.' },
-      { title: 'What other studies say', text: 'ICIMOD measured up to 30 cm with NISAR on that slope between 26 Jul and 19 Aug, and a paper in Remote Sensing (MDPI, 2026) sees 5–6 cm of apparent uplift on the northern valley flank. Our processing gives the same order on the slope (+4.5 cm). The 30 cm probably come from techniques that do track ice (image correlation), which we do not use here.' },
-      { title: 'Moving is not warning', text: 'Another study found 101 more areas moving downslope in the region, 93 of them glaciers. A mountain glacier always moves: the challenge is telling normal motion from the acceleration before a failure. With one image every 12 days, that is not yet a warning.' },
-      { title: 'What it would take', text: 'Ascending and descending tracks together (here descending track 48 only covers half the scene), ice-tracking techniques and ground sensors. NISAR provides the map of where to look.' },
-    ],
-    who: [
-      { title: 'Glacier monitoring (ICIMOD, DHM)', text: 'An inventory of accelerating slopes and glaciers, refreshed every 12 days.' },
-      { title: 'Hydropower', text: 'Twelve plants damaged: know which headwaters to watch before building or reopening.' },
-      { title: 'Valley communities', text: 'Warning systems downstream, where a few minutes of notice save lives.' },
     ],
   },
 }

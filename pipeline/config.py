@@ -201,6 +201,8 @@ CASES = {
             "claim": "Más de 600 000 desplazados; el radar ve el agua bajo las nubes que tapaban a Sentinel-2",
         },
     },
+    # no se publica como caso: su resultado (la ladera se movía antes del colapso) va dentro de «rasuwa».
+    # Si se reprocesa con 08_insar.py, quitarlo después de web/public/data/index.json
     "langtang": {
         "title": "Colapso del glaciar del Langtang Lirung (Nepal)",
         "region": "world",

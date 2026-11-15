@@ -145,7 +145,7 @@ for c in niebla dana; do
 done
 for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c; done
 # NISAR around the world / NISAR en el mundo
-for c in venezuela cdmx langtang; do ../.venv/bin/python 08_insar.py all $c; done
+for c in venezuela cdmx; do ../.venv/bin/python 08_insar.py all $c; done
 ../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
 ../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
 ../.venv/bin/python 02_extract.py rasuwa --track 98 && ../.venv/bin/python 03_process.py rasuwa && ../.venv/bin/python 04_context.py rasuwa \

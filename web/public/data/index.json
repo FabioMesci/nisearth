@@ -58,5 +58,49 @@
    28.619999999999997
   ],
   "event": "2021-09-19"
+ },
+ {
+  "id": "venezuela",
+  "title": "Terremotos de Venezuela (Caracas · La Guaira)",
+  "kind": "earthquake",
+  "center": [
+   -67.1,
+   10.55
+  ],
+  "event": "2026-06-24",
+  "region": "world"
+ },
+ {
+  "id": "krasheninnikov",
+  "title": "Volcán Krasheninnikov (Kamchatka)",
+  "kind": "volcano",
+  "center": [
+   160.26999999999998,
+   54.595
+  ],
+  "event": "2025-08-03",
+  "region": "world"
+ },
+ {
+  "id": "mozambique",
+  "title": "Inundaciones del Limpopo (Mozambique)",
+  "kind": "flood",
+  "center": [
+   33.025,
+   -24.75
+  ],
+  "event": "2026-01-15",
+  "region": "world"
+ },
+ {
+  "id": "cdmx",
+  "title": "Subsidencia de Ciudad de México",
+  "kind": "subsidence",
+  "center": [
+   -99.05,
+   19.425
+  ],
+  "event": "2025-10-25",
+  "region": "world"
  }
 ]

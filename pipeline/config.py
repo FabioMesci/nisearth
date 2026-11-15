@@ -86,6 +86,109 @@ CASES = {
                   "context": {"rail": True},
                   "s1_pair": ("2026-02-03", "2026-02-09")},  # Sentinel-1 pasada 74 asc: la víspera y 5 días después de la rotura
     },
+    # ---- NISAR en el mundo: eventos difundidos por NASA/JPL, procesados aquí con el mismo pipeline ----
+    # "official": imagen de NASA/JPL para comparar (se muestra con su crédito; la nuestra es independiente)
+    "venezuela": {
+        "title": "Terremotos de Venezuela (Caracas · La Guaira)",
+        "region": "world",
+        "kind": "earthquake",
+        "bbox": (-67.60, 10.35, -66.60, 10.75),
+        "window": ("2026-06-01", "2026-07-15"),
+        "event": "2026-06-24",  # M7,2 (20 km E de San Felipe) y, 33 s después, M7,5 (20 km O de Catia La Mar), USGS
+        "insar": {
+            "mode": "pairs",
+            "pairs": [  # tres pasadas que abarcan el terremoto; la 126 (desc) cubre el 100 % y va al final (mapa principal)
+                (162, "2026-06-13", "2026-06-25"),  # (la 54 desc solo cubre un rincón del oeste: descartada)
+                (61, "2026-06-18", "2026-06-30"),
+                (126, "2026-06-22", "2026-07-04"),
+            ],
+            "hotspot": (-67.048, 10.592),  # costa junto al aeropuerto de Maiquetía, válida en las 3 pasadas (el epicentro M7,5 está en el mar)
+            "ref_box": (-67.60, 10.35, -66.60, 10.42),  # cero: franja interior, lo más lejos posible de la falla costera
+            "res": 0.001,
+            "vmax_cm": 40.0,
+            "fringe_cm": 11.9,  # una franja = media longitud de onda en banda L
+            "exclude_km": 30,
+            "mask_cm": 5.0,
+            "detrend": "offset",
+            "peak": True,  # sin rampa ni relieve: la deformación cubre toda la franja costera
+        },
+        "official": {
+            "url": "https://science.nasa.gov/earth/earth-observatory/where-venezuelas-earthquakes-shifted-the-ground/",
+            "image": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/iotd/2026/where-venezuela’s-earthquakes-shifted-the-ground/venezuela_nisar_20260630.jpg",
+            "credit": "NASA Earth Observatory/Lauren Dauphin; datos: Eric Fielding, equipo científico NISAR (JPL)",
+            "date": "2026-07-10",
+            "claim": "Hasta ~60 cm de desplazamiento hacia el oeste junto al aeropuerto de Maiquetía",
+        },
+    },
+    "cdmx": {
+        "title": "Subsidencia de Ciudad de México",
+        "region": "world",
+        "kind": "subsidence",
+        "bbox": (-99.25, 19.25, -98.85, 19.60),
+        # 25 oct → 22 feb (10 pares): incluye el periodo del mapa de JPL (25 oct – 17 ene). Desde finales de febrero
+        # la coherencia en Chalco cae (campos en temporada seca) y los pares sin dato aplanarían la serie
+        "window": ("2025-10-20", "2026-02-21"),
+        "event": "2025-10-25",  # fenómeno continuo: inicio de la serie NISAR
+        "insar": {"mode": "chain", "track": 113, "res": 0.0005, "vmax_cm": 12.0, "fringe_cm": 5.0, "exclude_km": 8,
+                  "hotspot": (-99.051, 19.269),  # Chalco: mínimo del cuenco suavizado (~3 km); JPL también lo destaca
+                  "fit_above_m": 2280},  # rampa y relieve ajustados solo en los cerros; el lecho del antiguo lago (~2240 m) se hunde
+        "official": {
+            "url": "https://www.jpl.nasa.gov/images/pia26709-us-indian-spacecraft-captures-mexico-city-subsidence/",
+            "image": "https://d2pn8kiwq2w21t.cloudfront.net/original_images/PIA26709.jpg",
+            "credit": "NASA/JPL-Caltech/David Bekaert",
+            "date": "2026-04-28",
+            "claim": "Más de 2 cm/mes de hundimiento (25 oct 2025 – 17 ene 2026)",
+        },
+    },
+    "krasheninnikov": {
+        "title": "Volcán Krasheninnikov (Kamchatka)",
+        "region": "world",
+        "kind": "volcano",
+        "change": "lava",  # cambio de retrodispersión (GCOV), no interferometría: la colada nueva es más brillante
+        "bbox": (160.12, 54.52, 160.42, 54.67),
+        "window": ("2026-06-01", "2026-11-15"),
+        "event": "2025-08-03",  # primera erupción histórica (noche del 2 al 3 ago 2025), cuatro días después del M8,8 del 30 jul
+        "pair": ("2026-07-13", "2026-09-23"),  # verano sin nieve (el 1 jul aún quedan neveros húmedos)
+        "track": 80,
+        "lava": {"crater": (160.290, 54.603), "radius_km": 7, "min_db": 2.5},
+        "official": {
+            "url": "https://svs.gsfc.nasa.gov/5675",
+            "image": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005675/nisar_volcano_annotated.00500_print.jpg",
+            "credit": "NASA Scientific Visualization Studio: Alex Kekesi (ADNET); ciencia: Matthew Pritchard (Cornell), Paul A. Rosen y Marco Lavalle (JPL)",
+            "date": "2026-09-24",
+            "claim": "Timelapse de 17 imágenes NISAR (25 dic 2025 – ago 2026): la lava llena la caldera interior y se abre en abanico hacia el este",
+        },
+    },
+    "mozambique": {
+        "title": "Inundaciones del Limpopo (Mozambique)",
+        "region": "world",
+        "kind": "flood",
+        "bbox": (32.75, -25.10, 33.30, -24.40),  # Chókwè, Guijá y el bajo Limpopo
+        "window": ("2025-12-01", "2026-02-15"),
+        "event": "2026-01-15",
+        "pair": ("2026-01-05", "2026-01-17"),
+        "track": 114,
+        "water_db": -14.0,  # valle del histograma HH del 17 ene (agua ~−18 dB, tierra mojada ~−6 dB); Otsu daba −11,5
+        "official": {
+            "url": "https://svs.gsfc.nasa.gov/5661",
+            "image": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005661/Post_Chokwe.png",
+            "credit": "NASA SVS: Zoey N. Armstrong (Navteca); Alexandra Christensen y Bruce Chapman (JPL); Andrew Wang (JPL)",
+            "date": "2026-08-06",
+            "claim": "Más de 600 000 desplazados; el radar ve el agua bajo las nubes que tapaban a Sentinel-2",
+        },
+    },
+    "nepal": {
+        "title": "Riada del Bhote Koshi–Trishuli (Rasuwa, Nepal)",
+        "region": "world",
+        "kind": "flood",
+        "change": "debris",  # riada relámpago en valle encajado: el agua ya no se ve; se buscan cicatrices (sedimento, deslizamientos)
+        "bbox": (85.15, 27.85, 85.45, 28.35),  # de Gyirong (frontera china) a Betrawati por el corredor Bhote Koshi–Trishuli
+        "window": ("2026-07-15", "2026-10-15"),
+        "event": "2026-08-26",
+        "pair": ("2026-08-19", "2026-08-31"),  # pasada 98 asc, 100 %: 7 días antes y 5 después
+        "track": 98,
+        "official": None,  # NASA no ha publicado imagen NISAR de este evento: solo nuestro procesado
+    },
 }
 
 

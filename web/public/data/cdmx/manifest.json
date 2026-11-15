@@ -1,0 +1,302 @@
+{
+ "id": "cdmx",
+ "title": "Subsidencia de Ciudad de México",
+ "kind": "subsidence",
+ "event": "2025-10-25",
+ "mock": false,
+ "bbox": [
+  -99.25,
+  19.25,
+  -98.85,
+  19.6
+ ],
+ "center": [
+  -99.05,
+  19.425
+ ],
+ "coordinates": [
+  [
+   -99.25,
+   19.6
+  ],
+  [
+   -98.85,
+   19.6
+  ],
+  [
+   -98.85,
+   19.25
+  ],
+  [
+   -99.25,
+   19.25
+  ]
+ ],
+ "pair": {
+  "before": "2025-11-06",
+  "after": "2026-02-22"
+ },
+ "frames": [
+  {
+   "date": "2025-11-06",
+   "ref": "2025-10-25",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20251025_20251106.webp",
+   "hv": "f_113_20251025_20251106.webp",
+   "rgb": "c_113_20251025_20251106.webp"
+  },
+  {
+   "date": "2025-11-18",
+   "ref": "2025-11-06",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20251106_20251118.webp",
+   "hv": "f_113_20251106_20251118.webp",
+   "rgb": "c_113_20251106_20251118.webp"
+  },
+  {
+   "date": "2025-11-30",
+   "ref": "2025-11-18",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20251118_20251130.webp",
+   "hv": "f_113_20251118_20251130.webp",
+   "rgb": "c_113_20251118_20251130.webp"
+  },
+  {
+   "date": "2025-12-12",
+   "ref": "2025-11-30",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20251130_20251212.webp",
+   "hv": "f_113_20251130_20251212.webp",
+   "rgb": "c_113_20251130_20251212.webp"
+  },
+  {
+   "date": "2025-12-24",
+   "ref": "2025-12-12",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20251212_20251224.webp",
+   "hv": "f_113_20251212_20251224.webp",
+   "rgb": "c_113_20251212_20251224.webp"
+  },
+  {
+   "date": "2026-01-05",
+   "ref": "2025-12-24",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20251224_20260105.webp",
+   "hv": "f_113_20251224_20260105.webp",
+   "rgb": "c_113_20251224_20260105.webp"
+  },
+  {
+   "date": "2026-01-17",
+   "ref": "2026-01-05",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20260105_20260117.webp",
+   "hv": "f_113_20260105_20260117.webp",
+   "rgb": "c_113_20260105_20260117.webp"
+  },
+  {
+   "date": "2026-01-29",
+   "ref": "2026-01-17",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20260117_20260129.webp",
+   "hv": "f_113_20260117_20260129.webp",
+   "rgb": "c_113_20260117_20260129.webp"
+  },
+  {
+   "date": "2026-02-10",
+   "ref": "2026-01-29",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20260129_20260210.webp",
+   "hv": "f_113_20260129_20260210.webp",
+   "rgb": "c_113_20260129_20260210.webp"
+  },
+  {
+   "date": "2026-02-22",
+   "ref": "2026-02-10",
+   "track": 113,
+   "dir": "D",
+   "hh": "d_113_20260210_20260222.webp",
+   "hv": "f_113_20260210_20260222.webp",
+   "rgb": "c_113_20260210_20260222.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2025-11-06",
+   "2025-11-18",
+   "2025-11-30",
+   "2025-12-12",
+   "2025-12-24",
+   "2026-01-05",
+   "2026-01-17",
+   "2026-01-29",
+   "2026-02-10",
+   "2026-02-22"
+  ],
+  "hh": [
+   -5.34,
+   -10.59,
+   -13.66,
+   -13.95,
+   -15.11,
+   -16.46,
+   -17.93,
+   -18.17,
+   -19.72,
+   -21.91
+  ],
+  "hv": [
+   0.6,
+   0.63,
+   0.64,
+   0.48,
+   0.61,
+   0.62,
+   0.62,
+   0.56,
+   0.59,
+   0.57
+  ]
+ },
+ "metrics": [
+  {
+   "id": "insar_cum",
+   "label": "Desplazamiento acumulado en el punto que más se mueve",
+   "value": -21.9,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_rate",
+   "label": "Velocidad (ajuste lineal de la serie)",
+   "value": -55.5,
+   "unit": "cm/año"
+  },
+  {
+   "id": "insar_area",
+   "label": "Superficie que se mueve más que el ruido",
+   "value": 37541,
+   "unit": "ha"
+  },
+  {
+   "id": "insar_noise",
+   "label": "Ruido de fondo (desviación típica)",
+   "value": 1.0,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_coh",
+   "label": "Coherencia media",
+   "value": 59.0,
+   "unit": "%"
+  },
+  {
+   "id": "insar_n",
+   "label": "Interferogramas NISAR usados",
+   "value": 10,
+   "unit": ""
+  }
+ ],
+ "overlays": {},
+ "insar": {
+  "mode": "chain",
+  "product": "NISAR L2 GUNW",
+  "wavelength_cm": 23.8,
+  "vmax_cm": 12.0,
+  "fringe_cm": 5.0,
+  "hotspot": [
+   -99.051,
+   19.269
+  ],
+  "noise_cm": 1.04,
+  "rate_cm_yr": -55.5,
+  "series": "point",
+  "threshold_cm": 2.61,
+  "days": 120,
+  "detrend": "ramp",
+  "start": "2025-10-25",
+  "end": "2026-02-22",
+  "pairs": [
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2025-10-25",
+    "sec": "2025-11-06"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2025-11-06",
+    "sec": "2025-11-18"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2025-11-18",
+    "sec": "2025-11-30"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2025-11-30",
+    "sec": "2025-12-12"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2025-12-12",
+    "sec": "2025-12-24"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2025-12-24",
+    "sec": "2026-01-05"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2026-01-05",
+    "sec": "2026-01-17"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2026-01-17",
+    "sec": "2026-01-29"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2026-01-29",
+    "sec": "2026-02-10"
+   },
+   {
+    "track": 113,
+    "dir": "D",
+    "ref": "2026-02-10",
+    "sec": "2026-02-22"
+   }
+  ]
+ },
+ "region": "world",
+ "official": {
+  "url": "https://www.jpl.nasa.gov/images/pia26709-us-indian-spacecraft-captures-mexico-city-subsidence/",
+  "credit": "NASA/JPL-Caltech/David Bekaert",
+  "date": "2026-04-28",
+  "claim": "Más de 2 cm/mes de hundimiento (25 oct 2025 – 17 ene 2026)",
+  "file": "official.webp",
+  "source_image": "https://d2pn8kiwq2w21t.cloudfront.net/original_images/PIA26709.jpg"
+ }
+}

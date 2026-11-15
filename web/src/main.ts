@@ -139,9 +139,11 @@ async function main() {
       const ct = CONTENT[c.id]
       return `<li><button data-id="${c.id}" style="--c:${meta.color}" title="${ct?.place ?? c.title}"><span class="ic">${meta.icon}</span><span class="txt"><b>${ct?.short ?? c.title}<span class="rg">${ct?.region ?? ''}</span></b><i>${meta.label} · ${ct?.dateLabel ?? ''}</i></span></button></li>`
     }
+    const es = cases.filter((c) => c.region !== 'world')
     const groups = [
-      { label: t('groupSurface'), items: cases.filter((c) => surface(c.kind)) },
-      { label: t('groupGround'), items: cases.filter((c) => !surface(c.kind)) },
+      { label: t('groupSurface'), items: es.filter((c) => surface(c.kind)) },
+      { label: t('groupGround'), items: es.filter((c) => !surface(c.kind)) },
+      { label: t('groupWorld'), items: cases.filter((c) => c.region === 'world') },
     ].filter((g) => g.items.length)
     list.innerHTML = groups.map((g) => `<li class="grp">${g.label}</li>${g.items.map(row).join('')}`).join('')
     markActive()

@@ -165,12 +165,28 @@ def main():
     if case["kind"] == "flood":
         sample = hh_a[valid]
         thr = float(threshold_otsu(sample[(sample > -35) & (sample < 5)]))
+        if case.get("water_db") is not None:  # umbral fijado a mano en el valle del histograma (Otsu sesgado por la clase grande)
+            thr = float(case["water_db"])
         water_after = valid & (hh_a < thr)
         water_before = valid & (hh_b < thr)
         mask = water_after & (d_hh < -3)
         delta, color = d_hh, (40, 150, 255)
         extra = {"otsu_threshold_db": round(thr, 2),
                  "permanent_water_km2": None}
+    elif case.get("change") == "lava":
+        # colada nueva: la roca rugosa recién emplazada devuelve más señal en HH Y en HV a la vez (> 2,5 dB).
+        # Solo cerca del cráter: lejos, lo que se aclara son neveros que se funden y laderas que se secan.
+        lv = case["lava"]
+        s_hh_d, s_hv_d = smooth(d_hh, 5), smooth(d_hv, 5)
+        h_, w_ = d_hh.shape
+        x0, y0, x1, y1 = case["bbox"]
+        lon = x0 + (np.arange(w_) + 0.5) * (x1 - x0) / w_
+        lat = y1 - (np.arange(h_) + 0.5) * (y1 - y0) / h_
+        LX, LY = np.meshgrid((lon - lv["crater"][0]) * 111.32 * np.cos(np.radians(lv["crater"][1])), (lat - lv["crater"][1]) * 110.57)
+        near = np.hypot(LX, LY) <= lv["radius_km"]
+        mask = valid & near & (s_hh_d > lv["min_db"]) & (s_hv_d > lv["min_db"])
+        delta, color = d_hh, (255, 196, 40)
+        extra = {"rule": f"dHH>{lv['min_db']} & dHV>{lv['min_db']} dB (media 5x5), a menos de {lv['radius_km']} km del cráter"}
     else:
         s_hv_d, s_hh_d = smooth(d_hv, 15), smooth(d_hh, 15)
         mask = valid & (s_hv_d < -0.6) & (s_hh_d > -1.2)
@@ -178,7 +194,7 @@ def main():
         extra = {"rule": "dHV<-0.6 & dHH>-1.2 (media 15x15)"}
     mask = binary_opening(mask, disk(1))
     mask = binary_closing(mask, disk(2))
-    mask = remove_small_objects(mask, max_size=40 if case["kind"] == "flood" else 500)
+    mask = remove_small_objects(mask, max_size=40 if case["kind"] == "flood" else 30 if case.get("change") == "lava" else 500)
 
     px_km2 = pixel_area_km2(case["bbox"], mask.shape)
     area_km2 = float(mask.sum() * px_km2)
@@ -220,6 +236,9 @@ def main():
     metrics = (
         [{"id": "area", "label": "Agua nueva detectada", "value": round(area_km2, 1), "unit": "km²"}]
         if case["kind"] == "flood" else
+        [{"id": "area", "label": "Lava nueva o más brillante (radar)", "value": round(area_km2 * 100), "unit": "ha"},
+         {"id": "hhrise", "label": "Subida media de HH sobre la lava", "value": round(float(np.nanmean(d_hh[mask])), 1), "unit": "dB"}]
+        if case.get("change") == "lava" else
         [{"id": "area", "label": "Superficie quemada (radar)", "value": round(area_km2 * 100), "unit": "ha"},
          {"id": "hvdrop", "label": "Caída media de HV", "value": round(float(np.nanmean(d_hv[mask])), 1), "unit": "dB"}]
     )
@@ -288,7 +307,8 @@ def main():
     ipath = WEB_DATA / "index.json"
     index = json.loads(ipath.read_text()) if ipath.exists() else []
     index = [i for i in index if i["id"] != cid] + [
-        {"id": cid, "title": case["title"], "kind": case["kind"], "center": manifest["center"], "event": case["event"]}]
+        {"id": cid, "title": case["title"], "kind": case["kind"], "center": manifest["center"], "event": case["event"],
+         "region": case.get("region", "es")}]
     ipath.write_text(json.dumps(index, indent=1, ensure_ascii=False))
     print(f"[ok] {len(frames)} fechas exportadas -> {out}")
 

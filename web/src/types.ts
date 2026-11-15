@@ -6,6 +6,18 @@ export interface CaseIndexItem {
   kind: Kind
   center: [number, number]
   event: string
+  /** es = caso español; world = NISAR en el mundo (eventos difundidos por NASA/JPL) */
+  region?: 'es' | 'world'
+}
+
+/** Imagen oficial de NASA/JPL del mismo evento, para comparar con nuestro procesado (pipeline/09_world.py) */
+export interface Official {
+  url: string
+  file?: string
+  source_image?: string
+  credit: string
+  date: string
+  claim: string
 }
 
 export interface Frame {
@@ -53,6 +65,8 @@ export interface Manifest {
   /** Sentinel-1 (banda C): hh/hv contienen VV/VH */
   s1?: { pair: { before: string; after: string }; frames: Frame[]; change: string; delta_in_mask: { vv: number; vh: number } }
   nisar_delta_in_mask?: { hh: number; hv: number }
+  region?: 'es' | 'world'
+  official?: Official
   stats?: Record<string, unknown>
   /** Cobertura del suelo bajo la máscara (ESA WorldCover) */
   landcover?: { source: string; inside: LandRow[]; outside_ref?: LandRow[] }
@@ -72,6 +86,8 @@ export interface InsarInfo {
   /** point = disco alrededor del punto; region = zona (colada, vía) menos un anillo de 1 km */
   series?: 'point' | 'region'
   threshold_cm: number
+  /** ramp = rampa + relieve estimados en la escena; offset = solo el cero (terremotos grandes) */
+  detrend?: 'ramp' | 'offset'
   days: number
   start: string
   end: string

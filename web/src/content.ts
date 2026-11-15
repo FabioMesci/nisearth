@@ -23,6 +23,8 @@ export interface CaseContent {
   notes?: { date: string; label: string }[]
   /** Pasadas de radar alrededor del evento (para la línea de revisita) */
   passes?: { from: string; to: string; event: [string, string]; list: Pass[] }
+  /** NISAR en el mundo: qué afirma NASA/JPL (traducido); si falta, se usa el del manifest */
+  officialClaim?: string
   order: number
 }
 
@@ -215,6 +217,146 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Viajeros y economía', text: 'Tres meses sin AVE directo Málaga–Madrid: prevenir sale más barato.' },
     ],
   },
+  // ---- NISAR en el mundo: eventos difundidos por NASA/JPL, procesados con nuestro pipeline ----
+  venezuela: {
+    short: 'Caracas',
+    region: 'Venezuela',
+    order: 7,
+    place: 'Caracas · La Guaira (Venezuela)',
+    dateLabel: '24 jun 2026',
+    headline: 'Venezuela: la costa que se movió medio metro',
+    summary:
+      'El 24 de junio dos terremotos sacudieron el norte de Venezuela: un M7,2 y, medio minuto después, un M7,5 frente a Catia La Mar (USGS). Tres interferogramas NISAR de tres pasadas distintas ven la franja costera de La Guaira moverse hasta 59 cm en la línea de visión del satélite. NASA publicó su propio mapa con los mismos datos (hasta ~60 cm hacia el oeste junto al aeropuerto); nuestro procesado, hecho de forma independiente, llega al mismo orden de magnitud.',
+    notes: [{ date: '2026-06-24', label: 'M7,5' }],
+    officialClaim: 'Hasta ~60 cm de desplazamiento, sobre todo horizontal y hacia el oeste, junto al aeropuerto internacional al norte de Caracas.',
+    why: [
+      {
+        title: 'Una falla de desgarre',
+        text: 'La falla de San Sebastián corre paralela a la costa, bajo el mar. En un desgarre los bloques se deslizan en horizontal, uno junto al otro: por eso el movimiento se concentra en la franja costera.',
+      },
+      {
+        title: 'Dos miradas, dos colores',
+        text: 'Las pasadas ascendentes miran hacia el este y las descendentes hacia el oeste. Un mismo movimiento horizontal se ve como «alejarse» en unas y «acercarse» en otras: la costa sale roja en las pasadas 162 y 61 y azul en buena parte de la 126.',
+      },
+      {
+        title: 'Sin datos en el mar',
+        text: 'El agua cambia en cada instante y el radar no puede comparar dos pasadas sobre ella. El epicentro del M7,5 está en el mar: el máximo lo medimos en tierra, en la costa entre Maiquetía y La Guaira.',
+      },
+      {
+        title: 'Sin rampa ni corrección de relieve',
+        text: 'En Granada o Lorca quitamos una rampa y la atmósfera ligada al relieve. Aquí la deformación ocupa casi toda la escena y esas correcciones borrarían señal real: fijamos el cero en el interior, a ~20 km de la costa, y nada más. El precio es más ruido atmosférico (±6 cm), pequeño frente a 59 cm.',
+      },
+    ],
+    who: [
+      { title: 'Emergencias', text: 'Un mapa de qué tramos de costa se movieron más, en días y aunque haya nubes.' },
+      { title: 'Sismología', text: 'Con pasadas ascendentes y descendentes se separa el movimiento horizontal del vertical para modelar la falla.' },
+      { title: 'Infraestructuras', text: 'El aeropuerto de Maiquetía, el puerto de La Guaira y la autopista a Caracas están en la franja que más se movió.' },
+    ],
+  },
+  krasheninnikov: {
+    short: 'Krasheninnikov',
+    region: 'Kamchatka',
+    order: 8,
+    place: 'Volcán Krasheninnikov · Kamchatka (Rusia)',
+    dateLabel: 'jun–oct 2026',
+    headline: 'Krasheninnikov: el volcán que despertó tras siglos',
+    summary:
+      'Cuatro días después del terremoto M8,8 de Kamchatka (30 jul 2025), Krasheninnikov entró en erupción por primera vez en unos 500 años. Los datos NISAR públicos del volcán empiezan en junio de 2026: con 11 imágenes de la pasada 80 aparecen lóbulos nuevos y brillantes en el frente noreste de la colada. Sobre las zonas que se aclaran, la señal HH sube de −14 dB en junio a −4,5 dB el 18 de agosto y luego se estabiliza, como si la colada hubiera dejado de avanzar a mitad de verano.',
+    notes: [{ date: '2026-08-18', label: 'Se estabiliza' }],
+    officialClaim: 'Timelapse de 17 imágenes NISAR (25 dic 2025 – 17 ago 2026): la lava llena una caldera interior, desborda al cráter mayor y se abre en abanico hacia el este.',
+    why: [
+      {
+        title: 'La lava brilla en radar',
+        text: 'La roca nueva es rugosa a la escala de la onda (24 cm) y devuelve mucha señal en HH y en HV a la vez. La nieve húmeda y el suelo liso devuelven poca.',
+      },
+      {
+        title: 'El verano engaña',
+        text: 'De junio a agosto la nieve se funde y las laderas se secan: casi todo el volcán se aclara. Por eso comparamos el 13 jul con el 23 sep, ya sin nieve, y solo a menos de 7 km del cráter. Aun así, parte de lo marcado al suroeste son neveros que desaparecen, no lava.',
+      },
+      {
+        title: 'Lo que no vemos',
+        text: 'NASA tiene imágenes desde el 25 dic 2025, pero las públicas en ASF empiezan el 19 jun 2026. El inicio de la erupción (agosto de 2025) es anterior a NISAR.',
+      },
+      {
+        title: 'Remoto, pero importa',
+        text: 'Kamchatka casi no tiene población, pero la ceniza de sus volcanes cruza rutas aéreas del Pacífico Norte. Un radar que ve a través de las nubes y de noche sigue la erupción sin depender del tiempo.',
+      },
+    ],
+    who: [
+      { title: 'Observatorios volcánicos', text: 'Seguir la colada cada 12 días aunque haya nubes o noche polar.' },
+      { title: 'Aviación', text: 'Saber si la erupción sigue activa ayuda a decidir alertas de ceniza en las rutas del Pacífico Norte.' },
+      { title: 'Ciencia', text: 'Un volcán despertado por un M8,8: un caso raro para entender cómo los terremotos disparan erupciones.' },
+    ],
+  },
+  mozambique: {
+    short: 'Limpopo',
+    region: 'Mozambique',
+    order: 9,
+    place: 'Chókwè · bajo Limpopo (Mozambique)',
+    dateLabel: '5–17 ene 2026',
+    headline: 'Limpopo: el río que se salió de su valle',
+    summary:
+      'Las lluvias de diciembre y enero desbordaron el Limpopo y el Incomati en el sur de Mozambique: según NASA, más de 600 000 desplazados y 30 000 viviendas inundadas. Entre el 5 y el 17 de enero, NISAR ve aparecer 325 km² de agua nueva, sobre todo en la llanura del Limpopo y en el regadío de Chókwè, a través de las nubes que tapaban a los satélites ópticos. Otros 472 km² ya eran agua en las dos fechas: ríos, lagunas y zonas que ya estaban inundadas el 5 de enero.',
+    notes: [{ date: '2026-01-17', label: 'Crecida' }],
+    officialClaim: 'Comparación antes/después (5 y 17 ene) de las cuencas del Limpopo y el Incomati: el radar ve el agua bajo las nubes que bloqueaban a Sentinel-2. Más de 600 000 desplazados.',
+    why: [
+      {
+        title: 'El agua es un espejo',
+        text: 'Igual que en la DANA, una lámina de agua refleja el pulso lejos del satélite: la llanura inundada pasa de −11 a −17 dB en HH. Aquí el agua se queda semanas en una llanura casi plana, y la pasada del 17 de enero la pilla de lleno.',
+      },
+      {
+        title: 'Todo lo demás se aclara',
+        text: 'El suelo empapado devuelve más señal: casi toda la escena se aclara entre el 5 y el 17 de enero. Por eso pedimos las dos cosas a la vez: una caída de al menos 3 dB y quedar por debajo de −14 dB, el valle entre el agua (−18 dB) y la tierra mojada (−6 dB).',
+      },
+      {
+        title: 'Lo que el radar no ve',
+        text: 'Bajo árboles o entre cultivos altos, el agua no oscurece: rebota en los troncos y brilla (doble rebote). Ese bosque inundado no entra en nuestra máscara, así que el área real es mayor.',
+      },
+      {
+        title: 'Misma técnica que en España',
+        text: 'Es el mismo pipeline que en La Safor. La diferencia es el tiempo: en la DANA el agua drenó en horas y no hubo radar a tiempo; en el Limpopo dura semanas y NISAR la ve.',
+      },
+    ],
+    who: [
+      { title: 'Protección civil (INGD)', text: 'Dónde está el agua aunque haya nubes, para evacuar y llevar ayuda.' },
+      { title: 'Agricultura', text: 'Qué parcelas del regadío de Chókwè quedaron bajo el agua, para estimar pérdidas de cosecha.' },
+      { title: 'Gestión de cuencas', text: 'Calibrar los modelos de crecida del Limpopo, que cruza cuatro países.' },
+    ],
+  },
+  cdmx: {
+    short: 'Ciudad de México',
+    region: 'México',
+    order: 10,
+    place: 'Valle de México · Chalco (México)',
+    dateLabel: 'oct 2025 – feb 2026',
+    headline: 'Ciudad de México: una ciudad que se hunde a la vista',
+    summary:
+      'Ciudad de México está construida sobre el lecho de un antiguo lago y bombea el agua de su acuífero: el suelo arcilloso se compacta y la ciudad se hunde. Con 10 interferogramas NISAR encadenados (25 oct → 22 feb), unas 37 500 ha del antiguo lago bajan más que el ruido (±1 cm). En Chalco, al sureste, el hundimiento llega a 22 cm en 120 días. Es el mismo fenómeno que en Lorca, pero varias veces más rápido.',
+    officialClaim: 'Mapa NISAR del 25 oct 2025 al 17 ene 2026: las zonas en azul oscuro se hunden más de 2 cm al mes, sobre todo por el bombeo de agua subterránea.',
+    why: [
+      {
+        title: 'Un lago que se vacía por debajo',
+        text: 'Las arcillas del antiguo lago de Texcoco tienen mucha agua. Al bombear el acuífero, pierden presión y se compactan: el suelo baja, y no vuelve a subir.',
+      },
+      {
+        title: 'Corregir solo en los cerros',
+        text: 'En Lorca y La Palma ajustamos la rampa y la atmósfera ligada al relieve en toda la escena. Aquí eso borraba el cuenco: el lecho plano y bajo es justo lo que se hunde. Ajustamos las correcciones solo en los cerros (por encima de 2280 m), que son roca estable.',
+      },
+      {
+        title: '¿Medio metro al año?',
+        text: 'Al ritmo de estos 120 días, Chalco bajaría unos 55 cm al año. Pero los dos primeros pares (oct–nov, final de la temporada de lluvias) bajan unos 5 cm cada uno, más que los demás: parte puede ser atmósfera húmeda. La cifra prudente es la medida, 22 cm en 4 meses.',
+      },
+      {
+        title: 'Por qué paramos en febrero',
+        text: 'Desde finales de febrero la coherencia en Chalco cae por debajo de 0,3 (campos en temporada seca). Esos pares no tienen dato allí y aplanarían la serie, así que la cortamos.',
+      },
+    ],
+    who: [
+      { title: 'Gestión del agua (CONAGUA)', text: 'Ver cada 12 días dónde el bombeo hunde más el terreno, para repartir los pozos.' },
+      { title: 'Metro e infraestructuras', text: 'El hundimiento desigual rompe tuberías, deforma vías y daña la línea 12 del metro y edificios históricos.' },
+      { title: 'Protección civil', text: 'Un terreno que baja cambia por dónde corre el agua en las inundaciones.' },
+    ],
+  },
 }
 
 const STORY_ES = [
@@ -362,6 +504,92 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Rail infrastructure manager', text: 'Watch repaired slopes millimetre by millimetre and prioritise the ones that move.' },
       { title: 'Geological survey', text: 'A national landslide inventory updated from space.' },
       { title: 'Travellers and the economy', text: 'Three months without direct Málaga–Madrid trains: prevention is cheaper.' },
+    ],
+  },
+  venezuela: {
+    ...CONTENT_ES.venezuela,
+    place: 'Caracas · La Guaira (Venezuela)',
+    dateLabel: '24 Jun 2026',
+    headline: 'Venezuela: the coast that moved half a metre',
+    summary:
+      'On 24 June two earthquakes shook northern Venezuela: an M7.2 and, half a minute later, an M7.5 offshore Catia La Mar (USGS). Three NISAR interferograms from three different tracks see the La Guaira coastal strip move up to 59 cm along the satellite line of sight. NASA published its own map from the same data (up to ~60 cm westward next to the airport); our independent processing reaches the same order of magnitude.',
+    notes: [{ date: '2026-06-24', label: 'M7.5' }],
+    officialClaim: 'Up to ~60 cm of displacement, mostly horizontal and westward, next to the international airport north of Caracas.',
+    why: [
+      { title: 'A strike-slip fault', text: 'The San Sebastián fault runs parallel to the coast, under the sea. In a strike-slip quake the blocks slide past each other horizontally, so the motion concentrates on the coastal strip.' },
+      { title: 'Two views, two colours', text: 'Ascending tracks look east and descending tracks look west. The same horizontal motion reads as “away” in one and “towards” in the other: the coast is red in tracks 162 and 61 and blue over much of track 126.' },
+      { title: 'No data over the sea', text: 'Water changes from moment to moment and radar cannot compare two passes over it. The M7.5 epicentre is offshore, so we measure the maximum on land, on the coast between Maiquetía and La Guaira.' },
+      { title: 'No ramp, no height correction', text: 'In Granada or Lorca we remove a ramp and height-related atmosphere. Here the deformation fills almost the whole scene and those corrections would erase real signal: we set zero inland, ~20 km from the coast, and nothing more. The cost is more atmospheric noise (±6 cm), small next to 59 cm.' },
+    ],
+    who: [
+      { title: 'Emergency services', text: 'A map of which stretches of coast moved most, within days and through clouds.' },
+      { title: 'Seismology', text: 'Ascending and descending tracks together separate horizontal from vertical motion to model the fault.' },
+      { title: 'Infrastructure', text: 'Maiquetía airport, the port of La Guaira and the motorway to Caracas sit in the strip that moved most.' },
+    ],
+  },
+  krasheninnikov: {
+    ...CONTENT_ES.krasheninnikov,
+    place: 'Krasheninnikov volcano · Kamchatka (Russia)',
+    dateLabel: 'Jun–Oct 2026',
+    headline: 'Krasheninnikov: the volcano that woke after centuries',
+    summary:
+      'Four days after the M8.8 Kamchatka earthquake (30 Jul 2025), Krasheninnikov erupted for the first time in about 500 years. Public NISAR data over the volcano start in June 2026: across 11 images from track 80, new bright lobes appear at the north-eastern front of the lava flow. Over the areas that brighten, HH rises from −14 dB in June to −4.5 dB on 18 August and then levels off, as if the flow stopped advancing in mid-summer.',
+    notes: [{ date: '2026-08-18', label: 'Levels off' }],
+    officialClaim: '17-frame NISAR time-lapse (25 Dec 2025 – 17 Aug 2026): lava fills an inner caldera, overflows into the wider crater and fans out to the east.',
+    why: [
+      { title: 'Lava is bright to radar', text: 'Fresh rock is rough at the scale of the wave (24 cm) and returns strong signal in both HH and HV. Wet snow and smooth ground return little.' },
+      { title: 'Summer is misleading', text: 'From June to August snow melts and slopes dry out: almost the whole volcano brightens. So we compare 13 Jul with 23 Sep, both snow-free, and only within 7 km of the crater. Even so, part of what is flagged to the south-west is snow patches disappearing, not lava.' },
+      { title: 'What we cannot see', text: 'NASA has images from 25 Dec 2025, but the public ones at ASF start on 19 Jun 2026. The start of the eruption (August 2025) predates NISAR.' },
+      { title: 'Remote, but it matters', text: 'Kamchatka is almost uninhabited, but ash from its volcanoes crosses North Pacific air routes. A radar that sees through cloud and at night follows the eruption regardless of weather.' },
+    ],
+    who: [
+      { title: 'Volcano observatories', text: 'Track the flow every 12 days through cloud and polar night.' },
+      { title: 'Aviation', text: 'Knowing whether the eruption is still active helps set ash alerts on North Pacific routes.' },
+      { title: 'Science', text: 'A volcano woken by an M8.8: a rare case to understand how earthquakes trigger eruptions.' },
+    ],
+  },
+  mozambique: {
+    ...CONTENT_ES.mozambique,
+    region: 'Mozambique',
+    place: 'Chókwè · lower Limpopo (Mozambique)',
+    dateLabel: '5–17 Jan 2026',
+    headline: 'Limpopo: the river that left its valley',
+    summary:
+      'December and January rains pushed the Limpopo and Incomati rivers over their banks in southern Mozambique: according to NASA, over 600,000 people displaced and 30,000 homes flooded. Between 5 and 17 January NISAR sees 325 km² of new water appear, mostly on the Limpopo floodplain and the Chókwè irrigation scheme, through the clouds that blocked optical satellites. Another 472 km² were water on both dates: rivers, lagoons and areas already flooded on 5 January.',
+    notes: [{ date: '2026-01-17', label: 'Flood' }],
+    officialClaim: 'Before/after comparison (5 and 17 Jan) of the Limpopo and Incomati basins: radar sees water under the clouds that blocked Sentinel-2. Over 600,000 people displaced.',
+    why: [
+      { title: 'Water is a mirror', text: 'As in the Valencia storm, a sheet of water reflects the pulse away from the satellite: the flooded plain drops from −11 to −17 dB in HH. Here the water stays for weeks on an almost flat plain, and the 17 January pass catches it in full.' },
+      { title: 'Everything else brightens', text: 'Soaked soil returns more signal: almost the whole scene brightens between 5 and 17 January. So we require both a drop of at least 3 dB and a value below −14 dB, the valley between water (−18 dB) and wet land (−6 dB).' },
+      { title: 'What radar misses', text: 'Under trees or tall crops water does not darken: it bounces off the trunks and shines (double bounce). That flooded forest is not in our mask, so the real area is larger.' },
+      { title: 'Same technique as in Spain', text: 'This is the same pipeline as in La Safor. The difference is time: in Valencia the water drained within hours and no radar came in time; on the Limpopo it lasts weeks and NISAR sees it.' },
+    ],
+    who: [
+      { title: 'Civil protection (INGD)', text: 'Where the water is despite the clouds, to evacuate and bring aid.' },
+      { title: 'Agriculture', text: 'Which plots of the Chókwè irrigation scheme went under water, to estimate crop losses.' },
+      { title: 'Basin management', text: 'Calibrate flood models of the Limpopo, which crosses four countries.' },
+    ],
+  },
+  cdmx: {
+    ...CONTENT_ES.cdmx,
+    short: 'Mexico City',
+    region: 'Mexico',
+    place: 'Valley of Mexico · Chalco (Mexico)',
+    dateLabel: 'Oct 2025 – Feb 2026',
+    headline: 'Mexico City: a city sinking in plain sight',
+    summary:
+      'Mexico City is built on an ancient lakebed and pumps water from its aquifer: the clay compacts and the city sinks. With 10 chained NISAR interferograms (25 Oct → 22 Feb), about 37,500 ha of the old lake drop by more than the noise (±1 cm). In Chalco, to the south-east, subsidence reaches 22 cm in 120 days. It is the same process as in Lorca, but several times faster.',
+    officialClaim: 'NISAR map from 25 Oct 2025 to 17 Jan 2026: dark blue areas are sinking by more than 2 cm per month, mainly from groundwater pumping.',
+    why: [
+      { title: 'A lake drained from below', text: 'The clays of the old Lake Texcoco hold a lot of water. When the aquifer is pumped they lose pressure and compact: the ground goes down and does not come back.' },
+      { title: 'Correct on the hills only', text: 'In Lorca and La Palma we fit the ramp and height-related atmosphere over the whole scene. Here that erased the bowl: the low, flat lakebed is exactly what sinks. We fit the corrections only on the hills (above 2,280 m), which are stable rock.' },
+      { title: 'Half a metre a year?', text: 'At the pace of these 120 days, Chalco would sink about 55 cm a year. But the first two pairs (Oct–Nov, end of the rainy season) drop about 5 cm each, more than the rest: part may be wet atmosphere. The safe figure is the measured one, 22 cm in 4 months.' },
+      { title: 'Why we stop in February', text: 'From late February coherence in Chalco falls below 0.3 (fields in the dry season). Those pairs have no data there and would flatten the series, so we cut it.' },
+    ],
+    who: [
+      { title: 'Water management (CONAGUA)', text: 'See every 12 days where pumping sinks the ground most, to rebalance the wells.' },
+      { title: 'Metro and infrastructure', text: 'Uneven subsidence breaks pipes, warps tracks and damages Metro Line 12 and historic buildings.' },
+      { title: 'Civil protection', text: 'Sinking ground changes where water runs during floods.' },
     ],
   },
 }

@@ -1,0 +1,179 @@
+{
+ "id": "venezuela",
+ "title": "Terremotos de Venezuela (Caracas · La Guaira)",
+ "kind": "earthquake",
+ "event": "2026-06-24",
+ "mock": false,
+ "bbox": [
+  -67.6,
+  10.35,
+  -66.6,
+  10.75
+ ],
+ "center": [
+  -67.1,
+  10.55
+ ],
+ "coordinates": [
+  [
+   -67.6,
+   10.75
+  ],
+  [
+   -66.6,
+   10.75
+  ],
+  [
+   -66.6,
+   10.35
+  ],
+  [
+   -67.6,
+   10.35
+  ]
+ ],
+ "pair": {
+  "before": "2026-06-25",
+  "after": "2026-07-04"
+ },
+ "frames": [
+  {
+   "date": "2026-06-25",
+   "ref": "2026-06-13",
+   "track": 162,
+   "dir": "A",
+   "hh": "d_162_20260613_20260625.webp",
+   "hv": "f_162_20260613_20260625.webp",
+   "rgb": "c_162_20260613_20260625.webp"
+  },
+  {
+   "date": "2026-06-30",
+   "ref": "2026-06-18",
+   "track": 61,
+   "dir": "A",
+   "hh": "d_61_20260618_20260630.webp",
+   "hv": "f_61_20260618_20260630.webp",
+   "rgb": "c_61_20260618_20260630.webp"
+  },
+  {
+   "date": "2026-07-04",
+   "ref": "2026-06-22",
+   "track": 126,
+   "dir": "D",
+   "hh": "d_126_20260622_20260704.webp",
+   "hv": "f_126_20260622_20260704.webp",
+   "rgb": "c_126_20260622_20260704.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2026-06-25",
+   "2026-06-30",
+   "2026-07-04"
+  ],
+  "hh": [
+   -11.06,
+   -12.01,
+   -11.07
+  ],
+  "hv": [
+   0.26,
+   0.22,
+   0.29
+  ]
+ },
+ "metrics": [
+  {
+   "id": "insar_epi",
+   "label": "Mayor desplazamiento cerca del epicentro (cualquier pasada)",
+   "value": -12.0,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_peak",
+   "label": "Mayor desplazamiento en tierra (pasada 61, percentil 99,5)",
+   "value": -58.8,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_area",
+   "label": "Superficie que se mueve más que el ruido",
+   "value": 7402,
+   "unit": "ha"
+  },
+  {
+   "id": "insar_noise",
+   "label": "Ruido de fondo (desviación típica)",
+   "value": 6.0,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_coh",
+   "label": "Coherencia media",
+   "value": 26.0,
+   "unit": "%"
+  },
+  {
+   "id": "insar_n",
+   "label": "Interferogramas NISAR usados",
+   "value": 3,
+   "unit": ""
+  }
+ ],
+ "overlays": {
+  "events": "events.geojson"
+ },
+ "insar": {
+  "mode": "pairs",
+  "product": "NISAR L2 GUNW",
+  "wavelength_cm": 23.8,
+  "vmax_cm": 40.0,
+  "fringe_cm": 11.9,
+  "hotspot": [
+   -67.048,
+   10.592
+  ],
+  "noise_cm": 5.95,
+  "rate_cm_yr": null,
+  "series": "point",
+  "threshold_cm": 14.88,
+  "days": 21,
+  "detrend": "offset",
+  "start": "2026-06-13",
+  "end": "2026-07-04",
+  "pairs": [
+   {
+    "track": 162,
+    "dir": "A",
+    "ref": "2026-06-13",
+    "sec": "2026-06-25"
+   },
+   {
+    "track": 61,
+    "dir": "A",
+    "ref": "2026-06-18",
+    "sec": "2026-06-30"
+   },
+   {
+    "track": 126,
+    "dir": "D",
+    "ref": "2026-06-22",
+    "sec": "2026-07-04"
+   }
+  ]
+ },
+ "refLabel": "Sismicidad: EMSC (seismicportal.eu)",
+ "official": {
+  "url": "https://science.nasa.gov/earth/earth-observatory/where-venezuelas-earthquakes-shifted-the-ground/",
+  "credit": "NASA Earth Observatory/Lauren Dauphin; datos: Eric Fielding, equipo científico NISAR (JPL)",
+  "date": "2026-07-10",
+  "claim": "Hasta ~60 cm de desplazamiento hacia el oeste junto al aeropuerto de Maiquetía",
+  "file": "official.webp",
+  "source_image": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/iotd/2026/where-venezuela’s-earthquakes-shifted-the-ground/venezuela_nisar_20260630.jpg"
+ },
+ "region": "world"
+}

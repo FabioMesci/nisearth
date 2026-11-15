@@ -1,0 +1,131 @@
+{
+ "id": "mozambique",
+ "title": "Inundaciones del Limpopo (Mozambique)",
+ "kind": "flood",
+ "event": "2026-01-15",
+ "mock": false,
+ "bbox": [
+  32.75,
+  -25.1,
+  33.3,
+  -24.4
+ ],
+ "center": [
+  33.025,
+  -24.75
+ ],
+ "coordinates": [
+  [
+   32.75,
+   -24.4
+  ],
+  [
+   33.3,
+   -24.4
+  ],
+  [
+   33.3,
+   -25.1
+  ],
+  [
+   32.75,
+   -25.1
+  ]
+ ],
+ "pair": {
+  "before": "2026-01-05",
+  "after": "2026-01-17"
+ },
+ "frames": [
+  {
+   "date": "2025-12-12",
+   "track": 114,
+   "hh": "hh_20251212.webp",
+   "hv": "hv_20251212.webp",
+   "rgb": "rgb_20251212.webp"
+  },
+  {
+   "date": "2025-12-24",
+   "track": 114,
+   "hh": "hh_20251224.webp",
+   "hv": "hv_20251224.webp",
+   "rgb": "rgb_20251224.webp"
+  },
+  {
+   "date": "2026-01-05",
+   "track": 114,
+   "hh": "hh_20260105.webp",
+   "hv": "hv_20260105.webp",
+   "rgb": "rgb_20260105.webp"
+  },
+  {
+   "date": "2026-01-17",
+   "track": 114,
+   "hh": "hh_20260117.webp",
+   "hv": "hv_20260117.webp",
+   "rgb": "rgb_20260117.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2025-12-12",
+   "2025-12-24",
+   "2026-01-05",
+   "2026-01-17"
+  ],
+  "hh": [
+   -11.22,
+   -9.6,
+   -10.78,
+   -16.69
+  ],
+  "hv": [
+   -19.54,
+   -18.22,
+   -19.12,
+   -23.31
+  ]
+ },
+ "metrics": [
+  {
+   "id": "area",
+   "label": "Agua nueva detectada",
+   "value": 325.0,
+   "unit": "km²"
+  },
+  {
+   "id": "rail",
+   "label": "Vía férrea en zona inundada",
+   "value": 5.4,
+   "unit": "km"
+  },
+  {
+   "id": "roads",
+   "label": "Carreteras en zona inundada",
+   "value": 19.0,
+   "unit": "km"
+  }
+ ],
+ "overlays": {
+  "rail": "rail_affected.geojson",
+  "roads": "roads_affected.geojson"
+ },
+ "stats": {
+  "otsu_threshold_db": -14.0,
+  "permanent_water_km2": 472.5,
+  "rail_lines": []
+ },
+ "region": "world",
+ "official": {
+  "url": "https://svs.gsfc.nasa.gov/5661",
+  "credit": "NASA SVS: Zoey N. Armstrong (Navteca); Alexandra Christensen y Bruce Chapman (JPL); Andrew Wang (JPL)",
+  "date": "2026-08-06",
+  "claim": "Más de 600 000 desplazados; el radar ve el agua bajo las nubes que tapaban a Sentinel-2",
+  "file": "official.webp",
+  "source_image": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005661/Post_Chokwe.png"
+ }
+}

@@ -246,6 +246,13 @@ input[type='range']:hover::-webkit-slider-thumb { box-shadow: 0 0 0 6px color-mi
 .who div::before { counter-increment: who; content: ''; grid-row: span 2; width: 6px; height: 6px; margin: 7px 0 0 2px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
 .who b { font-size: 14px; font-weight: 500; }
 .who span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+/* NISAR en el mundo: imagen oficial de NASA/JPL */
+.official .off-img { display: block; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); margin-bottom: 10px; }
+.official .off-img img { display: block; width: 100%; height: auto; }
+.official .off-claim { margin: 0 0 6px; font-size: 13.5px; line-height: 1.5; }
+.official .off-claim b { font-weight: 500; color: var(--accent); }
+.official .off-credit { margin: 8px 0 0; font: 400 11px/1.6 var(--mono); color: var(--muted); }
+.official .off-credit a { color: inherit; }
 .src { font: 400 11px/1.6 var(--mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; margin-top: 8px; }
 
 /* ---------- deslizador antes/después ---------- */

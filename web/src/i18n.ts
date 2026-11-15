@@ -102,6 +102,13 @@ const UI = {
     railOsm: 'Vías de tren (OpenStreetMap)',
     groupSurface: 'Superficie · antes y después',
     groupGround: 'Terreno que se mueve · interferometría',
+    groupWorld: 'NISAR en el mundo',
+    maskLava: 'Lava nueva',
+    official: 'Comparación con NASA / JPL',
+    officialNote: (d: string) => `Imagen publicada por NASA el ${d}. La nuestra (mapa) sale de los mismos datos públicos procesados con nuestro pipeline, de forma independiente.`,
+    officialSays: 'NASA dice',
+    officialLink: 'Ver la publicación original',
+    officialCredit: 'Crédito',
     polDisp: 'Movimiento',
     polFringe: 'Franjas',
     polCoh: 'Coherencia',
@@ -119,8 +126,9 @@ const UI = {
     hintTimelineI: 'Cada fotograma es un interferograma NISAR. En la serie encadenada, cada par de 12 días se suma al anterior.',
     hintChangeI: 'Movimiento total entre la primera y la última pasada, en la línea de visión del satélite.',
     pairLbl: (a: string, b: string, trk: number, dir: string) => `${a} → ${b} · pasada ${trk} ${dir === 'A' ? 'asc' : 'desc'}`,
-    sourceInsar: (n: number, a: string, b: string, s1: boolean, ref: string) =>
-      `Datos: NASA-ISRO NISAR L2 GUNW (interferogramas banda L, ${n} pares) vía ASF DAAC · ${a} → ${b} · rampa (órbita e ionosfera suave) y atmósfera ligada al relieve (Copernicus DEM) estimadas en la escena` +
+    sourceInsar: (n: number, a: string, b: string, s1: boolean, ref: string, offset = false) =>
+      `Datos: NASA-ISRO NISAR L2 GUNW (interferogramas banda L, ${n} pares) vía ASF DAAC · ${a} → ${b} · ` +
+      (offset ? 'sin rampa ni corrección de relieve (la deformación cubre la escena): cero fijado en el campo lejano' : 'rampa (órbita e ionosfera suave) y atmósfera ligada al relieve (Copernicus DEM) estimadas en la escena') +
       (s1 ? ' · Copernicus Sentinel-1 (banda C) procesado con ASF HyP3' : '') + (ref ? ` · ${ref}` : ''),
     sheetGrip: 'Subir o bajar el panel',
     explore: 'Explorar',
@@ -242,6 +250,13 @@ const UI = {
     railOsm: 'Railways (OpenStreetMap)',
     groupSurface: 'Surface · before and after',
     groupGround: 'Moving ground · interferometry',
+    groupWorld: 'NISAR around the world',
+    maskLava: 'New lava',
+    official: 'Comparison with NASA / JPL',
+    officialNote: (d: string) => `Image published by NASA on ${d}. Ours (the map) comes from the same public data run independently through our pipeline.`,
+    officialSays: 'NASA says',
+    officialLink: 'See the original release',
+    officialCredit: 'Credit',
     polDisp: 'Motion',
     polFringe: 'Fringes',
     polCoh: 'Coherence',
@@ -259,8 +274,9 @@ const UI = {
     hintTimelineI: 'Each frame is a NISAR interferogram. In the chained series every 12-day pair is added to the previous one.',
     hintChangeI: 'Total motion between the first and last pass, along the satellite line of sight.',
     pairLbl: (a: string, b: string, trk: number, dir: string) => `${a} → ${b} · track ${trk} ${dir === 'A' ? 'asc' : 'desc'}`,
-    sourceInsar: (n: number, a: string, b: string, s1: boolean, ref: string) =>
-      `Data: NASA-ISRO NISAR L2 GUNW (L-band interferograms, ${n} pairs) via ASF DAAC · ${a} → ${b} · ramp (orbit and smooth ionosphere) and height-related atmosphere (Copernicus DEM) estimated in the scene` +
+    sourceInsar: (n: number, a: string, b: string, s1: boolean, ref: string, offset = false) =>
+      `Data: NASA-ISRO NISAR L2 GUNW (L-band interferograms, ${n} pairs) via ASF DAAC · ${a} → ${b} · ` +
+      (offset ? 'no ramp or height correction (deformation fills the scene): zero set in the far field' : 'ramp (orbit and smooth ionosphere) and height-related atmosphere (Copernicus DEM) estimated in the scene') +
       (s1 ? ' · Copernicus Sentinel-1 (C-band) processed with ASF HyP3' : '') + (ref ? ` · ${ref}` : ''),
     sheetGrip: 'Raise or lower the panel',
     explore: 'Explore',
@@ -346,7 +362,10 @@ const METRICS: Record<string, { es: string; en: string }> = {
   ctx_out: { es: 'Movimiento mediano fuera de la colada', en: 'Median motion outside the lava flow' },
   insar_epi: { es: 'Desplazamiento máximo cerca del epicentro', en: 'Largest displacement near the epicentre' },
   insar_area: { es: 'Superficie que se mueve más que el ruido', en: 'Area moving more than the noise' },
-  insar_area_earthquake: { es: 'Superficie con el mismo movimiento en las dos pasadas descendentes', en: 'Area with the same motion in both descending tracks' },
+  insar_area_earthquake: { es: 'Superficie con el mismo movimiento en pasadas del mismo sentido', en: 'Area with the same motion in tracks looking the same way' },
+  area_volcano: { es: 'Superficie que se aclara en HH y HV cerca del cráter', en: 'Area brightening in HH and HV near the crater' },
+  insar_peak: { es: 'Mayor desplazamiento en tierra (cualquier pasada)', en: 'Largest displacement on land (any track)' },
+  hhrise: { es: 'Subida media de HH sobre la lava', en: 'Mean HH rise over the lava' },
   insar_noise: { es: 'Ruido de fondo (desviación típica)', en: 'Background noise (standard deviation)' },
   insar_coh: { es: 'Coherencia media', en: 'Mean coherence' },
   insar_n: { es: 'Interferogramas NISAR usados', en: 'NISAR interferograms used' },

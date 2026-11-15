@@ -63,7 +63,7 @@ export class Panel {
             <button data-v="hv" title="${t('titleHV')}">HV</button>
             ${m.frames[0]?.rgb ? `<button data-v="rgb" title="${t('titleRGB')}">RGB</button>` : ''}
           </div>
-          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.kind === 'flood' ? t('maskWater') : t('maskBurn')}</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.kind === 'flood' ? t('maskWater') : m.kind === 'volcano' ? t('maskLava') : t('maskBurn')}</span></label>
         </div>
         <div class="row toggles">
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${m.insar ? t('railOsm') : t('infra')}</span></label>` : ''}
@@ -90,6 +90,8 @@ export class Panel {
 
       ${m.landcover ? landcoverCard(m) : ''}
 
+      ${m.official ? officialCard(m) : ''}
+
       <section class="sec">
         <div class="label">${m.insar ? t('chartInsar')(m.insar.mode === 'pairs') : t('chart')}</div>
         <div class="chart-box"><canvas id="chart"></canvas></div>
@@ -112,7 +114,7 @@ export class Panel {
       </section>
 
       <footer class="src">
-        ${m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
+        ${m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '', m.insar.detrend === 'offset') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
       </footer>
     `
     this.bind(m)
@@ -473,4 +475,17 @@ function passesSvg(p: NonNullable<(typeof CONTENT)[string]['passes']>) {
     ${p.list.map((q) => `<circle cx="${x(q.date)}" cy="${rowY[q.sensor]}" r="3.6" class="${q.sensor === 'NISAR' ? 'nisar' : 's1'}"><title>${q.sensor} · ${q.date.replace('T', ' ')} UTC</title></circle>`).join('')}
     ${days.filter((_, i) => i % 3 === 1).map((d) => `<text x="${x(d)}" y="${H - 6}" text-anchor="middle" class="tick">${fmtDay(d)}</text>`).join('')}
   </svg>`
+}
+
+/** NISAR en el mundo: la imagen que publicó NASA/JPL del mismo evento, con su crédito */
+function officialCard(m: Manifest) {
+  const o = m.official!
+  const img = o.file ? `/data/${m.id}/${o.file}` : ''
+  return `<section class="sec official">
+    <div class="label">${t('official')}</div>
+    ${img ? `<a class="off-img" href="${o.url}" target="_blank" rel="noopener"><img src="${img}" alt="${t('official')}" loading="lazy" /></a>` : ''}
+    <p class="off-claim"><b>${t('officialSays')}:</b> ${CONTENT[m.id]?.officialClaim ?? o.claim}</p>
+    <p class="hint">${t('officialNote')(fmtDate(o.date))}</p>
+    <p class="off-credit">${t('officialCredit')}: ${o.credit} · <a href="${o.url}" target="_blank" rel="noopener">${t('officialLink')} ↗</a></p>
+  </section>`
 }

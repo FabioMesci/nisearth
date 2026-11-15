@@ -188,20 +188,14 @@ const CONTENT_ES: Record<string, CaseContent> = {
     order: 3,
     place: 'Alto Guadalentín · Lorca (Murcia)',
     dateLabel: 'jun–oct 2026',
-    headline: 'Lorca: el valle que se hunde',
-    summary:
-      'Décadas de bombeo para regadío han vaciado el acuífero del Alto Guadalentín y el suelo se compacta: es uno de los hundimientos más rápidos de Europa. Sumando 8 interferogramas NISAR de 12 días (25 jun → 11 oct), el punto que más baja, en el llano al sureste de Lorca, se aleja 6 cm del satélite en 108 días. La recta ajustada a la serie da unos 16 cm/año, en línea con los máximos publicados (10–16 cm/año), con un ruido de fondo de ±1,2 cm.',
+    headline: 'Lorca: meses de cambio, días de lluvia',
+    summary: '¿Cómo cambia un mismo territorio durante meses mientras experimenta episodios breves de lluvia? Comparamos una serie preliminar de desplazamiento en línea de visión con precipitación diaria estimada para el Alto Guadalentín.',
     why: [
-      { title: 'Agua que sale, suelo que baja', text: 'Al bajar el nivel del agua, las arcillas del acuífero pierden presión y se compactan sin vuelta atrás. El radar no ve el agua: ve el suelo bajar, centímetro a centímetro.' },
-      { title: 'Sumar pares limpia la atmósfera', text: 'Cada interferograma de 12 días lleva el retraso atmosférico de sus dos fechas. Al encadenarlos, las fechas intermedias se cancelan y solo quedan la primera y la última, mientras el hundimiento real se acumula.' },
-      { title: 'La forma del valle', text: 'La cubeta roja es alargada de suroeste a noreste, como el valle del Guadalentín. La bibliografía sitúa el máximo de 2006–2011 unos 4 km al suroeste de Lorca; NISAR lo ve algo más al este, en los cultivos del llano.' },
-      { title: 'Una lección de método', text: 'La corrección ionosférica que trae el producto añadía ruido en una escena tan pequeña: con ella el ruido acumulado era de 4,7 cm y la cubeta no se veía. Sin ella, 2,4 cm y la cubeta aparece. Comprobar cada paso importa tanto como el dato.' },
+      { title: 'Qué mide el radar', text: 'La interferometría mide cambios en la línea de visión del satélite, no directamente el movimiento vertical. Los resultados mostrados son preliminares y necesitan una auditoría de los productos originales.' },
+      { title: 'Dos escalas distintas', text: 'Las pasadas delimitan intervalos de 12 o 24 días; la precipitación es una estimación diaria de una celda de reanálisis, no una observación puntual.' },
+      { title: 'Coincidencia no es causa', text: 'El bombeo, las variaciones del acuífero, los retardos y otros factores pueden influir. La serie no permite atribuir una causa al desplazamiento.' },
     ],
-    who: [
-      { title: 'Confederación Hidrográfica del Segura', text: 'Ver, cada 12 días, si las restricciones de bombeo frenan el hundimiento.' },
-      { title: 'Urbanismo y protección civil', text: 'Un valle que baja cambia por dónde corre el agua en una riada: más zonas inundables.' },
-      { title: 'Infraestructuras', text: 'Carreteras, tuberías y vías que cruzan el valle sufren asientos diferenciales.' },
-    ],
+    who: [{ title: 'Investigación y gestión del agua', text: 'Comparar señales ayuda a plantear preguntas para contrastar con piezómetros y observaciones independientes.' }],
   },
   lapalma: {
     short: 'La Palma',
@@ -335,7 +329,7 @@ const STORY_ES = [
   },
   {
     title: 'Todo el año: el suelo que se mueve',
-    text: 'Con interferometría NISAR mide centímetros. En Lorca el valle se hunde unos 16 cm al año por el bombeo del acuífero. En Granada, La Palma y Álora el radar acota lo que no se movió: un terremoto de magnitud 5,2 que no deformó el suelo más de 1 cm, una colada que ya casi no se asienta y un talud de AVE estable tras su reparación.',
+    text: 'Con interferometría NISAR mide centímetros. En Lorca una serie preliminar muestra movimiento en la línea de visión del satélite; sus causas requieren estudio. En Granada, La Palma y Álora el radar acota lo que no se movió: un terremoto de magnitud 5,2 que no deformó el suelo más de 1 cm, una colada que ya casi no se asienta y un talud de AVE estable tras su reparación.',
     target: 'lorca',
   },
   {
@@ -423,20 +417,14 @@ const CONTENT_EN: Record<string, CaseContent> = {
     ...CONTENT_ES.lorca,
     place: 'Alto Guadalentín · Lorca (Murcia, Spain)',
     dateLabel: 'Jun–Oct 2026',
-    headline: 'Lorca: the sinking valley',
-    summary:
-      'Decades of pumping for irrigation have drained the Alto Guadalentín aquifer and the ground is compacting: one of the fastest subsidence areas in Europe. Adding up 8 NISAR 12-day interferograms (25 Jun → 11 Oct), the fastest spot, on the plain south-east of Lorca, moves 6 cm away from the satellite in 108 days. A line fitted to the series gives about 16 cm/yr, in line with the published maxima (10–16 cm/yr), with ±1.2 cm background noise.',
+    headline: 'Lorca: months of change, days of rain',
+    summary: 'How does one place change over months while experiencing short spells of rain? Compare a preliminary line-of-sight displacement series with estimated daily precipitation in Alto Guadalentín.',
     why: [
-      { title: 'Water out, ground down', text: 'As the water table drops, the aquifer clays lose pressure and compact for good. Radar does not see the water: it sees the ground going down, centimetre by centimetre.' },
-      { title: 'Adding pairs cleans the atmosphere', text: 'Each 12-day interferogram carries the atmospheric delay of its two dates. Chaining them cancels the dates in between, leaving only the first and last, while the real subsidence adds up.' },
-      { title: 'The shape of the valley', text: 'The red bowl is elongated south-west to north-east, like the Guadalentín valley. Studies place the 2006–2011 maximum about 4 km south-west of Lorca; NISAR sees it somewhat further east, in the farmland on the plain.' },
-      { title: 'A lesson in method', text: 'The ionospheric correction shipped with the product added noise in such a small scene: with it the cumulative noise was 4.7 cm and the bowl vanished. Without it, 2.4 cm and the bowl appears. Checking each step matters as much as the data.' },
+      { title: 'What radar measures', text: 'Interferometry measures change along the satellite line of sight, not vertical motion directly. These preliminary results require an audit of the original products.' },
+      { title: 'Two different timescales', text: 'Satellite passes define intervals of 12 or 24 days; precipitation is a daily reanalysis grid estimate, not a point observation.' },
+      { title: 'Timing is not causation', text: 'Pumping, aquifer variations, delays and other factors may contribute. This series cannot establish the cause of displacement.' },
     ],
-    who: [
-      { title: 'Segura river basin authority', text: 'See every 12 days whether pumping limits slow the subsidence.' },
-      { title: 'Planning and civil protection', text: 'A sinking valley changes where flood water runs: more flood-prone land.' },
-      { title: 'Infrastructure', text: 'Roads, pipes and railways crossing the valley suffer uneven settlement.' },
-    ],
+    who: [{ title: 'Research and water management', text: 'Comparing signals helps frame questions to test against groundwater gauges and independent observations.' }],
   },
   lapalma: {
     ...CONTENT_ES.lapalma,
@@ -534,7 +522,7 @@ const STORY_EN = [
   { title: 'Gelida, 20 January 2026', text: 'After days of heavy rain, a retaining wall gives way under water pressure and falls onto the Rodalies commuter line near Barcelona. A trainee driver dies and the Catalan rail network grinds to a halt. Water, fire, terrain and infrastructure: risks that can be watched from space.', target: null as string | null },
   { title: 'Summer: fire', text: '2026 is Spain’s second-worst wildfire year of the century. In Niebla (Huelva) NISAR measures about 32,000 ha burned through the smoke, with 89% agreement with the official European perimeter.', target: 'niebla' },
   { title: 'Autumn: the water nobody saw', text: 'Storm “Adam” dumps hundreds of litres on La Safor on the night of 18–19 October. No radar passed during the storm: by the time they came back, the water was gone.', target: 'dana' },
-  { title: 'All year round: ground on the move', text: 'With interferometry NISAR measures centimetres. In Lorca the valley sinks about 16 cm a year from aquifer pumping. In Granada, La Palma and Álora radar bounds what did not move: a magnitude 5.2 earthquake that deformed the ground less than 1 cm, a lava flow that has almost stopped settling and a high-speed rail slope that is stable after repair.', target: 'lorca' },
+  { title: 'All year round: ground on the move', text: 'With interferometry NISAR measures centimetres. In Lorca a preliminary series shows motion along the satellite line of sight; its causes need study. In Granada, La Palma and Álora radar bounds what did not move: a magnitude 5.2 earthquake that deformed the ground less than 1 cm, a lava flow that has almost stopped settling and a high-speed rail slope that is stable after repair.', target: 'lorca' },
   { title: 'What NISAR can do', text: 'NISAR sees day and night, through clouds and smoke, and tells fire from harvest thanks to its polarizations. Combined with other radars and tasked in time, it can become a warning system for decision-makers.', target: null },
 ]
 

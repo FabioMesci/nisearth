@@ -28,9 +28,8 @@ from scipy.ndimage import binary_dilation
 from config import CASES, RAW, WEB_DATA, WORK
 
 WC_URL = "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_{tile}_Map.tif"
-POP_URL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/ESP/esp_ppp_2020_constrained.tif"
-POP_FILE = RAW / "pop" / "esp_ppp_2020_constrained.tif"
-WC_CLASSES = {10: "tree", 20: "shrub", 30: "grass", 40: "crop", 50: "built", 60: "bare", 80: "water", 90: "wetland"}
+POP_URL_TPL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/{iso3}/{iso_lo}_ppp_2020_constrained.tif"
+WC_CLASSES = {10: "tree", 20: "shrub", 30: "grass", 40: "crop", 50: "built", 60: "bare", 70: "bare", 80: "water", 90: "wetland", 100: "grass"}
 
 
 def wc_tile(lon, lat):
@@ -71,13 +70,16 @@ def breakdown(wc, sel, pxha):
     return sorted(merged.values(), key=lambda r: -r["ha"])
 
 
-def population(sel, transform, crs, bbox):
+def population(sel, transform, crs, bbox, iso3="ESP"):
     """Personas dentro de 'sel': se lleva la fracción de máscara a la rejilla de 100 m de WorldPop."""
-    if not POP_FILE.exists():
-        POP_FILE.parent.mkdir(parents=True, exist_ok=True)
-        print("[pop] descargando WorldPop España (44 MB)…")
-        urllib.request.urlretrieve(POP_URL, POP_FILE)
-    with rasterio.open(POP_FILE) as src:
+    iso_lo = iso3.lower()
+    pop_file = RAW / "pop" / f"{iso_lo}_ppp_2020_constrained.tif"
+    if not pop_file.exists():
+        pop_file.parent.mkdir(parents=True, exist_ok=True)
+        pop_url = POP_URL_TPL.format(iso3=iso3.upper(), iso_lo=iso_lo)
+        print(f"[pop] descargando WorldPop {iso3}…")
+        urllib.request.urlretrieve(pop_url, pop_file)
+    with rasterio.open(pop_file) as src:
         win = from_bounds(*bbox, transform=src.transform).round_offsets().round_lengths()
         pop = src.read(1, window=win).astype("float64")
         ptr = src.window_transform(win)
@@ -94,6 +96,7 @@ def main():
     args = ap.parse_args()
     cid, case = args.case, CASES[args.case]
     bbox = case["bbox"]
+    iso3 = case.get("iso3", "ESP")
 
     with rasterio.open(WORK / cid / "mask.tif") as ds:
         mask = ds.read(1).astype(bool)
@@ -115,8 +118,8 @@ def main():
         # interfaz urbano-forestal: 1 km alrededor de la zona quemada confirmada
         px_m = abs(tr.a) * 111320 * np.cos(np.radians(lat))
         ring = binary_dilation(confirmed, iterations=int(round(1000 / px_m))) & ~confirmed
-        p_in = population(confirmed, tr, crs, bbox)
-        p_ring = population(ring, tr, crs, bbox)
+        p_in = population(confirmed, tr, crs, bbox, iso3)
+        p_ring = population(ring, tr, crs, bbox, iso3)
         print(f"[lc] quemado confirmado: {lc}")
         print(f"[lc] fuera de EFFIS: {lc_out}")
         print(f"[pop] dentro {p_in:.0f} · a <1 km {p_ring:.0f}")
@@ -127,11 +130,25 @@ def main():
             {"id": "forest", "label": "Bosque y matorral quemados (confirmado)", "value": veg, "unit": "ha"},
             {"id": "pop1km", "label": "Personas a menos de 1 km del borde quemado", "value": round(p_ring, -1), "unit": "hab."},
         ]
+    elif case["kind"] == "landslide":
+        px_m = abs(tr.a) * 111320 * np.cos(np.radians(lat))
+        sel = binary_dilation(mask, iterations=1)
+        ring = binary_dilation(mask, iterations=int(round(1000 / px_m))) & ~mask
+        lc = breakdown(wc, mask, pxha)
+        p_in = population(sel, tr, crs, bbox, iso3)
+        p_ring = population(ring, tr, crs, bbox, iso3)
+        print(f"[lc] superficie deslizada / GLOF: {lc}")
+        print(f"[pop] en cauce/lengua {p_in:.0f} · a <1 km del corredor {p_ring:.0f}")
+        man["landcover"] = {"source": "ESA WorldCover 2021 (10 m)", "inside": lc}
+        man["exposure"] = {"source": "WorldPop 2020 (100 m)", "pop_inside": round(p_in), "pop_1km": round(p_ring)}
+        metrics = [
+            {"id": "pop", "label": "Personas en el corredor afectado (<1 km)", "value": round(p_in + p_ring), "unit": "hab."},
+        ]
     else:
         # inundación: incluimos 1 px de margen, como en 04_context (bordes de agua)
         sel = binary_dilation(mask, iterations=1)
         lc = breakdown(wc, mask, pxha)
-        p_in = population(sel, tr, crs, bbox)
+        p_in = population(sel, tr, crs, bbox, iso3)
         print(f"[lc] agua nueva: {lc}")
         print(f"[pop] en zona inundada {p_in:.0f}")
         man["landcover"] = {"source": "ESA WorldCover 2021 (10 m)", "inside": lc}

@@ -1,0 +1,181 @@
+{
+ "id": "venezuela",
+ "title": "Doblete sísmico de Venezuela (Yaracuy · La Guaira)",
+ "kind": "earthquake",
+ "event": "2026-06-24",
+ "mock": false,
+ "bbox": [
+  -68.9,
+  10.21,
+  -66.75,
+  10.85
+ ],
+ "center": [
+  -67.825,
+  10.530000000000001
+ ],
+ "coordinates": [
+  [
+   -68.9,
+   10.85
+  ],
+  [
+   -66.75,
+   10.85
+  ],
+  [
+   -66.75,
+   10.21
+  ],
+  [
+   -68.9,
+   10.21
+  ]
+ ],
+ "pair": {
+  "before": "2026-06-29",
+  "after": "2026-06-25"
+ },
+ "frames": [
+  {
+   "date": "2026-06-29",
+   "ref": "2026-06-17",
+   "track": 54,
+   "dir": "D",
+   "hh": "d_54_20260617_20260629.webp",
+   "hv": "f_54_20260617_20260629.webp",
+   "rgb": "c_54_20260617_20260629.webp"
+  },
+  {
+   "date": "2026-06-30",
+   "ref": "2026-06-18",
+   "track": 61,
+   "dir": "A",
+   "hh": "d_61_20260618_20260630.webp",
+   "hv": "f_61_20260618_20260630.webp",
+   "rgb": "c_61_20260618_20260630.webp"
+  },
+  {
+   "date": "2026-07-04",
+   "ref": "2026-06-22",
+   "track": 126,
+   "dir": "D",
+   "hh": "d_126_20260622_20260704.webp",
+   "hv": "f_126_20260622_20260704.webp",
+   "rgb": "c_126_20260622_20260704.webp"
+  },
+  {
+   "date": "2026-06-25",
+   "ref": "2026-06-13",
+   "track": 162,
+   "dir": "A",
+   "hh": "d_162_20260613_20260625.webp",
+   "hv": "f_162_20260613_20260625.webp",
+   "rgb": "c_162_20260613_20260625.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2026-06-29",
+   "2026-06-30",
+   "2026-07-04",
+   "2026-06-25"
+  ],
+  "hh": [
+   -23.68,
+   -37.89,
+   32.67,
+   -32.25
+  ],
+  "hv": [
+   0.27,
+   0.22,
+   0.32,
+   0.31
+  ]
+ },
+ "metrics": [
+  {
+   "id": "insar_epi",
+   "label": "Mayor desplazamiento cerca del epicentro (cualquier pasada)",
+   "value": -37.9,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_area",
+   "label": "Superficie que se mueve más que el ruido",
+   "value": 102325,
+   "unit": "ha"
+  },
+  {
+   "id": "insar_noise",
+   "label": "Ruido de fondo (desviación típica)",
+   "value": 6.2,
+   "unit": "cm"
+  },
+  {
+   "id": "insar_coh",
+   "label": "Coherencia media",
+   "value": 28.0,
+   "unit": "%"
+  },
+  {
+   "id": "insar_n",
+   "label": "Interferogramas NISAR usados",
+   "value": 4,
+   "unit": ""
+  }
+ ],
+ "overlays": {
+  "events": "events.geojson"
+ },
+ "insar": {
+  "mode": "pairs",
+  "product": "NISAR L2 GUNW",
+  "wavelength_cm": 23.8,
+  "vmax_cm": 40.0,
+  "fringe_cm": 11.9,
+  "hotspot": [
+   -67.2109,
+   10.55
+  ],
+  "noise_cm": 6.21,
+  "rate_cm_yr": null,
+  "series": "point",
+  "threshold_cm": 15.53,
+  "days": 21,
+  "start": "2026-06-13",
+  "end": "2026-07-04",
+  "pairs": [
+   {
+    "track": 54,
+    "dir": "D",
+    "ref": "2026-06-17",
+    "sec": "2026-06-29"
+   },
+   {
+    "track": 61,
+    "dir": "A",
+    "ref": "2026-06-18",
+    "sec": "2026-06-30"
+   },
+   {
+    "track": 126,
+    "dir": "D",
+    "ref": "2026-06-22",
+    "sec": "2026-07-04"
+   },
+   {
+    "track": 162,
+    "dir": "A",
+    "ref": "2026-06-13",
+    "sec": "2026-06-25"
+   }
+  ]
+ },
+ "refLabel": "Sismicidad: USGS (earthquake.usgs.gov)"
+}

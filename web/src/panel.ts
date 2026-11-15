@@ -63,7 +63,7 @@ export class Panel {
             <button data-v="hv" title="${t('titleHV')}">HV</button>
             ${m.frames[0]?.rgb ? `<button data-v="rgb" title="${t('titleRGB')}">RGB</button>` : ''}
           </div>
-          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.kind === 'flood' ? t('maskWater') : t('maskBurn')}</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.kind === 'flood' ? t('maskWater') : m.kind === 'landslide' ? t('maskSlide') : t('maskBurn')}</span></label>
         </div>
         <div class="row toggles">
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${m.insar ? t('railOsm') : t('infra')}</span></label>` : ''}
@@ -428,14 +428,15 @@ const LC_COLORS: Record<string, string> = {
 function landcoverCard(m: Manifest) {
   const lc = m.landcover!
   const fire = m.kind === 'fire'
+  const slide = m.kind === 'landslide'
   const names = t('lc')
   const rows = lc.inside.filter((r) => r.pct >= 0.5)
   const fmt = (v: number) => v.toLocaleString(locale(), { maximumFractionDigits: 0 })
   const crop = lc.outside_ref?.find((r) => r.cls === 'crop')
   const ex = m.exposure
-  const pop = ex ? (fire ? t('lcPop')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : t('lcPopFlood')(fmt(ex.pop_inside))) : ''
+  const pop = ex ? (fire ? t('lcPop')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : slide ? t('lcPopSlide')(fmt(ex.pop_inside), fmt(Math.round((ex.pop_1km ?? 0) / 10) * 10)) : t('lcPopFlood')(fmt(ex.pop_inside))) : ''
   return `<section class="sec">
-    <div class="label">${t('lcTitle')(fire)}</div>
+    <div class="label">${t('lcTitle')(m.kind)}</div>
     <div class="lc-bar" role="img" aria-label="${rows.map((r) => `${names[r.cls] ?? r.cls} ${r.pct}%`).join(', ')}">
       ${rows.map((r) => `<i style="flex:${r.pct};background:${LC_COLORS[r.cls] ?? LC_COLORS.other}" title="${names[r.cls] ?? r.cls}: ${fmt(r.ha)} ha"></i>`).join('')}
     </div>

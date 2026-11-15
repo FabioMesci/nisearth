@@ -65,6 +65,13 @@ HAZARD = {
         "w_edge": 0.25,
         "intensity_floor": 1.0,
     },
+    "landslide": {
+        "w_ref_only": 1.0,
+        "w_radar_only": 1.0,
+        "edge_m": 500,         # valley-floor runout / terrace hazard buffer
+        "w_edge": 0.30,
+        "intensity_floor": 1.0,
+    },
 }
 EXPOSURE_W = {"population": 0.40, "built": 0.15, "infrastructure": 0.15, "critical": 0.15, "land": 0.15}
 VULNERABILITY_W = {"physical": 0.40, "social": 0.30, "coping": 0.30}
@@ -84,14 +91,15 @@ MC_SPREAD = 0.25
 SUSCEPTIBILITY = {
     "fire": {"tree": 0.9, "shrub": 1.0, "grass": 0.7, "crop": 0.4, "built": 0.6, "bare": 0.05, "water": 0.0, "wetland": 0.2},
     "flood": {"tree": 0.3, "shrub": 0.3, "grass": 0.3, "crop": 0.7, "built": 0.9, "bare": 0.2, "water": 0.0, "wetland": 0.1},
+    "landslide": {"tree": 0.6, "shrub": 0.7, "grass": 0.6, "crop": 0.8, "built": 0.95, "bare": 0.4, "water": 0.1, "wetland": 0.3},
 }
-LAND_ASSET = {"fire": ("tree", "shrub"), "flood": ("crop",)}
+LAND_ASSET = {"fire": ("tree", "shrub"), "flood": ("crop",), "landslide": ("crop", "tree", "shrub")}
 
 WC_URL = "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_{tile}_Map.tif"
-WC_CLASSES = {10: "tree", 20: "shrub", 30: "grass", 40: "crop", 50: "built", 60: "bare", 80: "water", 90: "wetland"}
-POP_URL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/ESP/esp_ppp_2020_constrained.tif"
-POP1K_URL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_1km/2020/ESP/esp_ppp_2020_1km_Aggregated.tif"
-AGE_URL = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020_1km/unconstrained/2020/ESP/esp_{sex}_{age}_2020_1km.tif"
+WC_CLASSES = {10: "tree", 20: "shrub", 30: "grass", 40: "crop", 50: "built", 60: "bare", 70: "bare", 80: "water", 90: "wetland", 100: "grass"}
+POP_URL_TPL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/{iso3}/{iso_lo}_ppp_2020_constrained.tif"
+POP1K_URL_TPL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_1km/2020/{iso3}/{iso_lo}_ppp_2020_1km_Aggregated.tif"
+AGE_URL_TPL = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020_1km/unconstrained/2020/{iso3}/{iso_lo}_{sex}_{age}_2020_1km.tif"
 DEPENDENT_AGES = (0, 1, 65, 70, 75, 80)  # WorldPop 5-year groups: under 5 and 65+
 DEM_URL = "https://copernicus-dem-30m.s3.amazonaws.com/{name}/{name}.tif"
 OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
@@ -297,7 +305,9 @@ def main():
 
     # ---- land cover and slope on the fine grid
     wc = worldcover(fshape, ftr, bbox, cache / "worldcover.npz")
-    lc = {name: avg(wc == code) for code, name in WC_CLASSES.items()}
+    lc = {name: np.zeros(cshape) for name in set(WC_CLASSES.values())}
+    for code, name in WC_CLASSES.items():
+        lc[name] += avg(wc == code)
     slope = slope_deg(fshape, ftr, bbox, cache / "slope.npz")
     slope_c = avg(slope)
     land = avg(wc > 0)  # share of the cell that is not sea / nodata
@@ -334,7 +344,10 @@ def main():
     confidence = np.where(seen > 0, f_both / np.maximum(seen, 1e-9), 0)  # share confirmed by both sources
 
     # ---- EXPOSURE
-    pop_f, pop_tr = read_window(fetch(POP_URL, RAW / "pop" / "esp_ppp_2020_constrained.tif"), bbox, pad=0.01)
+    iso3 = case.get("iso3", "ESP").upper()
+    iso_lo = iso3.lower()
+    pop_url = POP_URL_TPL.format(iso3=iso3, iso_lo=iso_lo)
+    pop_f, pop_tr = read_window(fetch(pop_url, RAW / "pop" / f"{iso_lo}_ppp_2020_constrained.tif"), bbox, pad=0.01)
     pop = to_grid(pop_f, pop_tr, cshape, ctr, Resampling.sum)
     osm = overpass(bbox, RAW / "osm" / f"{cid}_risk.json")["elements"]
     ways = [e for e in osm if e["type"] == "way" and "geometry" in e]
@@ -362,16 +375,20 @@ def main():
     dep = None
     for age in DEPENDENT_AGES:
         for sex in "fm":
-            a, age_tr = read_window(fetch(AGE_URL.format(sex=sex, age=age), RAW / "pop" / "age" / f"esp_{sex}_{age}_2020_1km.tif"), bbox, pad=0.02)
+            age_url = AGE_URL_TPL.format(iso3=iso3, iso_lo=iso_lo, sex=sex, age=age)
+            a, age_tr = read_window(fetch(age_url, RAW / "pop" / "age" / f"{iso_lo}_{sex}_{age}_2020_1km.tif"), bbox, pad=0.02)
             dep = a if dep is None else dep + a
-    tot, _ = read_window(fetch(POP1K_URL, RAW / "pop" / "esp_ppp_2020_1km_Aggregated.tif"), bbox, pad=0.02)
+    pop1k_url = POP1K_URL_TPL.format(iso3=iso3, iso_lo=iso_lo)
+    tot, _ = read_window(fetch(pop1k_url, RAW / "pop" / f"{iso_lo}_ppp_2020_1km_Aggregated.tif"), bbox, pad=0.02)
     share = np.where(tot >= 5, dep / np.maximum(tot, 1e-9), np.nan)  # too few people: no reliable age structure
     area_share = float(np.nansum(np.where(tot >= 5, dep, 0)) / max(np.nansum(np.where(tot >= 5, tot, 0)), 1e-9))
     share = to_grid(np.nan_to_num(share, nan=area_share), age_tr, cshape, ctr, Resampling.bilinear)
     share = np.where(share > 0, share, area_share)
     d_hosp, _ = nearest_km(LON, LAT, hospitals, lat0)
     d_fire, _ = nearest_km(LON, LAT, stations, lat0)
-    places = [(pt(e), e["tags"].get("name")) for e in tagged if e.get("tags", {}).get("place") and e["tags"].get("name")]
+    TRANS = {"郭巴村": "Guoba", "स्याप्रु बेसी": "Syaphrubesi"}
+    pname = lambda t: TRANS.get(t.get("name"), t.get("name:es") or t.get("name:en") or t.get("int_name") or t.get("name"))
+    places = [(pt(e), pname(e["tags"])) for e in tagged if e.get("tags", {}).get("place") and pname(e["tags"])]
     _, place_idx = nearest_km(LON, LAT, [p for p, _ in places], lat0)
 
     v_parts = {

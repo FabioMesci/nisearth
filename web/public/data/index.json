@@ -58,5 +58,25 @@
    28.619999999999997
   ],
   "event": "2021-09-19"
+ },
+ {
+  "id": "rasuwa",
+  "title": "Derrumbe y GLOF de Rasuwa — Langtang (Nepal)",
+  "kind": "landslide",
+  "center": [
+   85.41499999999999,
+   28.255
+  ],
+  "event": "2026-08-26"
+ },
+ {
+  "id": "venezuela",
+  "title": "Doblete sísmico de Venezuela (Yaracuy · La Guaira)",
+  "kind": "earthquake",
+  "center": [
+   -67.825,
+   10.530000000000001
+  ],
+  "event": "2026-06-24"
  }
 ]

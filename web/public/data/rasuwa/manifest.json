@@ -1,0 +1,562 @@
+{
+ "id": "rasuwa",
+ "title": "Derrumbe y GLOF de Rasuwa — Langtang (Nepal)",
+ "kind": "landslide",
+ "event": "2026-08-26",
+ "mock": false,
+ "bbox": [
+  85.25,
+  28.15,
+  85.58,
+  28.36
+ ],
+ "center": [
+  85.41499999999999,
+  28.255
+ ],
+ "coordinates": [
+  [
+   85.25,
+   28.36
+  ],
+  [
+   85.58,
+   28.36
+  ],
+  [
+   85.58,
+   28.15
+  ],
+  [
+   85.25,
+   28.15
+  ]
+ ],
+ "pair": {
+  "before": "2026-08-19",
+  "after": "2026-08-31"
+ },
+ "frames": [
+  {
+   "date": "2026-06-08",
+   "track": 98,
+   "hh": "hh_20260608.webp",
+   "hv": "hv_20260608.webp",
+   "rgb": "rgb_20260608.webp"
+  },
+  {
+   "date": "2026-06-20",
+   "track": 98,
+   "hh": "hh_20260620.webp",
+   "hv": "hv_20260620.webp",
+   "rgb": "rgb_20260620.webp"
+  },
+  {
+   "date": "2026-07-02",
+   "track": 98,
+   "hh": "hh_20260702.webp",
+   "hv": "hv_20260702.webp",
+   "rgb": "rgb_20260702.webp"
+  },
+  {
+   "date": "2026-07-14",
+   "track": 98,
+   "hh": "hh_20260714.webp",
+   "hv": "hv_20260714.webp",
+   "rgb": "rgb_20260714.webp"
+  },
+  {
+   "date": "2026-07-26",
+   "track": 98,
+   "hh": "hh_20260726.webp",
+   "hv": "hv_20260726.webp",
+   "rgb": "rgb_20260726.webp"
+  },
+  {
+   "date": "2026-08-19",
+   "track": 98,
+   "hh": "hh_20260819.webp",
+   "hv": "hv_20260819.webp",
+   "rgb": "rgb_20260819.webp"
+  },
+  {
+   "date": "2026-08-31",
+   "track": 98,
+   "hh": "hh_20260831.webp",
+   "hv": "hv_20260831.webp",
+   "rgb": "rgb_20260831.webp"
+  },
+  {
+   "date": "2026-09-12",
+   "track": 98,
+   "hh": "hh_20260912.webp",
+   "hv": "hv_20260912.webp",
+   "rgb": "rgb_20260912.webp"
+  },
+  {
+   "date": "2026-09-24",
+   "track": 98,
+   "hh": "hh_20260924.webp",
+   "hv": "hv_20260924.webp",
+   "rgb": "rgb_20260924.webp"
+  },
+  {
+   "date": "2026-10-06",
+   "track": 98,
+   "hh": "hh_20261006.webp",
+   "hv": "hv_20261006.webp",
+   "rgb": "rgb_20261006.webp"
+  },
+  {
+   "date": "2026-10-18",
+   "track": 98,
+   "hh": "hh_20261018.webp",
+   "hv": "hv_20261018.webp",
+   "rgb": "rgb_20261018.webp"
+  },
+  {
+   "date": "2026-10-30",
+   "track": 98,
+   "hh": "hh_20261030.webp",
+   "hv": "hv_20261030.webp",
+   "rgb": "rgb_20261030.webp"
+  },
+  {
+   "date": "2026-11-11",
+   "track": 98,
+   "hh": "hh_20261111.webp",
+   "hv": "hv_20261111.webp",
+   "rgb": "rgb_20261111.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2026-06-08",
+   "2026-06-20",
+   "2026-07-02",
+   "2026-07-14",
+   "2026-07-26",
+   "2026-08-19",
+   "2026-08-31",
+   "2026-09-12",
+   "2026-09-24",
+   "2026-10-06",
+   "2026-10-18",
+   "2026-10-30",
+   "2026-11-11"
+  ],
+  "hh": [
+   1.35,
+   1.29,
+   2.42,
+   3.31,
+   2.36,
+   2.75,
+   0.27,
+   0.1,
+   0.69,
+   -0.08,
+   -1.21,
+   -0.73,
+   -0.33
+  ],
+  "hv": [
+   -6.44,
+   -6.57,
+   -5.64,
+   -6.28,
+   -5.96,
+   -5.23,
+   -8.92,
+   -8.36,
+   -8.33,
+   -8.07,
+   -8.4,
+   -7.41,
+   -7.95
+  ]
+ },
+ "metrics": [
+  {
+   "id": "area",
+   "label": "Superficie deslizada / GLOF (radar)",
+   "value": 633,
+   "unit": "ha"
+  },
+  {
+   "id": "hvdrop",
+   "label": "Caída media de HV",
+   "value": -3.4,
+   "unit": "dB"
+  },
+  {
+   "id": "rain",
+   "label": "Lluvia entre las dos pasadas NISAR (Langtang · Rasuwa)",
+   "value": 125.5,
+   "unit": "mm"
+  },
+  {
+   "id": "pop",
+   "label": "Personas en el corredor afectado (<1 km)",
+   "value": 2884,
+   "unit": "hab."
+  },
+  {
+   "id": "roads",
+   "label": "Carreteras y senderos en zona deslizada / GLOF",
+   "value": 0.6,
+   "unit": "km"
+  }
+ ],
+ "overlays": {
+  "risk": "risk.geojson",
+  "rail": "rail_affected.geojson",
+  "roads": "roads_affected.geojson"
+ },
+ "stats": {
+  "rule": "dHV<-1.5 & media9x9(dHV)<-1.3"
+ },
+ "daily": {
+  "kind": "rain",
+  "dates": [
+   "2026-08-15",
+   "2026-08-16",
+   "2026-08-17",
+   "2026-08-18",
+   "2026-08-19",
+   "2026-08-20",
+   "2026-08-21",
+   "2026-08-22",
+   "2026-08-23",
+   "2026-08-24",
+   "2026-08-25",
+   "2026-08-26",
+   "2026-08-27",
+   "2026-08-28",
+   "2026-08-29",
+   "2026-08-30",
+   "2026-08-31",
+   "2026-09-01",
+   "2026-09-02",
+   "2026-09-03",
+   "2026-09-04",
+   "2026-09-05"
+  ],
+  "values": [
+   11.3,
+   15.3,
+   16.5,
+   23.7,
+   17.3,
+   8.7,
+   9.5,
+   11.1,
+   16.5,
+   13.1,
+   7.9,
+   9.2,
+   15.0,
+   7.4,
+   14.1,
+   13.0,
+   18.4,
+   19.9,
+   27.3,
+   17.2,
+   16.1,
+   15.0
+  ],
+  "unit": "mm",
+  "place": "Langtang · Rasuwa",
+  "source": "Open-Meteo (reanálisis ERA5)",
+  "peak_hour_mm": 3.6,
+  "peak_hour": "2026-08-19T00:00"
+ },
+ "landcover": {
+  "source": "ESA WorldCover 2021 (10 m)",
+  "inside": [
+   {
+    "cls": "tree",
+    "ha": 254,
+    "pct": 40.1
+   },
+   {
+    "cls": "bare",
+    "ha": 211,
+    "pct": 33.3
+   },
+   {
+    "cls": "grass",
+    "ha": 147,
+    "pct": 23.1
+   },
+   {
+    "cls": "built",
+    "ha": 14,
+    "pct": 2.3
+   },
+   {
+    "cls": "water",
+    "ha": 8,
+    "pct": 1.3
+   },
+   {
+    "cls": "crop",
+    "ha": 0,
+    "pct": 0.0
+   }
+  ]
+ },
+ "exposure": {
+  "source": "WorldPop 2020 (100 m)",
+  "pop_inside": 735,
+  "pop_1km": 2149
+ },
+ "risk": {
+  "generated": "2026-11-15",
+  "model": "risk = (hazard x exposure x vulnerability)^(1/3), INFORM-style geometric mean, 0-1 per cell",
+  "cell_m": [
+   490,
+   553
+  ],
+  "cells": 226,
+  "classes": [
+   {
+    "cls": "very_low",
+    "cells": 170,
+    "area_ha": 4608,
+    "population": 67
+   },
+   {
+    "cls": "low",
+    "cells": 53,
+    "area_ha": 1437,
+    "population": 1562
+   },
+   {
+    "cls": "medium",
+    "cells": 2,
+    "area_ha": 54,
+    "population": 493
+   },
+   {
+    "cls": "high",
+    "cells": 1,
+    "area_ha": 27,
+    "population": 540
+   },
+   {
+    "cls": "very_high",
+    "cells": 0,
+    "area_ha": 0,
+    "population": 0
+   }
+  ],
+  "pop_high": 540,
+  "pop_high_range": [
+   513,
+   540
+  ],
+  "pop_expected": 435,
+  "roads_high_km": 0.7,
+  "rail_high_km": 0.0,
+  "critical_high": 0,
+  "components": {
+   "hazard": 0.46,
+   "exposure": 0.4,
+   "vulnerability": 0.54
+  },
+  "drivers": {
+   "exposure": {
+    "population": 0.59,
+    "built": 0.31,
+    "infrastructure": 0.15,
+    "critical": 0.0,
+    "land": 0.61
+   },
+   "vulnerability": {
+    "physical": 0.63,
+    "social": 0.32,
+    "coping": 0.65
+   }
+  },
+  "dependent_age_pct": 15.8,
+  "hotspots": [
+   {
+    "place": "Syaphrubesi",
+    "lon": 85.3375,
+    "lat": 28.1625,
+    "risk": 0.546,
+    "class": "high",
+    "hazard": 0.48,
+    "exposure": 0.587,
+    "vulnerability": 0.576,
+    "population": 540.2
+   },
+   {
+    "place": "Guoba",
+    "lon": 85.4825,
+    "lat": 28.3375,
+    "risk": 0.367,
+    "class": "medium",
+    "hazard": 0.717,
+    "exposure": 0.131,
+    "vulnerability": 0.527,
+    "population": 0.0
+   },
+   {
+    "place": "Labi",
+    "lon": 85.3675,
+    "lat": 28.2525,
+    "risk": 0.364,
+    "class": "medium",
+    "hazard": 0.192,
+    "exposure": 0.474,
+    "vulnerability": 0.53,
+    "population": 493.3
+   },
+   {
+    "place": "Guoba",
+    "lon": 85.4825,
+    "lat": 28.3275,
+    "risk": 0.339,
+    "class": "low",
+    "hazard": 0.717,
+    "exposure": 0.104,
+    "vulnerability": 0.522,
+    "population": 0.0
+   },
+   {
+    "place": "Guoba",
+    "lon": 85.4875,
+    "lat": 28.3275,
+    "risk": 0.338,
+    "class": "low",
+    "hazard": 0.813,
+    "exposure": 0.091,
+    "vulnerability": 0.524,
+    "population": 0.0
+   }
+  ],
+  "cascade": {
+   "type": "rain_slope_failure",
+   "rain_mm": 125.5,
+   "steep_deg": 15,
+   "cells": 28,
+   "roads_km": 34.7,
+   "rail_km": 0.0
+  },
+  "stability": {
+   "runs": 300,
+   "spread_pct": 25,
+   "stable_high_pct": 100,
+   "mean_pct": 94
+  },
+  "weights": {
+   "hazard": {
+    "w_ref_only": 1.0,
+    "w_radar_only": 1.0,
+    "edge_m": 500,
+    "w_edge": 0.3,
+    "intensity_floor": 1.0
+   },
+   "exposure": {
+    "population": 0.4,
+    "built": 0.15,
+    "infrastructure": 0.15,
+    "critical": 0.15,
+    "land": 0.15
+   },
+   "vulnerability": {
+    "physical": 0.4,
+    "social": 0.3,
+    "coping": 0.3
+   },
+   "class_edges": [
+    0.2,
+    0.35,
+    0.5,
+    0.65
+   ]
+  },
+  "sources": [
+   "NISAR L2 GCOV change mask (this pipeline)",
+   "EFFIS burnt-area perimeters / Copernicus EMS Rapid Mapping",
+   "NASA FIRMS VIIRS 375 m fire radiative power",
+   "WorldPop 2020 population (100 m) and age structure (1 km)",
+   "ESA WorldCover 2021 (10 m)",
+   "OpenStreetMap roads, railways, hospitals, schools, fire stations (ODbL)",
+   "Copernicus DEM GLO-30"
+  ],
+  "files": {
+   "geojson": "risk.geojson",
+   "csv": "risk.csv"
+  }
+ },
+ "s1": {
+  "pair": {
+   "before": "2026-08-16",
+   "after": "2026-08-28"
+  },
+  "frames": [
+   {
+    "date": "2026-07-23",
+    "track": 85,
+    "hh": "s1vv_20260723_p85.webp",
+    "hv": "s1vh_20260723_p85.webp",
+    "rgb": "s1rgb_20260723_p85.webp",
+    "mean_hh": -5.01,
+    "mean_hv": -12.17
+   },
+   {
+    "date": "2026-08-04",
+    "track": 85,
+    "hh": "s1vv_20260804_p85.webp",
+    "hv": "s1vh_20260804_p85.webp",
+    "rgb": "s1rgb_20260804_p85.webp",
+    "mean_hh": -5.15,
+    "mean_hv": -12.29
+   },
+   {
+    "date": "2026-08-16",
+    "track": 85,
+    "hh": "s1vv_20260816_p85.webp",
+    "hv": "s1vh_20260816_p85.webp",
+    "rgb": "s1rgb_20260816_p85.webp",
+    "mean_hh": -5.39,
+    "mean_hv": -12.86
+   },
+   {
+    "date": "2026-08-28",
+    "track": 85,
+    "hh": "s1vv_20260828_p85.webp",
+    "hv": "s1vh_20260828_p85.webp",
+    "rgb": "s1rgb_20260828_p85.webp",
+    "mean_hh": -4.21,
+    "mean_hv": -12.88
+   },
+   {
+    "date": "2026-09-09",
+    "track": 85,
+    "hh": "s1vv_20260909_p85.webp",
+    "hv": "s1vh_20260909_p85.webp",
+    "rgb": "s1rgb_20260909_p85.webp",
+    "mean_hh": -4.42,
+    "mean_hv": -12.89
+   }
+  ],
+  "change": "s1_change.webp",
+  "delta_in_mask": {
+   "vv": 0.78,
+   "vh": -0.14
+  }
+ },
+ "nisar_delta_in_mask": {
+  "hh": -1.55,
+  "hv": -3.37
+ }
+}

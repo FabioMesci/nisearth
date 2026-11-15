@@ -36,6 +36,19 @@ CASES = {
         "s1_pair": ("2026-07-21", "2026-08-26"),  # Sentinel-1: mismas fechas que NISAR
         "s1_track": 147,  # pasada 147 asc: cubre el 100 % del perímetro EFFIS (la 52 solo el 54 %)
     },
+    "rasuwa": {
+        "title": "Derrumbe y GLOF de Rasuwa — Langtang (Nepal)",
+        "kind": "landslide",
+        "iso3": "NPL",
+        "bbox": (85.25, 28.15, 85.58, 28.36),  # valle de Langtang + garganta Lende Khola / Trishuli
+        "window": ("2026-06-01", "2026-11-14"),
+        "event": "2026-08-26",  # avalancha de roca/hielo en Langtang + GLOF (Copernicus EMSR927)
+        "pair": ("2026-08-19", "2026-08-31"),  # misma pasada 98 asc (40 MHz DHDH, 100 % cobertura)
+        "track": 98,
+        "s1_pair": ("2026-08-16", "2026-08-28"),  # Sentinel-1D pasada 85 asc: 2 días después del evento
+        "s1_track": 85,
+        "ems": {"code": "EMSR927", "date": "2026-08-26"},
+    },
     # ---- Casos de interferometría (InSAR, NISAR L2 GUNW): pipeline/08_insar.py ----
     # mode "pairs": cada interferograma es un fotograma independiente (terremoto: varias geometrías)
     # mode "chain": pares consecutivos de 12 días de una pasada, sumados = desplazamiento acumulado
@@ -57,6 +70,34 @@ CASES = {
             "vmax_cm": 4.0,
             "fringe_cm": 2.0,
             "exclude_km": 12,  # radio sin usar para quitar rampa y atmósfera
+        },
+    },
+    "venezuela": {
+        "title": "Doblete sísmico de Venezuela (Yaracuy · La Guaira)",
+        "kind": "earthquake",
+        "iso3": "VEN",
+        "seismic_source": "usgs",
+        "bbox": (-68.90, 10.21, -66.75, 10.85),
+        "window": ("2026-06-01", "2026-07-15"),
+        "event": "2026-06-24",  # Mw 7,2 (22:04:31 UTC, San Felipe) y Mw 7,5 (22:05:03 UTC, Catia La Mar), prof. 10 km
+        "insar": {
+            "mode": "pairs",
+            "pairs": [
+                (54, "2026-06-17", "2026-06-29"),   # descendente: ruptura occidental y central (Yaracuy - Puerto Cabello - Aragua)
+                (61, "2026-06-18", "2026-06-30"),   # ascendente: ruptura oriental (Catia La Mar - La Guaira - Caracas)
+                (126, "2026-06-22", "2026-07-04"),  # descendente: ruptura central y oriental (Catia La Mar - La Guaira)
+                (162, "2026-06-13", "2026-06-25"),  # ascendente (+12 h tras el sismo): cubre ambos epicentros M7,2 y M7,5
+            ],
+            "hotspot": (-67.2109, 10.5500),   # zona costera epicentral M7,5 al oeste de Catia La Mar (cubierta por 61, 126 y 162)
+            "hotspot2": (-68.2500, 10.5400),  # traza costera de la falla de Morón / M7,2 San Felipe (cubierta por 54 y 162)
+            "disc_km": 1.2,
+            "iono": True,
+            "detrend": "x_dem",
+            "excl_lat_min": 10.28,
+            "res": 0.0012,
+            "vmax_cm": 40.0,
+            "fringe_cm": 11.9,
+            "exclude_km": 32,
         },
     },
     "lorca": {

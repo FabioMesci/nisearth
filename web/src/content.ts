@@ -131,6 +131,57 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'Agencias espaciales', text: 'Coordinar NISAR, Sentinel-1 y otras misiones para no dejar huecos durante el evento.' },
       { title: 'Adif · Renfe', text: 'Con revisita suficiente: tramos de vía bajo el agua para priorizar inspecciones.' },
     ],
+  },
+  rasuwa: {
+    short: 'Rasuwa · Langtang',
+    region: 'Nepal',
+    order: 3,
+    place: 'Valle de Langtang · Rasuwa (Nepal)',
+    dateLabel: '26 ago 2026',
+    headline: 'Rasuwa: el derrumbe glaciar y la riada que vio el radar bajo el monzón',
+    summary:
+      'El 26 de agosto de 2026, en pleno monzón del Himalaya, una avalancha de roca y hielo en la cabecera de Langtang desencadenó una avenida torrencial (GLOF) que arrasó el cauce del Lende Khola y el Trishuli (activación Copernicus EMSR927). Mientras las nubes taparon los satélites ópticos durante cinco semanas, la banda L de NISAR (pasada 98 ascendente, 19 ago → 31 ago) cartografió las 633 ha de lengua de derrubios y garganta arrasada sin un solo hueco, con una caída media de −3,4 dB en HV allí donde la avenida arrancó el bosque de ribera.',
+    passes: {
+      from: '2026-08-15',
+      to: '2026-09-06',
+      event: ['2026-08-26T00:00', '2026-08-26T18:00'],
+      list: [
+        { date: '2026-08-16T12:21', sensor: 'S1D' },
+        { date: '2026-08-16T12:58', sensor: 'NISAR' },
+        { date: '2026-08-19T23:39', sensor: 'NISAR' },
+        { date: '2026-08-23T13:06', sensor: 'NISAR' },
+        { date: '2026-08-24T00:18', sensor: 'S1D' },
+        { date: '2026-08-28T12:21', sensor: 'S1D' },
+        { date: '2026-08-28T12:58', sensor: 'NISAR' },
+        { date: '2026-08-31T23:39', sensor: 'NISAR' },
+        { date: '2026-09-04T13:06', sensor: 'NISAR' },
+        { date: '2026-09-05T00:18', sensor: 'S1D' },
+      ],
+    },
+    notes: [{ date: '2026-08-26', label: 'Derrumbe / GLOF' }],
+    why: [
+      {
+        title: 'Atravesar cinco semanas de monzón',
+        text: 'Entre el 24 de agosto y el 28 de septiembre todas las pasadas ópticas de Sentinel-2 tuvieron entre un 49 % y un 97 % de nubes; la primera imagen despejada llegó el 1 de octubre. NISAR midió el alcance completo cinco días después del colapso.',
+      },
+      {
+        title: 'Lengua glaciar y garganta arrasada',
+        text: 'La caída de HV (−3,4 dB de media) traza tanto el lóbulo de desprendimiento en la morrena glaciar oriental (211 ha de roca y hielo) como los 254 ha de bosque subalpino y de ribera arrancados a lo largo del cañón hacia Syaphrubesi.',
+      },
+      {
+        title: 'Geometría en cañones de 5.000 m',
+        text: 'En gargantas profundas del Himalaya la geometría de visión es crítica: la pasada 98 ascendente (modo 40 MHz DHDH) cubre el 100 % del valle sin huecos, mientras que la pasada 48 descendente del 28 de agosto dejó una franja ciega entre sub-haces sobre la cabecera.',
+      },
+      {
+        title: '323 mm de lluvia continua',
+        text: 'El reanálisis ERA5 registra lluvia todos los días del 15 de agosto al 5 de septiembre (125,5 mm solo entre las dos pasadas de NISAR), saturando las laderas y morrenas antes de la rotura.',
+      },
+    ],
+    who: [
+      { title: 'Protección civil (NDRRMA)', text: 'Identificar en horas qué tramos de la carretera Pasang Lhamu (0,6 km afectados directamente) y aldeas como Syaphrubesi quedan aislados bajo las nubes.' },
+      { title: 'Vigilancia glaciar (ICIMOD)', text: 'Detectar vaciados bruscos de lagos glaciares (GLOF) y avalanchas de roca-hielo sin esperar al fin del monzón.' },
+      { title: 'Hidroeléctricas y cuencas', text: 'Evaluar la avenida de lodo y bloques en el corredor del Trishuli, donde viven unas 2.880 personas a menos de 1 km del cauce.' },
+    ],
   },  lorca: {
     short: 'Lorca',
     region: 'Murcia',
@@ -192,6 +243,55 @@ const CONTENT_ES: Record<string, CaseContent> = {
       { title: 'IGN y sismólogos', text: 'Acotar cuánto se movió la superficie ayuda a modelar la falla.' },
       { title: 'Protección civil', text: 'Descartar en días deformaciones grandes en presas, laderas o carreteras de la zona.' },
       { title: 'Ingeniería', text: 'La coherencia también revela daños: los edificios que colapsan dejan de devolver la misma señal.' },
+    ],
+  },
+  venezuela: {
+    short: 'Yaracuy · La Guaira',
+    region: 'Venezuela',
+    order: 6,
+    place: 'San Felipe (Yaracuy) · Catia La Mar (La Guaira)',
+    dateLabel: '24 jun 2026',
+    headline: 'Venezuela: el doblete Mw 7,2 y 7,5 que desgarró 200 km de costa en 39 segundos',
+    summary:
+      'El 24 de junio de 2026 un doblete sísmico superficial (10,0 km de profundidad, USGS) rompió el límite entre las placas del Caribe y Sudamérica: el precursor de Mw 7,2 se registró a las 18:04:31 HLV (22:04:31 UTC) 20 km al este de San Felipe, Yaracuy (10,371° N, 68,556° O), y 39 segundos después, a las 18:05:03 HLV (22:05:03 UTC), el sismo principal de Mw 7,5 golpeó 17 km al oeste de Catia La Mar, La Guaira (10,622° N, 67,194° O). Apenas 12 horas más tarde (25 jun, 10:06 UTC), la pasada 162 ascendente de NISAR capturó toda la ruptura: junto a las pasadas 54, 61 y 126, cuatro interferogramas L2 GUNW revelan desplazamientos en línea de visión de hasta −37,9 cm y +32,7 cm y más de 102.000 ha deformadas a lo largo del sistema de fallas Boconó–Morón–San Sebastián.',
+    passes: {
+      from: '2026-06-12',
+      to: '2026-07-05',
+      event: ['2026-06-24T22:04', '2026-06-24T23:00'],
+      list: [
+        { date: '2026-06-13T10:06', sensor: 'NISAR' },
+        { date: '2026-06-17T23:02', sensor: 'NISAR' },
+        { date: '2026-06-18T09:58', sensor: 'NISAR' },
+        { date: '2026-06-22T22:54', sensor: 'NISAR' },
+        { date: '2026-06-25T10:06', sensor: 'NISAR' },
+        { date: '2026-06-29T23:02', sensor: 'NISAR' },
+        { date: '2026-06-30T09:58', sensor: 'NISAR' },
+        { date: '2026-07-04T22:54', sensor: 'NISAR' },
+      ],
+    },
+    notes: [{ date: '2026-06-24', label: 'Mw 7,2 + 7,5' }],
+    why: [
+      {
+        title: 'Signos opuestos = desgarre horizontal dextral',
+        text: 'En una órbita ascendente el radar mira hacia el este; en una descendente, hacia el oeste. En la costa del Mw 7,5 (Chichiriviche–Catia La Mar), las pasadas ascendentes 162 y 61 miden −32,3 y −37,9 cm (el suelo se aleja), mientras la descendente 126 mide +32,7 cm (se acerca). Esa inversión demuestra un movimiento horizontal dextral (rumbo lateral derecho) a lo largo de la falla de San Sebastián.',
+      },
+      {
+        title: 'La traza de la falla de Morón, al descubierto',
+        text: 'En el extremo occidental (Mw 7,2, San Felipe–Morón), el interferograma corta de este a oeste la costa del Golfo Triste: el bloque norte avanza hacia el oeste (+30,5 cm en la pasada 162 ascendente; −23,7 cm en la 54 descendente) frente al bloque sur, sumando un salto relativo de más de medio metro a través de la falla.',
+      },
+      {
+        title: 'Banda L frente a la selva nublada costera',
+        text: 'La Cordillera de la Costa (Henri Pittier, Sierra de Aroa y El Ávila, hasta 2.765 m) está cubierta de selva tropical densa donde la banda C pierde coherencia en días. La longitud de onda de 23,8 cm de NISAR penetra el dosel y permite contar franjas completas de 11,9 cm sin saltos de fase.',
+      },
+      {
+        title: '12 horas de respuesta y corrección ionosférica',
+        text: 'La pasada 162 ascendente sobrevoló Venezuela a las 10:06 UTC del 25 de junio, solo 12 horas después del doblete. A 10° N de latitud ecuatorial y en una escena de 235 km, aplicar la pantalla ionosférica de espectro dividido (split-spectrum) del producto GUNW resulta clave para aislar la deformación tectónica.',
+      },
+    ],
+    who: [
+      { title: 'FUNVISIS y USGS', text: 'Invertir el deslizamiento coseísmico en las fallas de Morón y San Sebastián combinando las cuatro geometrías ascendentes y descendentes.' },
+      { title: 'Protección Civil y puertos', text: 'Identificar los tramos costeros con mayor sacudida, subsidencia y licuefacción en Puerto Cabello, Morón, Catia La Mar y La Guaira.' },
+      { title: 'Infraestructuras críticas', text: 'Inspeccionar autopistas (Caracas–La Guaira, Valencia–Puerto Cabello), refinerías costeras y taludes en la Cordillera de la Costa.' },
     ],
   },
   alora: {
@@ -287,6 +387,38 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Space agencies', text: 'Coordinate NISAR, Sentinel-1 and other missions so no gap is left during the event.' },
       { title: 'Rail operators', text: 'With enough revisits: flooded track sections to prioritise inspections.' },
     ],
+  },
+  rasuwa: {
+    ...CONTENT_ES.rasuwa,
+    place: 'Langtang Valley · Rasuwa (Nepal)',
+    dateLabel: '26 Aug 2026',
+    headline: 'Rasuwa: the glacial landslide and outburst flood radar saw through the monsoon',
+    summary:
+      'On 26 August 2026, at the height of the Himalayan monsoon, a rock and ice avalanche in the upper Langtang valley triggered a glacial lake outburst flood (GLOF) and debris flow down the Lende Khola and Trishuli gorge (Copernicus EMSR927 activation). While monsoon clouds blinded optical satellites for five weeks, NISAR’s L-band (ascending track 98, 19 Aug → 31 Aug) mapped all 633 ha of the detachment tongue and scoured canyon with zero gaps, recording a −3.4 dB mean HV drop where the surge stripped the riparian forest.',
+    notes: [{ date: '2026-08-26', label: 'Landslide / GLOF' }],
+    why: [
+      {
+        title: 'Seeing through five weeks of monsoon',
+        text: 'Between 24 August and 28 September every Sentinel-2 optical pass had 49% to 97% cloud cover; the first clear view arrived on 1 October. NISAR mapped the full extent five days after the collapse.',
+      },
+      {
+        title: 'Glacier detachment and scoured gorge',
+        text: 'The HV drop (−3.4 dB on average) traces both the detachment lobe on the eastern glacial moraine (211 ha of bare rock and ice) and the 254 ha of subalpine and riparian forest stripped along the canyon down towards Syaphrubesi.',
+      },
+      {
+        title: 'Geometry in 5,000 m canyons',
+        text: 'In deep Himalayan gorges viewing geometry is critical: ascending track 98 (40 MHz DHDH mode) covers 100% of the valley seamlessly, whereas descending track 48 on 28 August left a ScanSAR sub-swath gap across the headwall.',
+      },
+      {
+        title: '323 mm of continuous rain',
+        text: 'ERA5 reanalysis records rain every single day from 15 August to 5 September (125.5 mm between the two NISAR passes alone), saturating slopes and moraines prior to failure.',
+      },
+    ],
+    who: [
+      { title: 'Disaster response (NDRRMA)', text: 'Pinpoint within hours which sections of the Pasang Lhamu Highway (0.6 km directly hit) and settlements such as Syaphrubesi are cut off under monsoon cloud.' },
+      { title: 'Glacial lake monitoring (ICIMOD)', text: 'Detect sudden glacial lake outburst floods (GLOFs) and rock-ice avalanches without waiting for the monsoon to end.' },
+      { title: 'Hydropower and river basins', text: 'Assess boulder and sediment surges along the Trishuli corridor, where about 2,880 people live within 1 km of the channel.' },
+    ],
   },  lorca: {
     ...CONTENT_ES.lorca,
     place: 'Alto Guadalentín · Lorca (Murcia, Spain)',
@@ -343,6 +475,38 @@ const CONTENT_EN: Record<string, CaseContent> = {
       { title: 'Seismologists', text: 'Bounding how much the surface moved helps model the fault.' },
       { title: 'Civil protection', text: 'Rule out large deformation of dams, slopes or roads within days.' },
       { title: 'Engineering', text: 'Coherence also reveals damage: collapsed buildings stop returning the same signal.' },
+    ],
+  },
+  venezuela: {
+    ...CONTENT_ES.venezuela,
+    place: 'San Felipe (Yaracuy) · Catia La Mar (La Guaira, Venezuela)',
+    dateLabel: '24 Jun 2026',
+    headline: 'Venezuela: the Mw 7.2 & 7.5 earthquake doublet that tore 200 km of coast in 39 seconds',
+    summary:
+      'On 24 June 2026 a shallow earthquake doublet (10.0 km depth, USGS) ruptured the Caribbean–South American plate boundary: an Mw 7.2 foreshock struck at 18:04:31 local time (22:04:31 UTC) 20 km east of San Felipe, Yaracuy (10.371° N, 68.556° W), followed 39 seconds later at 18:05:03 local time (22:05:03 UTC) by an Mw 7.5 mainshock 17 km west of Catia La Mar, La Guaira (10.622° N, 67.194° W). Just 12 hours later (25 Jun, 10:06 UTC), NISAR ascending track 162 captured the entire rupture corridor: together with tracks 54, 61 and 126, four L2 GUNW interferograms reveal line-of-sight displacements of up to −37.9 cm and +32.7 cm and over 102,000 ha of coherent ground deformation along the Boconó–Morón–San Sebastián fault system.',
+    notes: [{ date: '2026-06-24', label: 'Mw 7.2 + 7.5' }],
+    why: [
+      {
+        title: 'Opposite signs = right-lateral strike-slip',
+        text: 'In an ascending orbit the radar looks east; in a descending orbit it looks west. Along the Mw 7.5 coast (Chichiriviche–Catia La Mar), ascending tracks 162 and 61 measure −32.3 and −37.9 cm (moving away from the satellite), while descending track 126 measures +32.7 cm (moving towards it). That sign reversal proves horizontal right-lateral (dextral) strike-slip motion along the San Sebastián fault.',
+      },
+      {
+        title: 'The Morón surface fault trace exposed',
+        text: 'In the western rupture zone (Mw 7.2, San Felipe–Morón), the interferogram slices east–west across the Golfo Triste coast: the northern block shifts westwards (+30.5 cm on ascending track 162; −23.7 cm on descending track 54) relative to the southern block, totalling over half a metre of relative offset across the fault.',
+      },
+      {
+        title: 'L-band through tropical cloud forest',
+        text: 'The Cordillera de la Costa (Henri Pittier, Sierra de Aroa and El Ávila, up to 2,765 m) is blanketed in dense tropical cloud forest where C-band loses coherence within days. NISAR’s 23.8 cm wavelength penetrates the canopy and unwraps full 11.9 cm fringes without phase jumps.',
+      },
+      {
+        title: '12-hour response and ionospheric screen',
+        text: 'Ascending track 162 flew over Venezuela at 10:06 UTC on 25 June, only 12 hours after the doublet. At 10° N equatorial latitude across a 235 km scene, applying the split-spectrum ionospheric phase screen from the GUNW product is essential to isolate the tectonic signal.',
+      },
+    ],
+    who: [
+      { title: 'FUNVISIS & USGS', text: 'Invert coseismic slip on the Morón and San Sebastián faults by combining all four ascending and descending viewing geometries.' },
+      { title: 'Civil protection & ports', text: 'Pinpoint coastal sectors with the strongest shaking, subsidence and liquefaction around Puerto Cabello, Morón, Catia La Mar and La Guaira.' },
+      { title: 'Critical infrastructure', text: 'Prioritise inspections of the Caracas–La Guaira and Valencia–Puerto Cabello highways, coastal refineries and steep mountain slopes.' },
     ],
   },
   alora: {

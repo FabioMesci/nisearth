@@ -176,7 +176,7 @@ export class DetailView {
       this.map.addLayer({
         id: 'events', type: 'circle', source: 'events', layout: { visibility: vis },
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['get', 'mag'], 2.5, 3, 5.2, 16],
+          'circle-radius': ['interpolate', ['linear'], ['get', 'mag'], 2.5, 3, 5.2, 16, 7.5, 24],
           'circle-color': 'rgba(244,114,182,0.25)', 'circle-stroke-color': '#f472b6', 'circle-stroke-width': 1.5,
         },
       })

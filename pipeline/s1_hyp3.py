@@ -47,8 +47,16 @@ GRANULES = {
         "S1C_IW_GRDH_1SDV_20260215T181722_20260215T181747_006370_00CD06_FCEE",
         "S1A_IW_GRDH_1SDV_20260621T181835_20260621T181900_065071_0833A5_7125",
     ],
+    "rasuwa": [  # pasada 85 ascendente y 19 descendente alrededor del derrumbe / GLOF de Rasuwa (26 ago 2026)
+        "S1D_IW_GRDH_1SDV_20260804T122146_20260804T122211_003976_00737C_09BA",
+        "S1D_IW_GRDH_1SDV_20260816T122145_20260816T122210_004151_0079A3_39D9",
+        "S1D_IW_GRDH_1SDV_20260828T122146_20260828T122211_004326_007FAB_5FE3",
+        "S1D_IW_GRDH_1SDV_20260909T122147_20260809T122212_004501_0085A6_86DF",
+        "S1D_IW_GRDH_1SDV_20260824T001857_20260824T001922_004260_007D60_87BC",
+        "S1D_IW_GRDH_1SDV_20260905T001856_20260905T001921_004435_00836E_C3BA",
+    ],
 }
-PATHS = {"0609": 8, "1753": 30, "0634": 52, "1826": 147, "1817": 74, "1818": 74}  # hora de paso (HHMM) -> pasada relativa
+PATHS = {"0609": 8, "1753": 30, "0634": 52, "1826": 147, "1817": 74, "1818": 74, "1221": 85, "0018": 19}  # hora de paso (HHMM) -> pasada relativa
 
 
 def client() -> HyP3:
@@ -81,10 +89,16 @@ def clip_to_grid(tif, bbox):
     transform, w, h = grid(bbox)
     out = np.full((h, w), np.nan, "float32")
     with rasterio.open(tif) as src:
-        arr = src.read(1).astype("float32")
-        arr[(arr <= 0) | ~np.isfinite(arr)] = np.nan
-        reproject(arr, out, src_transform=src.transform, src_crs=src.crs, dst_transform=transform,
-                  dst_crs="EPSG:4326", src_nodata=np.nan, dst_nodata=np.nan, resampling=Resampling.average)
+        if str(tif).startswith("http"):
+            reproject(rasterio.band(src, 1), out, src_transform=src.transform, src_crs=src.crs,
+                      dst_transform=transform, dst_crs="EPSG:4326",
+                      src_nodata=src.nodata or -32768, dst_nodata=np.nan, resampling=Resampling.average)
+            out[(out <= 0) | ~np.isfinite(out)] = np.nan
+        else:
+            arr = src.read(1).astype("float32")
+            arr[(arr <= 0) | ~np.isfinite(arr)] = np.nan
+            reproject(arr, out, src_transform=src.transform, src_crs=src.crs, dst_transform=transform,
+                      dst_crs="EPSG:4326", src_nodata=np.nan, dst_nodata=np.nan, resampling=Resampling.average)
     with np.errstate(divide="ignore", invalid="ignore"):
         return 10 * np.log10(out)
 
@@ -126,5 +140,51 @@ def fetch():
         (dl / vv).unlink(); (dl / vh).unlink(); zips[0].unlink()  # liberar espacio
 
 
+def opera():
+    """Extrae directamente los recortes RTC de Sentinel-1 (gamma0) a la rejilla común sin esperar a HyP3."""
+    import requests
+    from urllib.parse import quote
+
+    case = sys.argv[2] if len(sys.argv) > 2 else "rasuwa"
+    cfg = CASES[case]
+    bbox = cfg["bbox"]
+    trk = cfg.get("s1_track", 85)
+    r = requests.post(
+        "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+        json={"collections": ["sentinel-1-rtc"], "bbox": list(bbox), "datetime": "2026-07-20T00:00:00Z/2026-10-01T23:59:59Z", "limit": 50},
+        timeout=60,
+    )
+    r.raise_for_status()
+    feats = [f for f in r.json().get("features", []) if f.get("properties", {}).get("sat:relative_orbit") == trk]
+    feats.sort(key=lambda f: f["properties"]["datetime"])
+    transform, w, h = grid(bbox)
+    for f in feats:
+        date = f["properties"]["datetime"][:10].replace("-", "")
+        out = WORK / case / "s1" / f"{date}_s1p{trk}.tif"
+        if out.exists():
+            print(f"[skip] {out.name}")
+            continue
+        bands = []
+        for pol in ("vv", "vh"):
+            href = f["assets"][pol]["href"]
+            js = requests.get(f"https://planetarycomputer.microsoft.com/api/sas/v1/sign?href={quote(href, safe='')}", timeout=30).json()
+            if "href" not in js:
+                break
+            bands.append(clip_to_grid(js["href"], bbox))
+        if len(bands) < 2:
+            continue
+        data = np.stack(bands)
+        if np.isnan(data[0]).mean() > 0.90:
+            print(f"[skip] {date} cobertura insuficiente")
+            continue
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with rasterio.open(out, "w", driver="GTiff", width=w, height=h, count=2, dtype="float32",
+                           crs="EPSG:4326", transform=transform, nodata=np.nan, compress="deflate") as dst:
+            dst.write(data)
+            dst.set_band_description(1, "VV_dB")
+            dst.set_band_description(2, "VH_dB")
+        print(f"[ok] {case} {out.name} cobertura {100 * np.isfinite(data[0]).mean():.0f}%", flush=True)
+
+
 if __name__ == "__main__":
-    {"submit": submit, "fetch": fetch}[sys.argv[1] if len(sys.argv) > 1 else "submit"]()
+    {"submit": submit, "fetch": fetch, "opera": opera}[sys.argv[1] if len(sys.argv) > 1 else "submit"]()

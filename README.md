@@ -1,4 +1,6 @@
-# Spain through radar · España desde el radar
+# NISEarth · what the radar saw
+
+*From Spain to the world with NISAR · De España al mundo con NISAR*
 
 **NASA Space Apps Challenge 2026 · Dancing with the SARs** · [Versión en español](README.es.md)
 
@@ -46,7 +48,7 @@ A 3D globe (globe.gl / three.js) opens onto a detailed map (MapLibre) for each c
 - change masks, cumulative InSAR displacement and coherence;
 - affected roads and railways (OpenStreetMap), land cover and exposed population;
 - validation against EFFIS, Copernicus EMS and NASA FIRMS;
-- a risk index per grid cell for the fire and flood (hazard × exposure × vulnerability, [method](docs/EVENTS_AND_RISK.md));
+- a risk index per grid cell for the fire, the floods and the subsidence cases (hazard × exposure × vulnerability, [method](docs/EVENTS_AND_RISK.md));
 - a "Spain watch" panel: active Iberian fires today (NASA FIRMS) and the next NISAR pass over each;
 - a hazard guide (fire, flood, earthquake, landslide, volcano, subsidence): what each one looks like to radar;
 - a guided story mode, and a full Spanish / English interface.
@@ -145,6 +147,7 @@ for c in venezuela cdmx langtang; do ../.venv/bin/python 08_insar.py all $c; don
 ../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
 ../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
 ../.venv/bin/python 02_extract.py nepal --track 98 && ../.venv/bin/python 03_process.py nepal
+for c in mozambique nepal lorca cdmx; do ../.venv/bin/python 07_risk.py $c; done
 ../.venv/bin/python 09_world.py                     # NASA/JPL image + "world" region (after processing)
 ../.venv/bin/python 05_external.py watch            # "Spain watch" panel: rerun right before a demo
 ```

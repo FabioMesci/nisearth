@@ -208,7 +208,9 @@
    "unit": ""
   }
  ],
- "overlays": {},
+ "overlays": {
+  "risk": "risk.geojson"
+ },
  "insar": {
   "mode": "chain",
   "product": "NISAR L2 GUNW",
@@ -298,5 +300,183 @@
   "claim": "Más de 2 cm/mes de hundimiento (25 oct 2025 – 17 ene 2026)",
   "file": "official.webp",
   "source_image": "https://d2pn8kiwq2w21t.cloudfront.net/original_images/PIA26709.jpg"
+ },
+ "risk": {
+  "generated": "2026-11-15",
+  "model": "risk = (hazard x exposure x vulnerability)^(1/3), INFORM-style geometric mean, 0-1 per cell",
+  "cell_m": [
+   525,
+   553
+  ],
+  "cells": 2706,
+  "classes": [
+   {
+    "cls": "very_low",
+    "cells": 479,
+    "area_ha": 13901,
+    "population": 64326
+   },
+   {
+    "cls": "low",
+    "cells": 712,
+    "area_ha": 20662,
+    "population": 1352386
+   },
+   {
+    "cls": "medium",
+    "cells": 503,
+    "area_ha": 14597,
+    "population": 1610057
+   },
+   {
+    "cls": "high",
+    "cells": 421,
+    "area_ha": 12217,
+    "population": 1740010
+   },
+   {
+    "cls": "very_high",
+    "cells": 591,
+    "area_ha": 17151,
+    "population": 2920483
+   }
+  ],
+  "pop_high": 4660493,
+  "pop_high_range": [
+   4304289,
+   4731058
+  ],
+  "pop_expected": 3533583,
+  "roads_high_km": 1891.4,
+  "rail_high_km": 52.7,
+  "critical_high": 1290,
+  "components": {
+   "hazard": 0.55,
+   "exposure": 0.86,
+   "vulnerability": 0.47
+  },
+  "drivers": {
+   "exposure": {
+    "population": 0.99,
+    "built": 0.95,
+    "infrastructure": 0.8,
+    "critical": 0.46
+   },
+   "vulnerability": {
+    "physical": 0.88,
+    "social": 0.31,
+    "coping": 0.09
+   }
+  },
+  "dependent_age_pct": 15.2,
+  "hotspots": [
+   {
+    "place": "Aragón",
+    "lon": -99.0525,
+    "lat": 19.4525,
+    "risk": 0.81,
+    "class": "very_high",
+    "hazard": 0.985,
+    "exposure": 1.0,
+    "vulnerability": 0.54,
+    "population": 3505.5
+   },
+   {
+    "place": "Nezahualcóyotl",
+    "lon": -99.0475,
+    "lat": 19.4325,
+    "risk": 0.805,
+    "class": "very_high",
+    "hazard": 0.991,
+    "exposure": 1.0,
+    "vulnerability": 0.526,
+    "population": 4025.3
+   },
+   {
+    "place": "Aragón",
+    "lon": -99.0675,
+    "lat": 19.4675,
+    "risk": 0.804,
+    "class": "very_high",
+    "hazard": 1.0,
+    "exposure": 1.0,
+    "vulnerability": 0.521,
+    "population": 3207.7
+   },
+   {
+    "place": "Aragón",
+    "lon": -99.0675,
+    "lat": 19.4725,
+    "risk": 0.802,
+    "class": "very_high",
+    "hazard": 0.985,
+    "exposure": 1.0,
+    "vulnerability": 0.524,
+    "population": 4343.9
+   },
+   {
+    "place": "Pueblo Santiago Acahualtepec",
+    "lon": -99.0075,
+    "lat": 19.3775,
+    "risk": 0.801,
+    "class": "very_high",
+    "hazard": 1.0,
+    "exposure": 1.0,
+    "vulnerability": 0.513,
+    "population": 4841.3
+   }
+  ],
+  "cascade": {
+   "type": "subsidence_flooding",
+   "sinking_flat_ha": 35399,
+   "flat_deg": 2,
+   "cells": 1227,
+   "roads_km": 1907.9,
+   "rail_km": 55.8
+  },
+  "stability": {
+   "runs": 300,
+   "spread_pct": 25,
+   "stable_high_pct": 76,
+   "mean_pct": 91
+  },
+  "kind": "subsidence",
+  "weights": {
+   "hazard": {
+    "w_ref_only": 1.0,
+    "w_radar_only": 1.0,
+    "edge_m": 500,
+    "w_edge": 0.25,
+    "intensity_floor": 1.0
+   },
+   "exposure": {
+    "population": 0.4,
+    "built": 0.15,
+    "infrastructure": 0.15,
+    "critical": 0.15
+   },
+   "vulnerability": {
+    "physical": 0.4,
+    "social": 0.3,
+    "coping": 0.3
+   },
+   "class_edges": [
+    0.2,
+    0.35,
+    0.5,
+    0.65
+   ]
+  },
+  "sources": [
+   "NISAR L2 GUNW interferometry, 120-day cumulative displacement (this pipeline)",
+   "WorldPop 2020 population (100 m) and age structure (1 km)",
+   "ESA WorldCover 2021 (10 m)",
+   "OpenStreetMap roads, railways, hospitals, schools, fire stations (ODbL)",
+   "Copernicus DEM GLO-30"
+  ],
+  "files": {
+   "geojson": "risk.geojson",
+   "csv": "risk.csv"
+  }
  }
 }

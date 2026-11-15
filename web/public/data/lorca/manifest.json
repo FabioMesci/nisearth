@@ -184,7 +184,9 @@
    "unit": ""
   }
  ],
- "overlays": {},
+ "overlays": {
+  "risk": "risk.geojson"
+ },
  "insar": {
   "mode": "chain",
   "product": "NISAR L2 GUNW",
@@ -252,5 +254,183 @@
     "sec": "2026-10-11"
    }
   ]
+ },
+ "risk": {
+  "generated": "2026-11-15",
+  "model": "risk = (hazard x exposure x vulnerability)^(1/3), INFORM-style geometric mean, 0-1 per cell",
+  "cell_m": [
+   440,
+   553
+  ],
+  "cells": 1189,
+  "classes": [
+   {
+    "cls": "very_low",
+    "cells": 847,
+    "area_ha": 20622,
+    "population": 7398
+   },
+   {
+    "cls": "low",
+    "cells": 337,
+    "area_ha": 8205,
+    "population": 23045
+   },
+   {
+    "cls": "medium",
+    "cells": 5,
+    "area_ha": 122,
+    "population": 555
+   },
+   {
+    "cls": "high",
+    "cells": 0,
+    "area_ha": 0,
+    "population": 0
+   },
+   {
+    "cls": "very_high",
+    "cells": 0,
+    "area_ha": 0,
+    "population": 0
+   }
+  ],
+  "pop_high": 0,
+  "pop_high_range": [
+   0,
+   0
+  ],
+  "pop_expected": 921,
+  "roads_high_km": 0.0,
+  "rail_high_km": 0.0,
+  "critical_high": 0,
+  "components": {
+   "hazard": 0.36,
+   "exposure": 0.42,
+   "vulnerability": 0.37
+  },
+  "drivers": {
+   "exposure": {
+    "population": 0.7,
+    "built": 0.22,
+    "infrastructure": 0.29,
+    "critical": 0.0
+   },
+   "vulnerability": {
+    "physical": 0.26,
+    "social": 0.49,
+    "coping": 0.42
+   }
+  },
+  "dependent_age_pct": 24.5,
+  "hotspots": [
+   {
+    "place": "Lorca",
+    "lon": -1.6525,
+    "lat": 37.5675,
+    "risk": 0.451,
+    "class": "medium",
+    "hazard": 0.564,
+    "exposure": 0.401,
+    "vulnerability": 0.404,
+    "population": 21.2
+   },
+   {
+    "place": "Puerto Lumbreras",
+    "lon": -1.7575,
+    "lat": 37.5675,
+    "risk": 0.378,
+    "class": "medium",
+    "hazard": 0.267,
+    "exposure": 0.491,
+    "vulnerability": 0.412,
+    "population": 159.7
+   },
+   {
+    "place": "Puerto Lumbreras",
+    "lon": -1.7575,
+    "lat": 37.5725,
+    "risk": 0.36,
+    "class": "medium",
+    "hazard": 0.333,
+    "exposure": 0.394,
+    "vulnerability": 0.354,
+    "population": 148.8
+   },
+   {
+    "place": "Puerto Lumbreras",
+    "lon": -1.7475,
+    "lat": 37.5725,
+    "risk": 0.353,
+    "class": "medium",
+    "hazard": 0.281,
+    "exposure": 0.447,
+    "vulnerability": 0.352,
+    "population": 121.4
+   },
+   {
+    "place": "Puerto Lumbreras",
+    "lon": -1.7625,
+    "lat": 37.5625,
+    "risk": 0.353,
+    "class": "medium",
+    "hazard": 0.348,
+    "exposure": 0.359,
+    "vulnerability": 0.351,
+    "population": 103.5
+   }
+  ],
+  "cascade": {
+   "type": "subsidence_flooding",
+   "sinking_flat_ha": 1392,
+   "flat_deg": 2,
+   "cells": 23,
+   "roads_km": 1.6,
+   "rail_km": 0.0
+  },
+  "stability": {
+   "runs": 300,
+   "spread_pct": 25,
+   "stable_high_pct": null,
+   "mean_pct": 97
+  },
+  "kind": "subsidence",
+  "weights": {
+   "hazard": {
+    "w_ref_only": 1.0,
+    "w_radar_only": 1.0,
+    "edge_m": 500,
+    "w_edge": 0.25,
+    "intensity_floor": 1.0
+   },
+   "exposure": {
+    "population": 0.4,
+    "built": 0.15,
+    "infrastructure": 0.15,
+    "critical": 0.15
+   },
+   "vulnerability": {
+    "physical": 0.4,
+    "social": 0.3,
+    "coping": 0.3
+   },
+   "class_edges": [
+    0.2,
+    0.35,
+    0.5,
+    0.65
+   ]
+  },
+  "sources": [
+   "NISAR L2 GUNW interferometry, 108-day cumulative displacement (this pipeline)",
+   "WorldPop 2020 population (100 m) and age structure (1 km)",
+   "ESA WorldCover 2021 (10 m)",
+   "OpenStreetMap roads, railways, hospitals, schools, fire stations (ODbL)",
+   "Copernicus DEM GLO-30"
+  ],
+  "files": {
+   "geojson": "risk.geojson",
+   "csv": "risk.csv"
+  }
  }
 }

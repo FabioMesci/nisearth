@@ -123,6 +123,8 @@ CASES = {
     "cdmx": {
         "title": "Subsidencia de Ciudad de México",
         "region": "world",
+        "iso3": "MEX",  # país para WorldPop (07_risk.py; por defecto ESP)
+        "risk_places": "city|town|suburb",  # nombres de colonia/alcaldía para las celdas de mayor riesgo
         "kind": "subsidence",
         "bbox": (-99.25, 19.25, -98.85, 19.60),
         # 25 oct → 22 feb (10 pares): incluye el periodo del mapa de JPL (25 oct – 17 ene). Desde finales de febrero
@@ -162,6 +164,7 @@ CASES = {
     "mozambique": {
         "title": "Inundaciones del Limpopo (Mozambique)",
         "region": "world",
+        "iso3": "MOZ",
         "kind": "flood",
         "bbox": (32.75, -25.10, 33.30, -24.40),  # Chókwè, Guijá y el bajo Limpopo
         "window": ("2025-12-01", "2026-02-15"),
@@ -180,6 +183,7 @@ CASES = {
     "nepal": {
         "title": "Riada del Bhote Koshi–Trishuli (Rasuwa, Nepal)",
         "region": "world",
+        "iso3": "NPL",  # el tramo chino (Gyirong) queda sin población WorldPop
         "kind": "flood",
         "change": "debris",  # riada relámpago en valle encajado: el agua ya no se ve; se buscan cicatrices (sedimento, deslizamientos)
         "bbox": (85.15, 27.85, 85.45, 28.35),  # de Gyirong (frontera china) a Betrawati por el corredor Bhote Koshi–Trishuli

@@ -389,9 +389,14 @@ function riskCard(m: Manifest) {
   const seen = new Set<string>()
   const hot = r.hotspots.filter((h) => !seen.has(h.place) && seen.add(h.place)).slice(0, 3)
   const idx = (name: string) => r.classes.findIndex((c) => c.cls === name)
-  const cascade = r.cascade.type === 'post_fire_runoff'
-    ? t('riskCascadeFire')(fmt(r.cascade.burned_steep_ha ?? 0), r.cascade.roads_km.toLocaleString(locale()))
-    : t('riskCascadeFlood')(fmt(r.cascade.rain_mm ?? 0), r.cascade.roads_km.toLocaleString(locale()), r.cascade.rail_km.toLocaleString(locale()))
+  const c = r.cascade
+  const km = (v: number) => v.toLocaleString(locale())
+  const cascade =
+    c.type === 'post_fire_runoff' ? t('riskCascadeFire')(fmt(c.burned_steep_ha ?? 0), km(c.roads_km))
+    : c.type === 'bank_undercutting' ? t('riskCascadeDebris')(fmt(c.steep_bank_ha ?? 0), km(c.roads_km))
+    : c.type === 'subsidence_flooding' ? t('riskCascadeSubsidence')(fmt(c.sinking_flat_ha ?? 0), km(c.roads_km), km(c.rail_km))
+    : c.cells === 0 ? t('riskCascadeFlat')(fmt(c.rain_mm ?? 0))
+    : t('riskCascadeFlood')(fmt(c.rain_mm ?? 0), km(c.roads_km), km(c.rail_km))
   return `<section class="sec risk">
     <div class="label">${t('riskTitle')}</div>
     <p class="risk-lead"><b>${fmt(r.pop_high)}</b> ${t('riskPop')(fmt(r.pop_high_range[0]), fmt(r.pop_high_range[1]))}</p>

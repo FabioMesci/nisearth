@@ -19,7 +19,8 @@ An event is one entry in `pipeline/config.py`:
 
 | Field | Meaning |
 |---|---|
-| `kind` | Hazard type: `fire` or `flood` today. The web app also accepts `earthquake`, `landslide`, `volcano`, `subsidence`. |
+| `kind` | Hazard type: `fire`, `flood`, `earthquake`, `landslide`, `volcano`, `subsidence`. The risk index runs for `fire`, `flood` (plus `change: "debris"`, a flash flood with sediment) and `subsidence`. |
+| `iso3` | Country for WorldPop population and age data (default `ESP`). |
 | `bbox` | Area of interest (lon/lat). Every raster of the event is resampled to one common grid over this box. |
 | `event` | Date of the event. |
 | `window` | Date range of the radar time series. |
@@ -63,6 +64,10 @@ Reasons for these choices:
 - **Flood, reference only = 1.0.** No radar passed during the storm. Copernicus EMS mapped the water
   the day after the peak; NISAR, four days later, still saw only 5 % of it. For the flood the reference
   is the main source and the radar confirms the residual water.
+- **Cases without an official reference** (Limpopo, Rasuwa, Lorca, Mexico City) use the radar
+  footprint alone with weight 1.0.
+- **Subsidence.** The footprint is the InSAR mask from `08_insar.py` (ground moving more than 2.5 times
+  the background noise), restricted to ground that goes down. Uplift is not counted.
 
 ---
 
@@ -95,6 +100,14 @@ hazard  = max(direct, 0.25 × edge)
 - `edge`: decays linearly from 1 at the footprint border to 0 at 1000 m (fire: embers, smoke,
   evacuation of the wildland-urban interface) or 250 m (flood: the extent is uncertain because the
   peak was not observed). Cells outside the footprint never exceed a hazard of 0.25.
+- **Debris flood** (Rasuwa): edge 300 m with weight 0.35, for bank erosion and deposits beside the
+  scoured channel.
+- **Subsidence** (Lorca, Mexico City): each sinking pixel is weighted by
+  `max(rate / 20 cm/yr, gradient / 10 cm/yr per km)`, capped at 1. The rate is the cumulative InSAR
+  displacement scaled to one year. The gradient is taken on the rate smoothed over about 500 m, because
+  at the native 50 m it is mostly noise (outside the sinking zone its 90th percentile is about 4 cm/yr per
+  km at 500 m). A gradient of 10 cm/yr per km is an angular distortion of 1/10,000 a year, which reaches
+  the usual cracking limits for buildings within a few decades. Edge 500 m with weight 0.25.
 
 ### 2.3 Exposure
 
@@ -106,7 +119,7 @@ Weighted mean of five components:
 | Built-up area | 0.15 | ESA WorldCover 2021 | 50 % of the cell built = 1 |
 | Roads and railways | 0.15 | OpenStreetMap (motorway to tertiary, rail) | 1.5 km per cell = 1, rail counts double |
 | Critical facilities | 0.15 | OpenStreetMap (hospital, clinic, school, nursing home, fire station, police) | at least one = 1 |
-| Land assets | 0.15 | ESA WorldCover | fire: share of forest and shrub; flood: share of cropland |
+| Land assets | 0.15 | ESA WorldCover | fire: share of forest and shrub; flood and debris flood: share of cropland; subsidence: not used (the other weights are rescaled) |
 
 ### 2.4 Vulnerability
 
@@ -120,16 +133,16 @@ Weighted mean of three components:
 
 Physical susceptibility coefficients (0 = unaffected, 1 = destroyed):
 
-| Land cover | Fire | Flood |
-|---|---|---|
-| Tree | 0.9 | 0.3 |
-| Shrub | 1.0 | 0.3 |
-| Grass | 0.7 | 0.3 |
-| Crop | 0.4 | 0.7 |
-| Built-up | 0.6 | 0.9 |
-| Bare | 0.05 | 0.2 |
-| Wetland | 0.2 | 0.1 |
-| Water | 0 | 0 |
+| Land cover | Fire | Flood | Debris flood | Subsidence |
+|---|---|---|---|---|
+| Tree | 0.9 | 0.3 | 0.6 | 0.1 |
+| Shrub | 1.0 | 0.3 | 0.6 | 0.1 |
+| Grass | 0.7 | 0.3 | 0.7 | 0.1 |
+| Crop | 0.4 | 0.7 | 0.9 | 0.3 |
+| Built-up | 0.6 | 0.9 | 1.0 | 1.0 |
+| Bare | 0.05 | 0.2 | 0.3 | 0.1 |
+| Wetland | 0.2 | 0.1 | 0.5 | 0.2 |
+| Water | 0 | 0 | 0 | 0 |
 
 ### 2.5 Robustness test
 
@@ -169,6 +182,41 @@ How to read it:
   (it changes class in most runs). The main message for this event stays the observation gap, not the
   risk map.
 
+Results for the cases added on 15 November 2026:
+
+| | Limpopo flood | Rasuwa debris flood | Lorca subsidence | Mexico City subsidence |
+|---|---|---|---|---|
+| Cells with hazard | 3,443 | 201 | 1,189 | 2,706 |
+| Medium risk | 11,877 ha, 17,070 people | 217 ha, 2,080 people | 122 ha, 555 people | 14,597 ha, 1.61 M people |
+| High risk | 671 ha, 1,365 people | 27 ha, 790 people | none | 12,217 ha, 1.74 M people |
+| Very high risk | none | none | none | 17,151 ha, 2.92 M people |
+| People in high cells, 5-95 % range | 289 to 2,724 | 0 to 790 | 0 | 4.30 M to 4.73 M |
+| Mean hazard / exposure / vulnerability (medium and above) | 0.73 / 0.22 / 0.54 | 0.36 / 0.48 / 0.43 | 0.36 / 0.42 / 0.37 | 0.55 / 0.86 / 0.47 |
+| Highest-risk cells near | Macarretane, Chókwè | Uttargaya (Betrawati) | Lorca, Puerto Lumbreras | Aragón, Nezahualcóyotl |
+| Cells keeping their class under ±25 % weights | 94 % | 97 % | 97 % | 91 % |
+
+- **Limpopo.** New water covers 325 km² of floodplain, mostly cropland. Risk concentrates where the
+  flood reaches the irrigation villages around Chókwè. Only 29 % of the high cells keep their class in
+  at least 80 % of the runs: the 1,365 people are a central value inside a wide range.
+- **Rasuwa.** The radar scars follow the river, but the people live on the terraces above it, so most
+  cells are low. The one high cell at Uttargaya (the Trishuli–Bhote Koshi confluence) is not robust.
+  The Chinese part of the valley (Gyirong) has no WorldPop data and counts zero people.
+- **Lorca.** The fastest sinking (about −16 cm/yr) lies under irrigated orchards south-west of the town,
+  so the risk stays medium at most. This is the expected result: Alto Guadalentín subsidence threatens
+  wells, canals and farm buildings more than the town.
+- **Mexico City.** The sinking lake bed is also the most densely populated part of the metropolis
+  (Iztapalapa, Nezahualcóyotl, Aragón, Chalco). Exposure saturates and the result is robust: 4.3 to
+  4.7 million people in high or very high cells whatever the weights.
+
+Cases without a risk index, and why:
+
+| Case | Reason |
+|---|---|
+| Krasheninnikov (Kamchatka) | No permanent population or infrastructure near the lava field: exposure is zero everywhere. |
+| Granada, La Palma, Álora | NISAR saw no deformation above the noise, so there is no hazard footprint. |
+| Venezuela (earthquake) | Coseismic displacement is not the hazard to people; shaking is. It needs the USGS ShakeMap as hazard. |
+| Langtang Lirung | The hazard is the collapse runout downstream, which the pre-collapse InSAR does not map. Rasuwa covers it. |
+
 ---
 
 ## 3. Interaction between events
@@ -204,7 +252,9 @@ where the secondary hazard is physically plausible, not that it will happen.
 | Event kind | Cascade | Formula | Current result |
 |---|---|---|---|
 | Fire | Post-fire runoff and erosion | direct hazard × slope factor (slope / 25°, capped at 1) | 14,576 ha burned on slopes steeper than 15°; 835 cells flagged, crossed by 11.2 km of main roads |
-| Flood | Rain-triggered slope failure onto infrastructure | rain factor (event rain / 200 mm) × slope factor × network density | 78.6 mm of rain; 4 cells flagged, with 5.6 km of main roads and 0.8 km of railway |
+| Flood | Rain-triggered slope failure onto infrastructure | rain factor (event rain / 200 mm) × slope factor × network density | DANA: 78.6 mm of rain; 4 cells flagged, with 5.6 km of main roads and 0.8 km of railway. Limpopo: 342.6 mm (Open-Meteo ERA5, between the passes) on a plain, no cell flagged |
+| Debris flood | Bank undercutting: landslides from the scoured banks onto the valley road | max(direct hazard, edge) × slope factor | 2,989 ha of slopes steeper than 15° within 300 m of the scars; 73 cells flagged, with 9.1 km of main roads |
+| Subsidence | Sinking flat ground ponds more rainwater each year | direct hazard × flatness (1 below 2°, 0 above 5°) | Lorca: 1,392 ha sinking on flat ground, 1.6 km of roads in flagged cells. Mexico City: 35,399 ha, 1,908 km of main roads and 56 km of railway |
 
 Slope comes from the Copernicus DEM GLO-30. It is a surface model, so tree canopy adds some noise
 to slopes in forest.
@@ -237,7 +287,10 @@ through the cascade value; the others are design rules for the next steps.
   robustness test shows how much they matter; it does not validate them.
 - **No independent validation.** There is no damage dataset to compare with.
 - **Population data are modelled** (WorldPop 2020) and do not include tourists or seasonal workers.
-  This matters on the Valencia coast, where campsites were evacuated.
+  This matters on the Valencia coast, where campsites were evacuated. Mozambique uses the UN-adjusted
+  WorldPop series, the only constrained one published for that country.
+- **InSAR measures along the line of sight.** Subsidence is treated as vertical motion. In Mexico City
+  and Lorca horizontal motion is small, so the error is minor.
 - **Social vulnerability is age only.** Income, disability, housing quality and language are not
   included. Municipal census data (INE) would improve it.
 - **Coping capacity uses straight-line distance**, not travel time on the road network.
@@ -271,7 +324,11 @@ python -m venv .venv && .venv/bin/pip install numpy scipy rasterio shapely pillo
 cd pipeline
 ../.venv/bin/python 07_risk.py niebla
 ../.venv/bin/python 07_risk.py dana
+for c in mozambique nepal lorca cdmx; do ../.venv/bin/python 07_risk.py $c; done
 ```
+
+Run `07_risk.py` after `03_process.py` / `08_insar.py`: they keep the `risk` block, but it goes stale
+if the mask changes.
 
 The first run downloads about 95 MB of open data into `data/raw/` (WorldPop population and age
 structure) and reads WorldCover, the Copernicus DEM and OpenStreetMap over the network. Later runs

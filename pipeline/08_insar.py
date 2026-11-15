@@ -485,7 +485,7 @@ def cmd_process(cid):
     # conservar lo que añaden otros pasos (contexto, Sentinel-1, eventos) si ya existía
     if man_path.exists():
         old = json.loads(man_path.read_text())
-        for k in ("overlays", "s1", "stats", "daily", "refLabel"):
+        for k in ("overlays", "s1", "stats", "daily", "refLabel", "risk"):  # risk: vuelve a correr 07_risk.py si cambia la máscara
             if k in old and old[k]:
                 manifest[k] = old[k]
     man_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=1))

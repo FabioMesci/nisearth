@@ -1,5 +1,5 @@
 /* =========================================================
-   España desde el radar — sistema visual
+   NISEarth — sistema visual
    Tinta nocturna, papel cálido, dos señales: fuego y agua.
    ========================================================= */
 :root {
@@ -75,10 +75,11 @@ button { font: inherit; color: inherit; }
 }
 
 /* ---------- cabecera ---------- */
-#brand { position: fixed; top: 28px; left: 32px; max-width: 420px; pointer-events: none; z-index: 5; text-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 2px 18px rgba(0,0,0,0.85); transition: opacity 0.4s var(--ease), transform 0.6s var(--ease); }
+#brand { position: fixed; top: 28px; left: 32px; max-width: 480px; pointer-events: none; z-index: 5; text-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 2px 18px rgba(0,0,0,0.85); transition: opacity 0.4s var(--ease), transform 0.6s var(--ease); }
 #brand h1 { margin: 0 0 14px; font: 400 64px/0.9 var(--serif); letter-spacing: -0.02em; text-wrap: balance; }
 #brand h1 span { display: block; text-transform: lowercase; }
 #brand h1 span::first-letter { text-transform: uppercase; }
+#brand h1 .name { text-transform: none; } /* NISEarth: mayúsculas propias del nombre */
 #brand h1 .accent { font-style: italic; color: var(--signal); }
 #brand h1 .accent::first-letter { text-transform: lowercase; }
 #brand p { margin: 0; max-width: 34ch; color: var(--text-2); font-size: 14.5px; line-height: 1.5; }

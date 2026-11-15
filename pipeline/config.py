@@ -190,6 +190,21 @@ CASES = {
         "debris": {"buffer_m": 300, "min_db": 3.0},
         "official": None,  # NASA no ha publicado imagen NISAR de este evento: solo nuestro procesado
     },
+    "langtang": {
+        "title": "Colapso del glaciar del Langtang Lirung (Nepal)",
+        "region": "world",
+        "kind": "landslide",
+        # origen de la riada de Rasuwa: avalancha de roca y hielo en la cara norte (5200–5400 m), 26 ago 2026 02:52 UTC
+        "bbox": (85.40, 28.18, 85.65, 28.36),
+        "window": ("2026-06-01", "2026-08-20"),  # solo ANTES del colapso: ¿se movía la ladera?
+        "event": "2026-08-26",
+        # el punto de rotura (85,525, 28,285) es hielo sin coherencia: fuera de las componentes conexas del GUNW.
+        # Serie en el punto que más se mueve a menos de 2 km (ladera a 1,7 km al O, 3860 m); la mediana en 2 km es +0,3 cm
+        "insar": {"mode": "chain", "track": 98, "hotspot": (85.5083, 28.2897), "res": 0.0005,
+                  "vmax_cm": 15.0, "fringe_cm": 5.0, "exclude_km": 3,
+                  "until": "2026-08-19"},  # el par 19→31 ago ya cruza el colapso: fuera
+        "official": None,  # sin imagen NASA; comparación con ICIMOD (hasta 30 cm, 26 jul – 19 ago) y Remote Sensing (MDPI, 2026)
+    },
 }
 
 

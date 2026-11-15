@@ -296,6 +296,8 @@ def cmd_process(cid):
     work = WORK / cid
     pairs = json.loads((work / "gunw_pairs.json").read_text())
     pairs = [p for p in pairs if (work / f"gunw_{tag(p)}.tif").exists()]
+    if ins.get("until"):  # solo pares que terminan antes de esa fecha (p. ej. antes de un colapso)
+        pairs = [p for p in pairs if p["sec"] <= ins["until"]]
     if ins["mode"] == "pairs":  # solo los pares del config, en su orden (se pueden descartar sin volver a extraer)
         want = [tuple(x) for x in ins["pairs"]]
         pairs = sorted([p for p in pairs if (p["track"], p["ref"], p["sec"]) in want], key=lambda p: want.index((p["track"], p["ref"], p["sec"])))

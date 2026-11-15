@@ -26,7 +26,7 @@ managers know when they can rely on it.
 
 ## NISAR around the world
 
-The same pipeline, applied to five events abroad. For four of them NASA/JPL published its own NISAR image; the app shows it next to ours, with credit, so judges can compare (ours is processed independently from the same public ASF data).
+The same pipeline, applied to six events abroad. For four of them NASA/JPL published its own NISAR image; the app shows it next to ours, with credit, so judges can compare (ours is processed independently from the same public ASF data).
 
 | Case | Technique | What radar shows | NASA/JPL says |
 |---|---|---|---|
@@ -34,7 +34,8 @@ The same pipeline, applied to five events abroad. For four of them NASA/JPL publ
 | 🌋 **Krasheninnikov volcano (Kamchatka)** | Backscatter change, 11 dates | New bright lobes at the NE front of the flow (13 Jul → 23 Sep); HH over them rises from −14 dB (Jun) to −4.5 dB (18 Aug), then levels off. Part of the flagged area is melting snow patches. | 17-frame time-lapse, Dec 2025 – Aug 2026 |
 | 💧 **Limpopo floods (Mozambique, Jan 2026)** | Backscatter change, 4 dates | **325 km²** of new water between 5 and 17 Jan (threshold −14 dB at the histogram valley); 5.4 km of railway and 19 km of roads under water (OSM). | Before/after, >600,000 displaced |
 | ⬇️ **Mexico City subsidence** | InSAR, 10 chained pairs (Oct–Feb) | ~37,500 ha of the old lakebed sink; **−22 cm in 120 days** at Chalco. Ramp and height fitted on the hills only (> 2,280 m). | > 2 cm/month |
-| 🌊 **Rasuwa flash flood (Nepal, 26 Aug 2026)** | Backscatter change, 6 dates | Water gone by the next pass; **385 ha** of valley floor (within 300 m of OSM rivers) change by > 3 dB. Not validated. | — (no NASA image) |
+| 🌊 **Rasuwa flood (Nepal, 26 Aug 2026)** | Backscatter change, 6 dates | Triggered by the rock–ice collapse of Langtang Lirung's north face (>1,400 dead). Water gone by the next pass; **385 ha** of valley floor (within 300 m of OSM rivers) change by > 3 dB. Not validated. | — (no NASA image) |
+| 🧊 **Langtang Lirung collapse — before (Nepal)** | InSAR, 6 chained pairs (27 May → 19 Aug) | The failing ice itself is incoherent and dropped by the GUNW. On the slope 1.7 km away: **+4.5 cm** (noise ±2.8 cm), 2.4 cm in the last 24 days; 9 other patches move > 5 cm in the same window. NISAR saw the mountain moving, not which part would fail. | — (ICIMOD: up to 30 cm; *Remote Sensing* 18:3727) |
 
 ## What the app does
 
@@ -140,7 +141,7 @@ for c in niebla dana; do
 done
 for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c; done
 # NISAR around the world / NISAR en el mundo
-for c in venezuela cdmx; do ../.venv/bin/python 08_insar.py all $c; done
+for c in venezuela cdmx langtang; do ../.venv/bin/python 08_insar.py all $c; done
 ../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
 ../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
 ../.venv/bin/python 02_extract.py nepal --track 98 && ../.venv/bin/python 03_process.py nepal

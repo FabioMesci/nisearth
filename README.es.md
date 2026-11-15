@@ -26,7 +26,7 @@ huecos, para que quien gestiona una emergencia sepa cuándo puede contar con él
 
 ## NISAR en el mundo
 
-El mismo pipeline aplicado a cinco eventos fuera de España. Para cuatro de ellos NASA/JPL publicó su propia imagen NISAR; la web la muestra junto a la nuestra, con su crédito, para poder comparar (la nuestra se procesa de forma independiente con los mismos datos públicos de ASF).
+El mismo pipeline aplicado a seis eventos fuera de España. Para cuatro de ellos NASA/JPL publicó su propia imagen NISAR; la web la muestra junto a la nuestra, con su crédito, para poder comparar (la nuestra se procesa de forma independiente con los mismos datos públicos de ASF).
 
 | Caso | Técnica | Qué muestra el radar | Qué dice NASA/JPL |
 |---|---|---|---|
@@ -34,7 +34,8 @@ El mismo pipeline aplicado a cinco eventos fuera de España. Para cuatro de ello
 | 🌋 **Volcán Krasheninnikov (Kamchatka)** | Cambio de retrodispersión, 11 fechas | Lóbulos nuevos y brillantes en el frente NE de la colada (13 jul → 23 sep); HH sobre ellos sube de −14 dB (jun) a −4,5 dB (18 ago) y se estabiliza. Parte de lo marcado son neveros que se funden. | Timelapse de 17 imágenes, dic 2025 – ago 2026 |
 | 💧 **Inundaciones del Limpopo (Mozambique, ene 2026)** | Cambio de retrodispersión, 4 fechas | **325 km²** de agua nueva entre el 5 y el 17 ene (umbral −14 dB en el valle del histograma); 5,4 km de vía férrea y 19 km de carreteras bajo el agua (OSM). | Antes/después, >600.000 desplazados |
 | ⬇️ **Subsidencia de Ciudad de México** | InSAR, 10 pares encadenados (oct–feb) | Unas 37.500 ha del antiguo lago se hunden; **−22 cm en 120 días** en Chalco. Rampa y relieve ajustados solo en los cerros (> 2.280 m). | > 2 cm/mes |
-| 🌊 **Riada de Rasuwa (Nepal, 26 ago 2026)** | Cambio de retrodispersión, 6 fechas | El agua ya no está en la siguiente pasada; **385 ha** del fondo del valle (a <300 m de los ríos de OSM) cambian más de 3 dB. Sin validar. | — (sin imagen de NASA) |
+| 🌊 **Riada de Rasuwa (Nepal, 26 ago 2026)** | Cambio de retrodispersión, 6 fechas | Provocada por el colapso de roca y hielo de la cara norte del Langtang Lirung (más de 1400 muertos). El agua ya no está en la siguiente pasada; **385 ha** del fondo del valle (a <300 m de los ríos de OSM) cambian más de 3 dB. Sin validar. | — (sin imagen de NASA) |
+| 🧊 **Colapso del Langtang Lirung — antes (Nepal)** | InSAR, 6 pares encadenados (27 may → 19 ago) | El hielo que se rompió no tiene coherencia y el GUNW lo descarta. En la ladera a 1,7 km: **+4,5 cm** (ruido ±2,8 cm), 2,4 cm en los últimos 24 días; otras 9 zonas se mueven más de 5 cm en la misma ventana. NISAR vio moverse la montaña, no qué parte iba a caer. | — (ICIMOD: hasta 30 cm; *Remote Sensing* 18:3727) |
 
 ## Qué hace la web
 
@@ -142,7 +143,7 @@ for c in niebla dana; do
 done
 for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c; done
 # NISAR around the world / NISAR en el mundo
-for c in venezuela cdmx; do ../.venv/bin/python 08_insar.py all $c; done
+for c in venezuela cdmx langtang; do ../.venv/bin/python 08_insar.py all $c; done
 ../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
 ../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
 ../.venv/bin/python 02_extract.py nepal --track 98 && ../.venv/bin/python 03_process.py nepal

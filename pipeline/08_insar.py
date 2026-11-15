@@ -347,7 +347,8 @@ def cmd_process(cid):
     out = WEB_DATA / cid
     out.mkdir(parents=True, exist_ok=True)
     for old in [*out.glob("*.webp"), *out.glob("*.png")]:
-        old.unlink()
+        if old.name != "flood-t100.png":
+            old.unlink()
     vmax, cyc = ins["vmax_cm"], ins["fringe_cm"]
     frames, series_d, series_c = [], [], []
     hx, hy = kx(hot[0]), ky(hot[1])
@@ -455,7 +456,9 @@ def cmd_process(cid):
     # conservar lo que añaden otros pasos (contexto, Sentinel-1, eventos) si ya existía
     if man_path.exists():
         old = json.loads(man_path.read_text())
-        for k in ("overlays", "s1", "stats", "daily", "refLabel"):
+        if old.get("layers", {}).get("flood_t100"):
+            manifest["layers"]["flood_t100"] = old["layers"]["flood_t100"]
+        for k in ("overlays", "s1", "stats", "daily", "refLabel", "risk"):
             if k in old and old[k]:
                 manifest[k] = old[k]
     man_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=1))

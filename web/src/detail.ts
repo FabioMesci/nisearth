@@ -9,7 +9,7 @@ import type { Manifest, Frame, Sensor } from './types'
 import { t, fmtDay, fmtDec } from './i18n'
 
 export type Pol = 'hh' | 'hv' | 'rgb'
-export type ViewMode = 'compare' | 'timeline' | 'change'
+export type ViewMode = 'compare' | 'timeline' | 'change' | 'flood'
 
 /** Risk classes, very low to very high */
 export const RISK_COLORS = ['#5b6b86', '#f2d96b', '#f5a03b', '#e4572e', '#a3123b']
@@ -29,6 +29,7 @@ const loadImg = (url: string) =>
 
 export class DetailView {
   map: MLMap
+  private mapReady: Promise<void>
   private el: HTMLElement
   private m?: Manifest
   private base = ''
@@ -74,6 +75,7 @@ export class DetailView {
       zoom: 5,
       attributionControl: { compact: true },
     })
+    this.mapReady = new Promise<void>((resolve) => this.map.once('load', () => resolve()))
     this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     this.map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left')
     this.map.on('move', () => this.placeHandle())
@@ -91,10 +93,10 @@ export class DetailView {
           ${p.place ? `<div class="rp-place">${t('riskNear')(p.place)}</div>` : ''}
           ${bar(t('riskH'), p.hazard)}${bar(t('riskE'), p.exposure)}${bar(t('riskV'), p.vulnerability)}
           <dl><dt>${t('riskCellPop')}</dt><dd>${Math.round(p.population)}</dd>
-          <dt>${t('riskCellRoads')}</dt><dd>${fmtDec(+p.roads_km + +p.rail_km, 1)} km</dd>
+          ${this.m?.risk?.scenario === 'snczi_t100_limited' ? '' : `<dt>${t('riskCellRoads')}</dt><dd>${fmtDec(+p.roads_km + +p.rail_km, 1)} km</dd>
           <dt>${t('riskCellHosp')}</dt><dd>${fmtDec(p.hospital_km, 1)} km</dd>
-          <dt>${t('riskCellAge')}</dt><dd>${Math.round(p.dependent_age_pct)} %</dd>
-          <dt>${t('riskCellSlope')}</dt><dd>${fmtDec(p.slope_deg, 1)}°</dd>
+          <dt>${t('riskCellAge')}</dt><dd>${Math.round(p.dependent_age_pct)} %</dd>`}
+          ${this.m?.risk?.scenario === 'snczi_t100_limited' ? '' : `<dt>${t('riskCellSlope')}</dt><dd>${fmtDec(p.slope_deg, 1)}°</dd>`}
           <dt>${t('riskCellStab')}</dt><dd>${Math.round(p.stability * 100)} %</dd></dl>`,
         )
         .addTo(this.map)
@@ -105,7 +107,7 @@ export class DetailView {
   }
 
   private ready() {
-    return this.map.loaded() ? Promise.resolve() : new Promise<void>((r) => this.map.once('load', () => r()))
+    return this.mapReady
   }
 
   private img(name: string, base = this.base) {
@@ -263,7 +265,8 @@ export class DetailView {
     const f = set.frames[Math.min(this.frameIdx, set.frames.length - 1)]
     // cargar antes de borrar: si mientras tanto llega otro repintado, este se descarta (sin parpadeos ni imágenes cruzadas)
     const imgs =
-      mode === 'change' ? [await this.img(set.change!)]
+      mode === 'flood' && this.m.layers.flood_t100 && set.change ? await Promise.all([this.img(set.change), this.img(this.m.layers.flood_t100)])
+      : mode === 'change' ? [await this.img(set.change!)]
       : mode === 'timeline' ? [await this.img(this.layerOf(f))]
       : await Promise.all([this.img(this.layerOf(this.frameFor('after'))), this.img(this.layerOf(this.frameFor('before')))])
     if (seq !== this.renderSeq) return
@@ -272,6 +275,16 @@ export class DetailView {
     const { width: W, height: H } = this.canvas
     ctx.clearRect(0, 0, W, H)
     ctx.drawImage(imgs[0], 0, 0, W, H)
+    if (mode === 'flood' && imgs[1]) {
+      // El escenario modelado solo aparece a la derecha del deslizador; el InSAR permanece debajo.
+      const x = Math.round(this.split * W)
+      ctx.save()
+      ctx.beginPath()
+      ctx.rect(x, 0, W - x, H)
+      ctx.clip()
+      ctx.drawImage(imgs[1], 0, 0, W, H)
+      ctx.restore()
+    }
     if (mode === 'compare') {
       const b = imgs[1]
       const sx = Math.round(this.split * W)
@@ -352,7 +365,7 @@ export class DetailView {
 
   // ---------- deslizador antes/después sobre el mapa ----------
   private placeHandle() {
-    const on = !!this.m && this.mode === 'compare' && !this.el.classList.contains('hidden')
+    const on = !!this.m && (this.mode === 'compare' || this.mode === 'flood') && !this.el.classList.contains('hidden')
     this.handle.classList.toggle('hidden', !on)
     this.labels.classList.toggle('hidden', !on)
     if (!on || !this.m) return
@@ -366,7 +379,10 @@ export class DetailView {
     this.handle.style.height = `${Math.max(40, Math.min(rect.height, bot.y) - Math.max(0, top.y))}px`
     const fmt = (d: string) => fmtDay(d)
     const pr = this.set.pair
-    if (this.m.insar && this.sensor === 'L') {
+    if (this.mode === 'flood') {
+      document.getElementById('lbl-before')!.textContent = t('floodBefore')
+      document.getElementById('lbl-after')!.textContent = t('floodAfter')
+    } else if (this.m.insar && this.sensor === 'L') {
       // interferogramas: cada lado es un par (fecha inicial → final)
       const a = this.frameFor('before'), b = this.frameFor('after')
       const lbl = (f: Frame) => `${fmt(f.ref ?? f.date)} → ${fmt(f.date)}${this.m!.insar!.mode === 'pairs' ? ` · ${f.track}${f.dir === 'A' ? '↑' : '↓'}` : ''}`

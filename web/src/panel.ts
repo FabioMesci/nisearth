@@ -56,6 +56,7 @@ export class Panel {
           <button data-v="timeline">${t('timeline')}</button>
           <button data-v="change">${t('change')}</button>
         </div>
+        ${m.layers.flood_t100 ? `<div class="seg" id="seg-flood"><button data-v="flood">${t('floodCompare')}</button></div>` : ''}
         ${m.s1 ? `<div class="seg" id="seg-sensor">
           <button data-v="L" title="NISAR · 24 cm">${t('bandL')}</button>
           <button data-v="C" title="Sentinel-1 · 5.5 cm">${t('bandC')}</button>
@@ -143,6 +144,11 @@ export class Panel {
       v.setMode(b.dataset.v as ViewMode)
       this.sync()
     }
+    this.el.querySelector<HTMLElement>('#seg-flood')?.addEventListener('click', () => {
+      this.stop()
+      v.setMode('flood')
+      this.sync()
+    })
     const segSensor = this.el.querySelector<HTMLElement>('#seg-sensor')
     if (segSensor)
       segSensor.onclick = (e) => {
@@ -208,6 +214,7 @@ export class Panel {
   private sync() {
     const v = this.view
     this.el.querySelectorAll<HTMLButtonElement>('#seg-mode button').forEach((b) => b.classList.toggle('on', b.dataset.v === v.mode))
+    this.el.querySelector<HTMLButtonElement>('#seg-flood button')?.classList.toggle('on', v.mode === 'flood')
     const ins = this.m?.insar && v.sensor === 'L' ? this.m.insar : undefined
     this.el.querySelectorAll<HTMLButtonElement>('#seg-pol button').forEach((b) => {
       b.classList.toggle('on', b.dataset.v === v.pol)
@@ -225,7 +232,7 @@ export class Panel {
     })
     const lg = this.el.querySelector<HTMLElement>('#legend-scale')
     if (lg) {
-      const show = ins ? (v.mode === 'change' ? 'hh' : v.pol) : null
+      const show = ins ? (v.mode === 'change' || v.mode === 'flood' ? 'hh' : v.pol) : null
       const n = (x: number) => fmtDec(x, 1)
       lg.innerHTML = !ins || !show ? ''
         : show === 'hh' ? `<div class="ls-bar disp"></div><div class="ls-ticks"><span>−${n(ins.vmax_cm)} cm</span><span>0</span><span>+${n(ins.vmax_cm)} cm</span></div><div class="ls-ticks sub"><span>${t('legendAway')}</span><span>${t('legendToward')}</span></div>`
@@ -233,10 +240,10 @@ export class Panel {
         : `<div class="ls-bar coh"></div><div class="ls-ticks"><span>0</span><span>${t('legendCoh')}</span><span>1</span></div>`
     }
     this.el.querySelectorAll<HTMLButtonElement>('#seg-sensor button').forEach((b) => b.classList.toggle('on', b.dataset.v === v.sensor))
-    this.el.querySelector<HTMLElement>('#seg-pol')!.classList.toggle('disabled', v.mode === 'change')
+    this.el.querySelector<HTMLElement>('#seg-pol')!.classList.toggle('disabled', v.mode === 'change' || v.mode === 'flood')
     const hints: Record<ViewMode, string> = ins
-      ? { compare: t('hintCompareI'), timeline: t('hintTimelineI'), change: t('hintChangeI') }
-      : { compare: t('hintCompare'), timeline: t('hintTimeline'), change: t('hintChange') }
+      ? { compare: t('hintCompareI'), timeline: t('hintTimelineI'), change: t('hintChangeI'), flood: t('floodHint') }
+      : { compare: t('hintCompare'), timeline: t('hintTimeline'), change: t('hintChange'), flood: t('floodHint') }
     this.el.querySelector('#mode-hint')!.textContent = hints[v.mode]
     if (v.mode !== 'timeline') this.el.querySelector('#frame-date')!.textContent = ''
   }
@@ -397,12 +404,13 @@ function riskCard(m: Manifest) {
   const seen = new Set<string>()
   const hot = r.hotspots.filter((h) => !seen.has(h.place) && seen.add(h.place)).slice(0, 3)
   const idx = (name: string) => r.classes.findIndex((c) => c.cls === name)
-  const cascade = r.cascade.type === 'post_fire_runoff'
-    ? t('riskCascadeFire')(fmt(r.cascade.burned_steep_ha ?? 0), r.cascade.roads_km.toLocaleString(locale()))
-    : t('riskCascadeFlood')(fmt(r.cascade.rain_mm ?? 0), r.cascade.roads_km.toLocaleString(locale()), r.cascade.rail_km.toLocaleString(locale()))
+  const cascade = r.cascade?.type === 'post_fire_runoff'
+    ? t('riskCascadeFire')(fmt(r.cascade?.burned_steep_ha ?? 0), (r.cascade?.roads_km ?? 0).toLocaleString(locale()))
+    : t('riskCascadeFlood')(fmt(r.cascade?.rain_mm ?? 0), (r.cascade?.roads_km ?? 0).toLocaleString(locale()), (r.cascade?.rail_km ?? 0).toLocaleString(locale()))
   return `<section class="sec risk">
     <div class="label">${t('riskTitle')}</div>
-    <p class="risk-lead"><b>${fmt(r.pop_high)}</b> ${t('riskPop')(fmt(r.pop_high_range[0]), fmt(r.pop_high_range[1]))}</p>
+    ${r.scenario === 'snczi_t100_limited' ? `<p class="hint">${lang === 'es' ? 'Escenario fluvial T100 del SNCZI: peligrosidad modelada, no inundación observada. El índice clasifica celdas para exploración; no predice daños ni es comparable directamente con Valencia. Sin color no significa ausencia de riesgo. Versión reducida: usa población, suelo construido y cultivos como exposición y solo susceptibilidad física de cobertura como vulnerabilidad. No incluye edad, vías ni servicios. Los pesos son supuestos.' : 'SNCZI T100 river scenario: modelled hazard, not an observed flood. This screening index ranks cells; it does not predict damage and is not directly comparable with Valencia. No colour does not mean no risk. Limited version: exposure uses population, built land and cropland; vulnerability uses only physical land-cover susceptibility. Age, roads and services are omitted. Weights are assumed.'}</p>` : ''}
+    <p class="risk-lead"><b>${fmt(r.pop_high)}</b> ${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `personas estimadas viven en celdas clasificadas como altas o muy altas (${fmt(r.pop_high_range[0])}–${fmt(r.pop_high_range[1])} al variar los pesos de exposición). No son personas afectadas observadas.` : `estimated people live in cells classified high or very high (${fmt(r.pop_high_range[0])}–${fmt(r.pop_high_range[1])} when exposure weights vary). They are not observed flood victims.`) : t('riskPop')(fmt(r.pop_high_range[0]), fmt(r.pop_high_range[1]))}</p>
     <div class="lc-bar" role="img" aria-label="${rows.map((c) => `${names[c.i]} ${fmt(c.area_ha)} ha`).join(', ')}">
       ${rows.map((c) => `<i style="flex:${Math.max(c.area_ha / total, 0.01)};background:${RISK_COLORS[c.i]}" title="${names[c.i]}: ${fmt(c.area_ha)} ha"></i>`).join('')}
     </div>
@@ -419,13 +427,13 @@ function riskCard(m: Manifest) {
       <p class="hint">${t('riskHot')}</p>
       ${hot.map((h) => `<div><span>${t('riskNear')(h.place)}</span><b style="color:${RISK_COLORS[idx(h.class)]}">${names[idx(h.class)]} · ${fmtDec(h.risk)}</b></div>`).join('')}
     </div>
-    <p class="hint">${cascade}</p>
-    <p class="hint">${t('riskStable')(r.stability.mean_pct, r.stability.runs, r.stability.spread_pct)}</p>
+    ${r.cascade ? `<p class="hint">${cascade}</p>` : ''}
+    <p class="hint">${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `Estabilidad media de clase: ${r.stability.mean_pct} % en ${r.stability.runs} simulaciones variando ±${r.stability.spread_pct} % los pesos de exposición; escenario T100 y vulnerabilidad física fijos.` : `Mean class stability: ${r.stability.mean_pct}% in ${r.stability.runs} simulations varying exposure weights by ±${r.stability.spread_pct}%; T100 scenario and physical vulnerability held fixed.`) : t('riskStable')(r.stability.mean_pct, r.stability.runs, r.stability.spread_pct)}</p>
     <div class="risk-dl">
       <a class="btn ghost" href="/data/${m.id}/${r.files.csv}" download="${m.id}_risk.csv">CSV</a>
       <a class="btn ghost" href="/data/${m.id}/${r.files.geojson}" download="${m.id}_risk.geojson">GeoJSON</a>
     </div>
-    <p class="hint src-inline">${t('riskMethod')(r.cell_m[0], r.cell_m[1])}</p>
+    <p class="hint src-inline">${r.scenario === 'snczi_t100_limited' ? (lang === 'es' ? `Rejilla de ${r.cell_m[0]} × ${r.cell_m[1]} m. Fuentes: SNCZI T100, WorldPop 2020 y ESA WorldCover 2021.` : `${r.cell_m[0]} × ${r.cell_m[1]} m grid. Sources: SNCZI T100, WorldPop 2020 and ESA WorldCover 2021.`) : t('riskMethod')(r.cell_m[0], r.cell_m[1])}</p>
   </section>`
 }
 

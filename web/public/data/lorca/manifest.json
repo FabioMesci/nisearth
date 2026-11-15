@@ -112,7 +112,8 @@
  ],
  "layers": {
   "mask": "mask.png",
-  "change": "change.webp"
+  "change": "change.webp",
+  "flood_t100": "flood-t100.png"
  },
  "series": {
   "dates": [
@@ -184,7 +185,9 @@
    "unit": ""
   }
  ],
- "overlays": {},
+ "overlays": {
+  "risk": "risk.geojson"
+ },
  "insar": {
   "mode": "chain",
   "product": "NISAR L2 GUNW",
@@ -252,5 +255,140 @@
     "sec": "2026-10-11"
    }
   ]
+ },
+ "risk": {
+  "scenario": "snczi_t100_limited",
+  "generated": "2026-11-15",
+  "model": "screening = (fraction T100 * exposure * physical susceptibility)^(1/3)",
+  "cell_m": [
+   440,
+   553
+  ],
+  "cells": 776,
+  "classes": [
+   {
+    "cls": "very_low",
+    "cells": 163,
+    "area_ha": 3969,
+    "population": 2299
+   },
+   {
+    "cls": "low",
+    "cells": 240,
+    "area_ha": 5843,
+    "population": 27722
+   },
+   {
+    "cls": "medium",
+    "cells": 219,
+    "area_ha": 5332,
+    "population": 21713
+   },
+   {
+    "cls": "high",
+    "cells": 136,
+    "area_ha": 3311,
+    "population": 20344
+   },
+   {
+    "cls": "very_high",
+    "cells": 18,
+    "area_ha": 438,
+    "population": 3458
+   }
+  ],
+  "pop_high": 23802,
+  "pop_high_range": [
+   20962,
+   24827
+  ],
+  "components": {
+   "hazard": 0.64,
+   "exposure": 0.41,
+   "vulnerability": 0.57
+  },
+  "drivers": {
+   "exposure": {
+    "population": 0.44,
+    "built": 0.21,
+    "land": 0.52
+   },
+   "vulnerability": {
+    "physical": 0.57
+   }
+  },
+  "hotspots": [
+   {
+    "place": "37.6025, -1.6775",
+    "lon": -1.6775,
+    "lat": 37.6025,
+    "risk": 0.725,
+    "class": "very_high",
+    "population": 46.7
+   },
+   {
+    "place": "37.6075, -1.6675",
+    "lon": -1.6675,
+    "lat": 37.6075,
+    "risk": 0.72,
+    "class": "very_high",
+    "population": 34.2
+   },
+   {
+    "place": "37.6075, -1.6475",
+    "lon": -1.6475,
+    "lat": 37.6075,
+    "risk": 0.704,
+    "class": "very_high",
+    "population": 36.9
+   },
+   {
+    "place": "37.5825, -1.7775",
+    "lon": -1.7775,
+    "lat": 37.5825,
+    "risk": 0.701,
+    "class": "very_high",
+    "population": 164.9
+   },
+   {
+    "place": "37.6225, -1.6725",
+    "lon": -1.6725,
+    "lat": 37.6225,
+    "risk": 0.699,
+    "class": "very_high",
+    "population": 84.4
+   }
+  ],
+  "stability": {
+   "runs": 300,
+   "spread_pct": 25,
+   "mean_pct": 96
+  },
+  "weights": {
+   "exposure": {
+    "population": 0.4,
+    "built": 0.15,
+    "land": 0.15
+   },
+   "physical_susceptibility": {
+    "tree": 0.3,
+    "shrub": 0.3,
+    "grass": 0.3,
+    "crop": 0.7,
+    "built": 0.9,
+    "bare": 0.2,
+    "water": 0.0,
+    "wetland": 0.1
+   }
+  },
+  "sources": [
+   "MITECO SNCZI T100 fluvial (WFS, escenario modelado)",
+   "WorldPop 2020 población (100 m)",
+   "ESA WorldCover 2021 (10 m)"
+  ],
+  "files": {
+   "geojson": "risk.geojson",
+   "csv": "risk.csv"
+  }
  }
 }

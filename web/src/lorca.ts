@@ -27,7 +27,7 @@ export function lorcaHtml(m: Manifest) {
     <div class="chart-box lorca-chart"><canvas id="lorca-chart" role="img" aria-label="${s.axisD}; ${s.axisR}"></canvas></div>
     <p class="hint" id="lorca-rain-status" role="status">${s.loading}</p><p class="hint">${s.caution}</p><p class="hint">${s.map}</p>
     <details class="why"><summary>${s.intervals}</summary><ul>${m.insar!.pairs.map(p => `<li>${fmtDay(p.ref)} → ${fmtDay(p.sec)} · 159 A</li>`).join('')}</ul></details>
-    <details class="why"><summary>${s.sources}</summary><p>${s.insar}</p><p>${s.meta}</p><p><a href="https://nisar-docs.asf.alaska.edu/gunw/" target="_blank" rel="noopener">NASA / ASF · GUNW</a> · <a href="https://open-meteo.com/en/docs/historical-weather-api" target="_blank" rel="noopener">Open-Meteo · ERA5</a> · <a href="/data/lorca/rain-era5.json" target="_blank" rel="noopener">ERA5 JSON</a> · <a href="/data/lorca/manifest.json" target="_blank" rel="noopener">Manifest</a></p></details></section>`
+    <details class="why"><summary>${s.sources}</summary><p>${s.insar}</p><p>${s.meta}</p><p><a href="https://nisar-docs.asf.alaska.edu/gunw/" target="_blank" rel="noopener">NASA / ASF · GUNW</a> · <a href="https://open-meteo.com/en/docs/historical-weather-api" target="_blank" rel="noopener">Open-Meteo · ERA5</a> · <a href="/data/lorca/rain-era5.json" target="_blank" rel="noopener">ERA5 JSON</a> · <a href="https://www.miteco.gob.es/es/cartografia-y-sig/ide/directorio_datos_servicios/agua.html" target="_blank" rel="noopener">MITECO · SNCZI T100</a> · <a href="/data/lorca/manifest.json" target="_blank" rel="noopener">Manifest</a></p></details></section>`
 }
 
 export async function drawLorca(m: Manifest, el: HTMLElement) {

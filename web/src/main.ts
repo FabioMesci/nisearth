@@ -161,6 +161,7 @@ async function main() {
       el.innerHTML = t(el.dataset.i18n as Parameters<typeof t>[0]) as string
     })
     document.querySelectorAll<HTMLButtonElement>('#lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang))
+    document.title = lang === 'en' ? 'Spain through radar · NISAR' : 'España desde el radar · NISAR'
     $('slider-handle').setAttribute('aria-label', t('sliderAria'))
     document.querySelectorAll('.sheet-grip').forEach((g) => g.setAttribute('aria-label', t('sheetGrip')))
   }

@@ -1,3 +1,4 @@
+import { lorcaHtml, drawLorca } from './lorca'
 import { Chart, LineController, LineElement, PointElement, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Filler } from 'chart.js'
 import { RISK_COLORS, type DetailView, type ViewMode, type Pol } from './detail'
 import type { Manifest } from './types'
@@ -31,6 +32,8 @@ export class Panel {
 
   /** Pinta el panel a partir del estado de la vista (los valores por defecto de cada caso los fija DetailView.open) */
   render(m: Manifest) {
+    const oldLorca = this.el.querySelector<HTMLCanvasElement>('#lorca-chart')
+    if (oldLorca) Chart.getChart(oldLorca)?.destroy()
     this.m = m
     const c = CONTENT[m.id]
     const meta = KIND_META[m.kind]
@@ -80,20 +83,21 @@ export class Panel {
         <div class="legend-scale" id="legend-scale"></div>
         <label class="opacity"><span>${t('opacity')}</span><input type="range" id="opacity" min="0" max="1" step="0.05" value="${v.sarOpacity}" /></label>
         <p class="hint" id="mode-hint"></p>
+        <p class="hint" id="layer-error" role="status"></p>
       </section>
 
       <section class="metrics">
-        ${m.metrics.map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${lang === 'en' ? ({ 'cm/año': 'cm/yr', 'hab.': 'people' } as Record<string, string>)[x.unit] ?? x.unit : x.unit}</small></b><span>${metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
+        ${m.metrics.filter((x) => m.id !== 'lorca' || !['insar_rate', 'insar_area'].includes(x.id)).map((x) => `<div class="metric"><b>${fmtNum(x.value)}<small> ${lang === 'en' ? ({ 'cm/año': 'cm/yr', 'hab.': 'people' } as Record<string, string>)[x.unit] ?? x.unit : x.unit}</small></b><span>${m.id === 'lorca' && x.id === 'insar_cum' ? (lang === 'es' ? 'Desplazamiento LOS preliminar en el punto seleccionado' : 'Preliminary LOS displacement at selected point') : metricLabel(x.id, m.kind, x.label)}</span></div>`).join('')}
       </section>
 
       ${m.risk ? riskCard(m) : ''}
 
       ${m.landcover ? landcoverCard(m) : ''}
 
-      <section class="sec">
+      ${m.id === 'lorca' ? lorcaHtml(m) : `<section class="sec">
         <div class="label">${m.insar ? t('chartInsar')(m.insar.mode === 'pairs') : t('chart')}</div>
         <div class="chart-box"><canvas id="chart"></canvas></div>
-      </section>
+      </section>`}
 
       ${m.daily ? `<section class="sec">
         <div class="label">${m.daily.kind === 'rain' ? t('rainChart')(m.daily.place ?? '') : t('firmsChart')}</div>
@@ -112,14 +116,20 @@ export class Panel {
       </section>
 
       <footer class="src">
-        ${m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
+        ${m.id === 'lorca' ? (lang === 'es' ? 'Fuentes y limitaciones en la comparación anterior.' : 'Sources and limitations are listed in the comparison above.') : m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
       </footer>
     `
+    this.view.onLayerError = () => {
+      const status = this.el.querySelector<HTMLElement>('#layer-error')
+      if (status) status.textContent = lang === 'es' ? 'No se pudo cargar una capa del mapa. Comprueba la conexión o prueba otra vista.' : 'A map layer could not be loaded. Check the connection or try another view.'
+    }
+    if (this.view.layerError) this.view.onLayerError()
     this.bind(m)
     // las dos casillas de riesgo (controles y tarjeta) reflejan el estado de la vista
     this.el.querySelectorAll<HTMLInputElement>('#chk-risk, #chk-risk2').forEach((c) => (c.checked = v.showRisk))
     this.sync()
-    this.drawChart(m)
+    if (m.id === 'lorca') { this.chart?.destroy(); this.chart = undefined; void drawLorca(m, this.el) }
+    else this.drawChart(m)
     this.drawDaily(m)
   }
 

@@ -50,6 +50,8 @@ export class DetailView {
   showEvents = true
   private popup?: maplibregl.Popup
   sarOpacity = 0.9
+  layerError = false
+  onLayerError?: () => void
   onFrame?: (f: Frame, i: number) => void
 
   constructor(el: HTMLElement) {
@@ -75,6 +77,7 @@ export class DetailView {
     this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     this.map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left')
     this.map.on('move', () => this.placeHandle())
+    this.map.on('error', () => { this.layerError = true; this.onLayerError?.() })
     this.map.on('click', 'risk', (e) => {
       const p = e.features?.[0]?.properties
       if (!p) return
@@ -109,7 +112,11 @@ export class DetailView {
     const url = `${base}/${name}`
     const hit = this.cache.get(url)
     if (hit) return Promise.resolve(hit)
-    return loadImg(url).then((i) => (this.cache.set(url, i), i))
+    return loadImg(url).then((i) => (this.cache.set(url, i), i)).catch(async () => {
+      this.layerError = true
+      this.onLayerError?.()
+      return loadImg('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')
+    })
   }
 
   /** Contadores para descartar aperturas y repintados que otro más reciente ha dejado obsoletos */
@@ -118,6 +125,7 @@ export class DetailView {
 
   async open(m: Manifest) {
     const seq = ++this.openSeq
+    this.layerError = false
     await this.ready()
     const base = `/data/${m.id}`
     // primero todo lo asíncrono; el mapa solo se toca si nadie ha abierto otro caso mientras tanto

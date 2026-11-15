@@ -439,3 +439,7 @@ body.in-detail #lang { right: 436px; }
   .hz-head h2 { font-size: 20px; line-height: 1.2; }
   .hz header { flex-wrap: wrap; }
 }
+
+.lorca-chart { height: 260px; margin: 12px 0; }
+.lorca-comparison a { color: #8dcff5; }
+.lorca-comparison ul { padding-left: 20px; color: var(--muted); font-size: 12px; }

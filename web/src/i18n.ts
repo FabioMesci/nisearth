@@ -39,9 +39,9 @@ export const fmtDay = (d: string, opts: Intl.DateTimeFormatOptions = { day: 'num
 const UI = {
   es: {
     kicker: 'NASA Space Apps 2026 · Dancing with the SARs',
-    title1: 'ESPAÑA',
-    title2: 'DESDE EL RADAR',
-    tagline: 'Incendios, inundaciones y terreno que se mueve en la España de 2026, vistos por <strong>NISAR</strong>, el radar que ve a través de las nubes y el humo y mide el suelo al centímetro.',
+    title1: 'NISEarth',
+    title2: 'lo que vio el radar',
+    tagline: 'Incendios, inundaciones y terreno que se mueve en 2026, de España al mundo, vistos por <strong>NISAR</strong>, el radar que ve a través de las nubes y el humo y mide el suelo al centímetro.',
     incidents: 'Incidentes 2026',
     story: 'Ver la historia',
     back: 'Volver al globo',
@@ -107,6 +107,14 @@ const UI = {
     railOsm: 'Vías de tren (OpenStreetMap)',
     groupSurface: 'Superficie · antes y después',
     groupGround: 'Terreno que se mueve · interferometría',
+    groupWorld: 'NISAR en el mundo',
+    maskLava: 'Lava nueva',
+    maskDebris: 'Cauce arrasado',
+    official: 'Comparación con NASA / JPL',
+    officialNote: (d: string) => `Imagen publicada por NASA el ${d}. La nuestra (mapa) sale de los mismos datos públicos procesados con nuestro pipeline, de forma independiente.`,
+    officialSays: 'NASA dice',
+    officialLink: 'Ver la publicación original',
+    officialCredit: 'Crédito',
     polDisp: 'Movimiento',
     polFringe: 'Franjas',
     polCoh: 'Coherencia',
@@ -124,8 +132,9 @@ const UI = {
     hintTimelineI: 'Cada fotograma es un interferograma NISAR. En la serie encadenada, cada intervalo disponible se suma al anterior.',
     hintChangeI: 'Movimiento total entre la primera y la última pasada, en la línea de visión del satélite.',
     pairLbl: (a: string, b: string, trk: number, dir: string) => `${a} → ${b} · pasada ${trk} ${dir === 'A' ? 'asc' : 'desc'}`,
-    sourceInsar: (n: number, a: string, b: string, s1: boolean, ref: string) =>
-      `Datos: NASA-ISRO NISAR L2 GUNW (interferogramas banda L, ${n} pares) vía ASF DAAC · ${a} → ${b} · rampa (órbita e ionosfera suave) y atmósfera ligada al relieve (Copernicus DEM) estimadas en la escena` +
+    sourceInsar: (n: number, a: string, b: string, s1: boolean, ref: string, offset = false) =>
+      `Datos: NASA-ISRO NISAR L2 GUNW (interferogramas banda L, ${n} pares) vía ASF DAAC · ${a} → ${b} · ` +
+      (offset ? 'sin rampa ni corrección de relieve (la deformación cubre la escena): cero fijado en el campo lejano' : 'rampa (órbita e ionosfera suave) y atmósfera ligada al relieve (Copernicus DEM) estimadas en la escena') +
       (s1 ? ' · Copernicus Sentinel-1 (banda C) procesado con ASF HyP3' : '') + (ref ? ` · ${ref}` : ''),
     sheetGrip: 'Subir o bajar el panel',
     explore: 'Explorar',
@@ -167,6 +176,9 @@ const UI = {
     riskNear: (p: string) => `cerca de ${p}`,
     riskCascadeFire: (ha: string, km: string) => `Efecto en cascada: ${ha} ha quemadas en pendientes de más de 15°, donde ahora la lluvia provoca escorrentía y erosión. ${km} km de carreteras principales cruzan las celdas más expuestas.`,
     riskCascadeFlood: (mm: string, roads: string, rail: string) => `Efecto en cascada: cayeron ${mm} mm de lluvia sobre laderas empinadas por encima de ${roads} km de carreteras principales y ${rail} km de vía férrea, donde son posibles los deslizamientos.`,
+    riskCascadeFlat: (mm: string) => `Efecto en cascada: cayeron ${mm} mm de lluvia entre las dos pasadas, pero sobre una llanura: no hay laderas empinadas que puedan deslizarse sobre carreteras o vías.`,
+    riskCascadeDebris: (ha: string, km: string) => `Efecto en cascada: la riada socavó las orillas al pie de ${ha} ha de laderas de más de 15°, que ahora pueden deslizarse. ${km} km de carreteras principales cruzan las celdas más expuestas.`,
+    riskCascadeSubsidence: (ha: string, roads: string, rail: string) => `Efecto en cascada: ${ha} ha que se hunden son llanas (menos de 2°), así que cada año encharcan más con la lluvia. ${roads} km de carreteras principales y ${rail} km de vía férrea cruzan las celdas más expuestas.`,
     riskStable: (p: number, runs: number, spread: number) => `Robustez: las celdas mantuvieron su clase en el ${p} % de ${runs} simulaciones variando cada peso hasta ±${spread} %.`,
     riskMethod: (x: number, y: number) => `Índice de cribado en una rejilla de ${x} × ${y} m, solo con datos abiertos. Ordena las celdas dentro de este evento; no es una estimación de daños. Método: docs/EVENTS_AND_RISK.md`,
     riskCellPop: 'Personas',
@@ -185,9 +197,9 @@ const UI = {
   },
   en: {
     kicker: 'NASA Space Apps 2026 · Dancing with the SARs',
-    title1: 'SPAIN',
-    title2: 'THROUGH RADAR',
-    tagline: 'Wildfires, floods and moving ground in 2026 Spain, seen by <strong>NISAR</strong>, the radar that sees through clouds and smoke and measures the ground to the centimetre.',
+    title1: 'NISEarth',
+    title2: 'what the radar saw',
+    tagline: 'Wildfires, floods and moving ground in 2026, from Spain to the world, seen by <strong>NISAR</strong>, the radar that sees through clouds and smoke and measures the ground to the centimetre.',
     incidents: '2026 incidents',
     story: 'Watch the story',
     back: 'Back to globe',
@@ -253,6 +265,14 @@ const UI = {
     railOsm: 'Railways (OpenStreetMap)',
     groupSurface: 'Surface · before and after',
     groupGround: 'Moving ground · interferometry',
+    groupWorld: 'NISAR around the world',
+    maskLava: 'New lava',
+    maskDebris: 'Scoured channel',
+    official: 'Comparison with NASA / JPL',
+    officialNote: (d: string) => `Image published by NASA on ${d}. Ours (the map) comes from the same public data run independently through our pipeline.`,
+    officialSays: 'NASA says',
+    officialLink: 'See the original release',
+    officialCredit: 'Credit',
     polDisp: 'Motion',
     polFringe: 'Fringes',
     polCoh: 'Coherence',
@@ -270,8 +290,9 @@ const UI = {
     hintTimelineI: 'Each frame is a NISAR interferogram. In the chained series each available interval is added to the previous one.',
     hintChangeI: 'Total motion between the first and last pass, along the satellite line of sight.',
     pairLbl: (a: string, b: string, trk: number, dir: string) => `${a} → ${b} · track ${trk} ${dir === 'A' ? 'asc' : 'desc'}`,
-    sourceInsar: (n: number, a: string, b: string, s1: boolean, ref: string) =>
-      `Data: NASA-ISRO NISAR L2 GUNW (L-band interferograms, ${n} pairs) via ASF DAAC · ${a} → ${b} · ramp (orbit and smooth ionosphere) and height-related atmosphere (Copernicus DEM) estimated in the scene` +
+    sourceInsar: (n: number, a: string, b: string, s1: boolean, ref: string, offset = false) =>
+      `Data: NASA-ISRO NISAR L2 GUNW (L-band interferograms, ${n} pairs) via ASF DAAC · ${a} → ${b} · ` +
+      (offset ? 'no ramp or height correction (deformation fills the scene): zero set in the far field' : 'ramp (orbit and smooth ionosphere) and height-related atmosphere (Copernicus DEM) estimated in the scene') +
       (s1 ? ' · Copernicus Sentinel-1 (C-band) processed with ASF HyP3' : '') + (ref ? ` · ${ref}` : ''),
     sheetGrip: 'Raise or lower the panel',
     explore: 'Explore',
@@ -313,6 +334,9 @@ const UI = {
     riskNear: (p: string) => `near ${p}`,
     riskCascadeFire: (ha: string, km: string) => `Cascade watch: ${ha} ha burned on slopes steeper than 15°, where rain now brings runoff and erosion. ${km} km of main roads cross the most exposed cells.`,
     riskCascadeFlood: (mm: string, roads: string, rail: string) => `Cascade watch: ${mm} mm of rain fell on steep slopes above ${roads} km of main roads and ${rail} km of railway, where slope failures are possible.`,
+    riskCascadeFlat: (mm: string) => `Cascade watch: ${mm} mm of rain fell between the two passes, but on a plain: there are no steep slopes that could fail onto roads or railways.`,
+    riskCascadeDebris: (ha: string, km: string) => `Cascade watch: the flood scoured the banks at the foot of ${ha} ha of slopes steeper than 15°, which can now slide. ${km} km of main roads cross the most exposed cells.`,
+    riskCascadeSubsidence: (ha: string, roads: string, rail: string) => `Cascade watch: ${ha} ha of sinking ground are flat (under 2°), so they pond more rainwater every year. ${roads} km of main roads and ${rail} km of railway cross the most exposed cells.`,
     riskStable: (p: number, runs: number, spread: number) => `Robustness: cells kept their class in ${p} % of ${runs} runs with every weight moved by up to ±${spread} %.`,
     riskMethod: (x: number, y: number) => `Screening index on a ${x} × ${y} m grid, from open data only. It ranks cells within this event; it is not a damage estimate. Method: docs/EVENTS_AND_RISK.md`,
     riskCellPop: 'People',
@@ -361,7 +385,11 @@ const METRICS: Record<string, { es: string; en: string }> = {
   ctx_out: { es: 'Movimiento mediano fuera de la colada', en: 'Median motion outside the lava flow' },
   insar_epi: { es: 'Desplazamiento máximo cerca del epicentro', en: 'Largest displacement near the epicentre' },
   insar_area: { es: 'Superficie que se mueve más que el ruido', en: 'Area moving more than the noise' },
-  insar_area_earthquake: { es: 'Superficie con el mismo movimiento en las dos pasadas descendentes', en: 'Area with the same motion in both descending tracks' },
+  insar_area_earthquake: { es: 'Superficie con el mismo movimiento en pasadas del mismo sentido', en: 'Area with the same motion in tracks looking the same way' },
+  area_volcano: { es: 'Superficie que se aclara en HH y HV cerca del cráter', en: 'Area brightening in HH and HV near the crater' },
+  insar_peak: { es: 'Mayor desplazamiento en tierra (cualquier pasada)', en: 'Largest displacement on land (any track)' },
+  area_debris: { es: 'Cauce con cambio fuerte de señal (radar)', en: 'Channel with strong signal change (radar)' },
+  hhrise: { es: 'Subida media de HH sobre la lava', en: 'Mean HH rise over the lava' },
   insar_noise: { es: 'Ruido de fondo (desviación típica)', en: 'Background noise (standard deviation)' },
   insar_coh: { es: 'Coherencia media', en: 'Mean coherence' },
   insar_n: { es: 'Interferogramas NISAR usados', en: 'NISAR interferograms used' },

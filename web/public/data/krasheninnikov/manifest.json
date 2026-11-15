@@ -1,0 +1,190 @@
+{
+ "id": "krasheninnikov",
+ "title": "Volcán Krasheninnikov (Kamchatka)",
+ "kind": "volcano",
+ "event": "2025-08-03",
+ "mock": false,
+ "bbox": [
+  160.12,
+  54.52,
+  160.42,
+  54.67
+ ],
+ "center": [
+  160.26999999999998,
+  54.595
+ ],
+ "coordinates": [
+  [
+   160.12,
+   54.67
+  ],
+  [
+   160.42,
+   54.67
+  ],
+  [
+   160.42,
+   54.52
+  ],
+  [
+   160.12,
+   54.52
+  ]
+ ],
+ "pair": {
+  "before": "2026-07-13",
+  "after": "2026-09-23"
+ },
+ "frames": [
+  {
+   "date": "2026-06-19",
+   "track": 80,
+   "hh": "hh_20260619.webp",
+   "hv": "hv_20260619.webp",
+   "rgb": "rgb_20260619.webp"
+  },
+  {
+   "date": "2026-07-01",
+   "track": 80,
+   "hh": "hh_20260701.webp",
+   "hv": "hv_20260701.webp",
+   "rgb": "rgb_20260701.webp"
+  },
+  {
+   "date": "2026-07-13",
+   "track": 80,
+   "hh": "hh_20260713.webp",
+   "hv": "hv_20260713.webp",
+   "rgb": "rgb_20260713.webp"
+  },
+  {
+   "date": "2026-07-25",
+   "track": 80,
+   "hh": "hh_20260725.webp",
+   "hv": "hv_20260725.webp",
+   "rgb": "rgb_20260725.webp"
+  },
+  {
+   "date": "2026-08-18",
+   "track": 80,
+   "hh": "hh_20260818.webp",
+   "hv": "hv_20260818.webp",
+   "rgb": "rgb_20260818.webp"
+  },
+  {
+   "date": "2026-08-30",
+   "track": 80,
+   "hh": "hh_20260830.webp",
+   "hv": "hv_20260830.webp",
+   "rgb": "rgb_20260830.webp"
+  },
+  {
+   "date": "2026-09-11",
+   "track": 80,
+   "hh": "hh_20260911.webp",
+   "hv": "hv_20260911.webp",
+   "rgb": "rgb_20260911.webp"
+  },
+  {
+   "date": "2026-09-23",
+   "track": 80,
+   "hh": "hh_20260923.webp",
+   "hv": "hv_20260923.webp",
+   "rgb": "rgb_20260923.webp"
+  },
+  {
+   "date": "2026-10-05",
+   "track": 80,
+   "hh": "hh_20261005.webp",
+   "hv": "hv_20261005.webp",
+   "rgb": "rgb_20261005.webp"
+  },
+  {
+   "date": "2026-10-17",
+   "track": 80,
+   "hh": "hh_20261017.webp",
+   "hv": "hv_20261017.webp",
+   "rgb": "rgb_20261017.webp"
+  },
+  {
+   "date": "2026-10-29",
+   "track": 80,
+   "hh": "hh_20261029.webp",
+   "hv": "hv_20261029.webp",
+   "rgb": "rgb_20261029.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2026-06-19",
+   "2026-07-01",
+   "2026-07-13",
+   "2026-07-25",
+   "2026-08-18",
+   "2026-08-30",
+   "2026-09-11",
+   "2026-09-23",
+   "2026-10-05",
+   "2026-10-17",
+   "2026-10-29"
+  ],
+  "hh": [
+   -14.17,
+   -12.85,
+   -11.21,
+   -8.24,
+   -4.53,
+   -4.16,
+   -4.4,
+   -4.9,
+   -5.72,
+   -5.81,
+   -6.44
+  ],
+  "hv": [
+   -17.63,
+   -16.47,
+   -15.5,
+   -13.03,
+   -11.84,
+   -11.25,
+   -11.2,
+   -11.13,
+   -11.46,
+   -11.43,
+   -11.32
+  ]
+ },
+ "metrics": [
+  {
+   "id": "area",
+   "label": "Lava nueva o más brillante (radar)",
+   "value": 161,
+   "unit": "ha"
+  },
+  {
+   "id": "hhrise",
+   "label": "Subida media de HH sobre la lava",
+   "value": 6.9,
+   "unit": "dB"
+  }
+ ],
+ "overlays": {},
+ "stats": {
+  "rule": "dHH>2.5 & dHV>2.5 dB (media 5x5), a menos de 7 km del cráter"
+ },
+ "official": {
+  "url": "https://svs.gsfc.nasa.gov/5675",
+  "credit": "NASA Scientific Visualization Studio: Alex Kekesi (ADNET); ciencia: Matthew Pritchard (Cornell), Paul A. Rosen y Marco Lavalle (JPL)",
+  "date": "2026-09-24",
+  "claim": "Timelapse de 17 imágenes NISAR (25 dic 2025 – ago 2026): la lava llena la caldera interior y se abre en abanico hacia el este",
+  "file": "official.webp",
+  "source_image": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005675/nisar_volcano_annotated.00500_print.jpg"
+ },
+ "region": "world"
+}

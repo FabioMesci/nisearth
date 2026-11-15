@@ -139,9 +139,11 @@ async function main() {
       const ct = CONTENT[c.id]
       return `<li><button data-id="${c.id}" style="--c:${meta.color}" title="${ct?.place ?? c.title}"><span class="ic">${meta.icon}</span><span class="txt"><b>${ct?.short ?? c.title}<span class="rg">${ct?.region ?? ''}</span></b><i>${meta.label} · ${ct?.dateLabel ?? ''}</i></span></button></li>`
     }
+    const es = cases.filter((c) => c.region !== 'world')
     const groups = [
-      { label: t('groupSurface'), items: cases.filter((c) => surface(c)) },
-      { label: t('groupGround'), items: cases.filter((c) => !surface(c)) },
+      { label: t('groupSurface'), items: es.filter((c) => surface(c)) },
+      { label: t('groupGround'), items: es.filter((c) => !surface(c)) },
+      { label: t('groupWorld'), items: cases.filter((c) => c.region === 'world') },
     ].filter((g) => g.items.length)
     list.innerHTML = groups.map((g) => `<li class="grp">${g.label}</li>${g.items.map(row).join('')}`).join('')
     markActive()
@@ -161,7 +163,7 @@ async function main() {
       el.innerHTML = t(el.dataset.i18n as Parameters<typeof t>[0]) as string
     })
     document.querySelectorAll<HTMLButtonElement>('#lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang))
-    document.title = lang === 'en' ? 'Spain through radar · NISAR' : 'España desde el radar · NISAR'
+    document.title = lang === 'en' ? 'NISEarth · what the radar saw' : 'NISEarth · lo que vio el radar'
     $('slider-handle').setAttribute('aria-label', t('sliderAria'))
     document.querySelectorAll('.sheet-grip').forEach((g) => g.setAttribute('aria-label', t('sheetGrip')))
   }

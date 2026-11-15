@@ -8,7 +8,7 @@ web
 
 ## Product
 
-**España desde el radar · Spain through radar** — NASA Space Apps Challenge 2026, challenge "Dancing with the SARs". An interactive web app that uses NISAR (NASA-ISRO, L-band) and Sentinel-1 (ESA, C-band) radar to follow the surface changes left by two Spanish disasters of 2026:
+**NISEarth · lo que vio el radar / what the radar saw** (formerly «España desde el radar») — NASA Space Apps Challenge 2026, challenge "Dancing with the SARs". An interactive web app that uses NISAR (NASA-ISRO, L-band) and Sentinel-1 (ESA, C-band) radar to follow the surface changes left by two Spanish disasters of 2026:
 
 - **Niebla (Huelva) wildfire, Aug 2026** — burn scar measured through the smoke (~32,000 ha, 89 % inside the official EFFIS perimeter). Physical rule: fire drops HV but not HH; harvest drops both.
 - **DANA Adam, La Safor / Oliva (Valencia), Oct 2026** — what radar *didn't* see: no radar passed during the storm (4.5 days without data), and by the time NISAR returned the water had drained. Argument for coordinating radar constellations in emergencies.

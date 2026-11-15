@@ -1,4 +1,6 @@
-# Spain through radar · España desde el radar
+# NISEarth · what the radar saw
+
+*From Spain to the world with NISAR · De España al mundo con NISAR*
 
 **NASA Space Apps Challenge 2026 · Dancing with the SARs** · [Versión en español](README.es.md)
 
@@ -13,7 +15,7 @@ the app is produced by our own pipeline from NISAR and Sentinel-1 data and check
 The point is not only to show what the satellite can do. It is also to show where the gaps are, so that emergency
 managers know when they can rely on it.
 
-## The six cases
+## The six cases in Spain
 
 | Case | Technique | What radar shows |
 |---|---|---|
@@ -26,6 +28,19 @@ managers know when they can rely on it.
 | ⛰️ **Rasuwa landslide & GLOF — Langtang (Nepal), 26 Aug 2026** | Backscatter change (NISAR L-band + Sentinel-1 C-band) | At the height of the Himalayan monsoon (5 weeks of 49–97 % cloud cover on Sentinel-2 and 323.5 mm of rain in 22 days), NISAR ascending track 98 maps **633 ha** of glacial avalanche tongue and scoured canyon (GLOF, EMSR927) with a **−3.4 dB** mean HV drop, **0.6 km** of highway hit and **2,884 people** exposed along the corridor (<1 km). |
 | 〰️ **Venezuela earthquake doublet (Yaracuy · La Guaira), 24 Jun 2026** | InSAR, 4 NISAR GUNW tracks (2 asc. + 2 desc.) + USGS | The **Mw 7.2** (San Felipe, 22:04:31 UTC) and **Mw 7.5** (Catia La Mar, 22:05:03 UTC, 10 km depth) doublet was captured just **12 hours later** by NISAR ascending track 162: line-of-sight displacements up to **−37.9 cm** (asc.) and **+32.7 cm** (desc.), sign reversal proving right-lateral strike-slip along the Morón and San Sebastián faults, and **102,325 ha** of coherent ground deformation. |
 
+## NISAR around the world
+
+The same pipeline, applied to six events abroad. For four of them NASA/JPL published its own NISAR image; the app shows it next to ours, with credit, so judges can compare (ours is processed independently from the same public ASF data).
+
+| Case | Technique | What radar shows | NASA/JPL says |
+|---|---|---|---|
+| 〰️ **Venezuela earthquakes (M7.2 + M7.5, 24 Jun 2026)** | InSAR, 3 tracks (2 asc, 1 desc) | Up to **−59 cm** along the line of sight on the La Guaira coast. No ramp or height fit (deformation fills the scene); zero set inland. | ~60 cm westward next to the airport |
+| 🌋 **Krasheninnikov volcano (Kamchatka)** | Backscatter change, 11 dates | New bright lobes at the NE front of the flow (13 Jul → 23 Sep); HH over them rises from −14 dB (Jun) to −4.5 dB (18 Aug), then levels off. Part of the flagged area is melting snow patches. | 17-frame time-lapse, Dec 2025 – Aug 2026 |
+| 💧 **Limpopo floods (Mozambique, Jan 2026)** | Backscatter change, 4 dates | **325 km²** of new water between 5 and 17 Jan (threshold −14 dB at the histogram valley); 5.4 km of railway and 19 km of roads under water (OSM). | Before/after, >600,000 displaced |
+| ⬇️ **Mexico City subsidence** | InSAR, 10 chained pairs (Oct–Feb) | ~37,500 ha of the old lakebed sink; **−22 cm in 120 days** at Chalco. Ramp and height fitted on the hills only (> 2,280 m). | > 2 cm/month |
+| 🌊 **Rasuwa flood (Nepal, 26 Aug 2026)** | Backscatter change, 6 dates | Triggered by the rock–ice collapse of Langtang Lirung's north face (>1,400 dead). Water gone by the next pass; **385 ha** of valley floor (within 300 m of OSM rivers) change by > 3 dB. Not validated. | — (no NASA image) |
+| 🧊 **Langtang Lirung collapse — before (Nepal)** | InSAR, 6 chained pairs (27 May → 19 Aug) | The failing ice itself is incoherent and dropped by the GUNW. On the slope 1.7 km away: **+4.5 cm** (noise ±2.8 cm), 2.4 cm in the last 24 days; 9 other patches move > 5 cm in the same window. NISAR saw the mountain moving, not which part would fail. | — (ICIMOD: up to 30 cm; *Remote Sensing* 18:3727) |
+
 ## What the app does
 
 A 3D globe (globe.gl / three.js) opens onto a detailed map (MapLibre) for each case, with:
@@ -35,7 +50,7 @@ A 3D globe (globe.gl / three.js) opens onto a detailed map (MapLibre) for each c
 - change masks, cumulative InSAR displacement and coherence;
 - affected roads and railways (OpenStreetMap), land cover and exposed population;
 - validation against EFFIS, Copernicus EMS and NASA FIRMS;
-- a risk index per grid cell for the fire and flood (hazard × exposure × vulnerability, [method](docs/EVENTS_AND_RISK.md));
+- a risk index per grid cell for the fire, the floods and the subsidence cases (hazard × exposure × vulnerability, [method](docs/EVENTS_AND_RISK.md));
 - a "Spain watch" panel: active Iberian fires today (NASA FIRMS) and the next NISAR pass over each;
 - a hazard guide (fire, flood, earthquake, landslide, volcano, subsidence): what each one looks like to radar;
 - a guided story mode, and a full Spanish / English interface.
@@ -128,6 +143,15 @@ for c in niebla dana; do
   && ../.venv/bin/python 07_risk.py $c
 done
 for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c; done
+# NISAR around the world / NISAR en el mundo
+for c in venezuela cdmx langtang; do ../.venv/bin/python 08_insar.py all $c; done
+../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
+../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
+../.venv/bin/python 02_extract.py rasuwa --track 98 && ../.venv/bin/python 03_process.py rasuwa && ../.venv/bin/python 04_context.py rasuwa \
+  && ../.venv/bin/python 06_exposure.py rasuwa && ../.venv/bin/python 05_external.py rasuwa
+for c in mozambique rasuwa cdmx; do ../.venv/bin/python 07_risk.py $c; done
+../.venv/bin/python 11_lorca_risk.py
+../.venv/bin/python 09_world.py                     # NASA/JPL image + "world" region (after processing)
 ../.venv/bin/python 05_external.py watch            # "Spain watch" panel: rerun right before a demo
 ```
 (Álora also uses Sentinel-1: run `s1_hyp3.py submit` and `s1_hyp3.py fetch` before `08_insar.py context alora`.)

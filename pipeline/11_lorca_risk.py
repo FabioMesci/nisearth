@@ -48,7 +48,7 @@ if (wc > 0).mean() < .95:
     raise SystemExit('Cobertura WorldCover insuficiente; no se calcula el índice.')
 lc = {name: avg(wc == code) for code, name in base.WC_CLASSES.items()}
 land = avg(wc > 0)
-pop_f, pop_tr = base.read_window(base.fetch(base.POP_URL, RAW / 'pop' / 'esp_ppp_2020_constrained.tif'), bbox, pad=.01)
+pop_f, pop_tr = base.read_window(base.fetch(base.POP_URL['BSGM'].format(ISO='ESP', iso='esp'), RAW / 'pop' / 'esp_ppp_2020_constrained.tif'), bbox, pad=.01)
 pop = base.to_grid(pop_f, pop_tr, cshape, ctr, Resampling.sum)
 if not np.isfinite(pop).all() or pop.sum() <= 0:
     raise SystemExit('Población no disponible; no se calcula el índice.')

@@ -40,7 +40,7 @@ from rasterio.features import rasterize
 from rasterio.transform import from_bounds
 from rasterio.warp import Resampling, reproject
 from rasterio.windows import from_bounds as window_from_bounds
-from scipy.ndimage import distance_transform_edt
+from scipy.ndimage import distance_transform_edt, gaussian_filter
 
 from config import CASES, RAW, WEB_DATA, WORK
 
@@ -65,6 +65,20 @@ HAZARD = {
         "w_edge": 0.25,
         "intensity_floor": 1.0,
     },
+    "debris": {                # flash flood with sediment in a narrow valley (radar scars along the river)
+        "w_ref_only": 1.0,
+        "w_radar_only": 1.0,
+        "edge_m": 300,         # bank erosion and overbank deposits next to the scoured channel
+        "w_edge": 0.35,
+        "intensity_floor": 1.0,
+    },
+    "subsidence": {            # InSAR: footprint = ground sinking faster than the noise, intensity = rate and gradient
+        "w_ref_only": 1.0,
+        "w_radar_only": 1.0,
+        "edge_m": 500,         # differential settlement just outside the mapped bowl
+        "w_edge": 0.25,
+        "intensity_floor": 1.0,
+    },
     "landslide": {
         "w_ref_only": 1.0,
         "w_radar_only": 1.0,
@@ -73,6 +87,10 @@ HAZARD = {
         "intensity_floor": 1.0,
     },
 }
+RATE_REF_CM_YR = 20      # subsidence rate -> hazard 1
+GRAD_SMOOTH_KM = 0.5     # gradient of the rate smoothed over ~500 m (outside the bowl: p90 ~ 4 cm/yr/km, CDMX and Lorca)
+GRAD_REF_CM_YR_KM = 10   # rate gradient (1e-4 / yr angular distortion) -> hazard 1: differential settlement cracks buildings
+FLAT_DEG = (2, 5)        # subsidence cascade: sinking ground below 2 deg keeps rainwater, none above 5 deg
 EXPOSURE_W = {"population": 0.40, "built": 0.15, "infrastructure": 0.15, "critical": 0.15, "land": 0.15}
 VULNERABILITY_W = {"physical": 0.40, "social": 0.30, "coping": 0.30}
 POP_DENSITY_REF = 5000   # persons / km2 -> exposure 1
@@ -91,23 +109,27 @@ MC_SPREAD = 0.25
 SUSCEPTIBILITY = {
     "fire": {"tree": 0.9, "shrub": 1.0, "grass": 0.7, "crop": 0.4, "built": 0.6, "bare": 0.05, "water": 0.0, "wetland": 0.2},
     "flood": {"tree": 0.3, "shrub": 0.3, "grass": 0.3, "crop": 0.7, "built": 0.9, "bare": 0.2, "water": 0.0, "wetland": 0.1},
+    "debris": {"tree": 0.6, "shrub": 0.6, "grass": 0.7, "crop": 0.9, "built": 1.0, "bare": 0.3, "water": 0.0, "wetland": 0.5},
+    "subsidence": {"tree": 0.1, "shrub": 0.1, "grass": 0.1, "crop": 0.3, "built": 1.0, "bare": 0.1, "water": 0.0, "wetland": 0.2},
     "landslide": {"tree": 0.6, "shrub": 0.7, "grass": 0.6, "crop": 0.8, "built": 0.95, "bare": 0.4, "water": 0.1, "wetland": 0.3},
 }
-LAND_ASSET = {"fire": ("tree", "shrub"), "flood": ("crop",), "landslide": ("crop", "tree", "shrub")}
+LAND_ASSET = {"fire": ("tree", "shrub"), "flood": ("crop",), "debris": ("crop",), "landslide": ("crop", "tree", "shrub"), "subsidence": ()}  # () = no land term
 
 WC_URL = "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_{tile}_Map.tif"
 WC_CLASSES = {10: "tree", 20: "shrub", 30: "grass", 40: "crop", 50: "built", 60: "bare", 70: "bare", 80: "water", 90: "wetland", 100: "grass"}
-POP_URL_TPL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/{iso3}/{iso_lo}_ppp_2020_constrained.tif"
-POP1K_URL_TPL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_1km/2020/{iso3}/{iso_lo}_ppp_2020_1km_Aggregated.tif"
-AGE_URL_TPL = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020_1km/unconstrained/2020/{iso3}/{iso_lo}_{sex}_{age}_2020_1km.tif"
+# WorldPop 2020 constrained 100 m: most countries are under BSGM, a few (Mozambique) only under maxar_v1 (UN-adjusted)
+POP_URL = {
+    "BSGM": "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/{ISO}/{iso}_ppp_2020_constrained.tif",
+    "maxar_v1": "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/maxar_v1/{ISO}/{iso}_ppp_2020_UNadj_constrained.tif",
+}
+POP_SERIES = {"MOZ": "maxar_v1"}
+POP1K_URL = "https://data.worldpop.org/GIS/Population/Global_2000_2020_1km/2020/{ISO}/{iso}_ppp_2020_1km_Aggregated.tif"
+AGE_URL = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020_1km/unconstrained/2020/{ISO}/{iso}_{sex}_{age}_2020_1km.tif"
 DEPENDENT_AGES = (0, 1, 65, 70, 75, 80)  # WorldPop 5-year groups: under 5 and 65+
 DEM_URL = "https://copernicus-dem-30m.s3.amazonaws.com/{name}/{name}.tif"
 OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
 
 SOURCES = [
-    "NISAR L2 GCOV change mask (this pipeline)",
-    "EFFIS burnt-area perimeters / Copernicus EMS Rapid Mapping",
-    "NASA FIRMS VIIRS 375 m fire radiative power",
     "WorldPop 2020 population (100 m) and age structure (1 km)",
     "ESA WorldCover 2021 (10 m)",
     "OpenStreetMap roads, railways, hospitals, schools, fire stations (ODbL)",
@@ -203,7 +225,7 @@ def slope_deg(shape, tr, bbox, cache):
     return slope
 
 
-def overpass(bbox, cache):
+def overpass(bbox, cache, places="city|town|village"):
     """Roads and railways in the bbox; facilities and settlements in a padded bbox."""
     if cache.exists():
         return json.loads(cache.read_text(encoding="utf-8"))
@@ -218,7 +240,7 @@ out geom tags;
 (nwr["amenity"~"^(hospital|fire_station)$"]{outer};
  nwr["amenity"~"^(school|kindergarten|clinic|nursing_home|police)$"]{inner};
  nwr["social_facility"="nursing_home"]{inner};
- node["place"~"^(city|town|village)$"]{outer};);
+ node["place"~"^({places})$"]{outer};);
 out center tags;"""
     for i in range(6):
         try:
@@ -273,6 +295,18 @@ def nearest_km(lon, lat, pts, lat0):
     return d.min(-1), d.argmin(-1)
 
 
+def rain_between(case, lat0):
+    """Event rainfall (mm) at the bbox centre between the two radar passes, from Open-Meteo (ERA5)."""
+    x0, y0, x1, y1 = case["bbox"]
+    d0, d1 = case["pair"]
+    url = (f"https://archive-api.open-meteo.com/v1/archive?latitude={(y0 + y1) / 2:.3f}&longitude={(x0 + x1) / 2:.3f}"
+           f"&start_date={d0}&end_date={d1}&daily=precipitation_sum&timezone=auto")
+    js = requests.get(url, timeout=60).json()
+    mm = round(sum(v or 0 for v in js["daily"]["precipitation_sum"]), 1)
+    print(f"[rain] {mm} mm between {d0} and {d1} (Open-Meteo ERA5)")
+    return mm
+
+
 def classify(r):
     return np.digitize(r, CLASS_EDGES)
 
@@ -283,7 +317,12 @@ def main():
     ap.add_argument("case", choices=CASES)
     args = ap.parse_args()
     cid, case = args.case, CASES[args.case]
-    kind, bbox = case["kind"], case["bbox"]
+    bbox = case["bbox"]
+    kind = "debris" if case.get("change") == "debris" else case["kind"]
+    if kind not in HAZARD:
+        raise SystemExit(f"no risk model for kind '{kind}'")
+    iso = case.get("iso3", "ESP")
+    urlf = lambda u, **k: u.format(ISO=iso, iso=iso.lower(), **k)
     hz = HAZARD[kind]
     out = WEB_DATA / cid
     cache = RAW / "risk" / cid
@@ -317,8 +356,25 @@ def main():
     ref_feats = load_geojson(out / ref_file) if ref_file else []
     ref = rasterize([(f["geometry"], 1) for f in ref_feats], out_shape=fshape, transform=ftr).astype(bool) if ref_feats else np.zeros(fshape, bool)
     natural = np.isin(wc, (10, 20, 30)) if kind == "fire" else np.ones(fshape, bool)  # crops outside EFFIS = harvest
+    sources = ["NISAR L2 GCOV change mask (this pipeline)"]
+    wfine = np.ones(fshape)  # per-pixel intensity inside the footprint (only subsidence uses it)
+    if kind == "subsidence":
+        # InSAR cumulative displacement (08_insar.py) -> annual rate; only sinking ground counts
+        with rasterio.open(WORK / cid / "insar_final.tif") as ds:
+            cum = ds.read(1)
+        assert cum.shape == fshape, "insar_final.tif and mask.png must share the grid"
+        rate = np.nan_to_num(cum) / man["insar"]["days"] * 365  # cm / yr, negative = down
+        mask &= rate < 0
+        ky, kx = abs(ftr.e) * 110.570, abs(ftr.a) * 111.320 * np.cos(np.radians(lat0))
+        sm = gaussian_filter(rate, GRAD_SMOOTH_KM / kx)  # ~100 m smoothing leaves a gradient made of noise
+        gy, gx = np.gradient(sm, ky, kx)
+        grad = np.hypot(gx, gy)  # cm / yr per km
+        wfine = np.maximum(np.clip(-rate / RATE_REF_CM_YR, 0, 1), np.clip(grad / GRAD_REF_CM_YR_KM, 0, 1))
+        sources = [f"NISAR L2 GUNW interferometry, {man['insar']['days']}-day cumulative displacement (this pipeline)"]
+    elif ref_feats:
+        sources.append("EFFIS burnt-area perimeters" if kind == "fire" else "Copernicus EMS Rapid Mapping")
     both, ref_only, radar_only = mask & ref, ref & ~mask, mask & ~ref & natural
-    f_both, f_ref, f_radar = avg(both), avg(ref_only), avg(radar_only)
+    f_both, f_ref, f_radar = avg(both * wfine), avg(ref_only * wfine), avg(radar_only * wfine)
 
     intensity = np.ones(cshape)
     firms = load_geojson(out / man["overlays"]["firms"]) if man["overlays"].get("firms") else []
@@ -330,6 +386,7 @@ def main():
         np.add.at(frp, (row[ok], col[ok]), np.array([f["properties"].get("frp") or 0 for f in firms])[ok])
         p90 = np.percentile(frp[frp > 0], 90) if (frp > 0).any() else 1
         intensity = hz["intensity_floor"] + (1 - hz["intensity_floor"]) * np.clip(frp / p90, 0, 1)
+        sources.append("NASA FIRMS VIIRS 375 m fire radiative power")
 
     footprint = both | ref_only | radar_only
     dist = distance_transform_edt(~footprint, sampling=(abs(ftr.e) * 110570, abs(ftr.a) * 111320 * np.cos(np.radians(lat0))))
@@ -340,16 +397,14 @@ def main():
         return np.maximum(direct, w_edge * edge), direct
 
     H, H_direct = hazard(hz["w_ref_only"], hz["w_radar_only"], hz["w_edge"])
-    seen = f_both + f_ref + f_radar
-    confidence = np.where(seen > 0, f_both / np.maximum(seen, 1e-9), 0)  # share confirmed by both sources
+    seen = avg(both) + avg(ref_only) + avg(radar_only)
+    confidence = np.where(seen > 0, avg(both) / np.maximum(seen, 1e-9), 0)  # share confirmed by both sources
 
     # ---- EXPOSURE
-    iso3 = case.get("iso3", "ESP").upper()
-    iso_lo = iso3.lower()
-    pop_url = POP_URL_TPL.format(iso3=iso3, iso_lo=iso_lo)
-    pop_f, pop_tr = read_window(fetch(pop_url, RAW / "pop" / f"{iso_lo}_ppp_2020_constrained.tif"), bbox, pad=0.01)
+    pop_u = urlf(POP_URL[POP_SERIES.get(iso, "BSGM")])
+    pop_f, pop_tr = read_window(fetch(pop_u, RAW / "pop" / pop_u.rsplit("/", 1)[-1]), bbox, pad=0.01)
     pop = to_grid(pop_f, pop_tr, cshape, ctr, Resampling.sum)
-    osm = overpass(bbox, RAW / "osm" / f"{cid}_risk.json")["elements"]
+    osm = overpass(bbox, RAW / "osm" / f"{cid}_risk.json", case.get("risk_places", "city|town|village"))["elements"]
     ways = [e for e in osm if e["type"] == "way" and "geometry" in e]
     roads_km = line_km([w for w in ways if "highway" in w.get("tags", {})], cshape, ctr, lat0)
     rail_km = line_km([w for w in ways if "railway" in w.get("tags", {})], cshape, ctr, lat0)
@@ -368,27 +423,28 @@ def main():
         "built": np.clip(lc["built"] / BUILT_REF, 0, 1),
         "infrastructure": np.clip((roads_km + 2 * rail_km) / INFRA_REF_KM, 0, 1),
         "critical": np.clip(critical, 0, 1),
-        "land": np.clip(sum(lc[k] for k in LAND_ASSET[kind]), 0, 1),
+        "land": np.clip(sum((lc[k] for k in LAND_ASSET[kind]), np.zeros(cshape)), 0, 1),
     }
+    exposure_w = {k: v for k, v in EXPOSURE_W.items() if k != "land" or LAND_ASSET[kind]}
 
     # ---- VULNERABILITY
     dep = None
     for age in DEPENDENT_AGES:
         for sex in "fm":
-            age_url = AGE_URL_TPL.format(iso3=iso3, iso_lo=iso_lo, sex=sex, age=age)
-            a, age_tr = read_window(fetch(age_url, RAW / "pop" / "age" / f"{iso_lo}_{sex}_{age}_2020_1km.tif"), bbox, pad=0.02)
+            a, age_tr = read_window(fetch(urlf(AGE_URL, sex=sex, age=age), RAW / "pop" / "age" / f"{iso.lower()}_{sex}_{age}_2020_1km.tif"), bbox, pad=0.02)
             dep = a if dep is None else dep + a
-    pop1k_url = POP1K_URL_TPL.format(iso3=iso3, iso_lo=iso_lo)
-    tot, _ = read_window(fetch(pop1k_url, RAW / "pop" / f"{iso_lo}_ppp_2020_1km_Aggregated.tif"), bbox, pad=0.02)
+    tot, _ = read_window(fetch(urlf(POP1K_URL), RAW / "pop" / f"{iso.lower()}_ppp_2020_1km_Aggregated.tif"), bbox, pad=0.02)
     share = np.where(tot >= 5, dep / np.maximum(tot, 1e-9), np.nan)  # too few people: no reliable age structure
     area_share = float(np.nansum(np.where(tot >= 5, dep, 0)) / max(np.nansum(np.where(tot >= 5, tot, 0)), 1e-9))
     share = to_grid(np.nan_to_num(share, nan=area_share), age_tr, cshape, ctr, Resampling.bilinear)
     share = np.where(share > 0, share, area_share)
     d_hosp, _ = nearest_km(LON, LAT, hospitals, lat0)
     d_fire, _ = nearest_km(LON, LAT, stations, lat0)
+    # non-Latin names fall back to a known transliteration or the English name tag
     TRANS = {"郭巴村": "Guoba", "स्याप्रु बेसी": "Syaphrubesi"}
-    pname = lambda t: TRANS.get(t.get("name"), t.get("name:es") or t.get("name:en") or t.get("int_name") or t.get("name"))
-    places = [(pt(e), pname(e["tags"])) for e in tagged if e.get("tags", {}).get("place") and pname(e["tags"])]
+    latin = lambda n: all(ord(ch) < 0x250 for ch in n)
+    label = lambda tg: TRANS.get(tg["name"]) or (tg["name"] if latin(tg["name"]) else tg.get("name:en") or tg["name"])
+    places = [(pt(e), label(e["tags"])) for e in tagged if e.get("tags", {}).get("place") and e["tags"].get("name")]
     _, place_idx = nearest_km(LON, LAT, [p for p, _ in places], lat0)
 
     v_parts = {
@@ -399,7 +455,7 @@ def main():
     }
 
     combine = lambda parts, w: sum(parts[k] * w[k] for k in w) / sum(w.values())
-    E, V = combine(e_parts, EXPOSURE_W), combine(v_parts, VULNERABILITY_W)
+    E, V = combine(e_parts, exposure_w), combine(v_parts, VULNERABILITY_W)
     R = np.cbrt(H * E * V)
     cls = classify(R)
     keep = (H >= MIN_HAZARD) & (land > 0.05)
@@ -411,8 +467,20 @@ def main():
         steep_ha = float((footprint & (slope >= STEEP_DEG)).sum() * fpx_ha)
         cascade_info = {"type": "post_fire_runoff", "burned_steep_ha": round(steep_ha),
                         "steep_deg": STEEP_DEG}
+    elif kind == "subsidence":
+        flat = np.clip((FLAT_DEG[1] - slope_c) / (FLAT_DEG[1] - FLAT_DEG[0]), 0, 1)
+        cascade = H_direct * flat
+        cascade_info = {"type": "subsidence_flooding",
+                        "sinking_flat_ha": round(float((mask & (slope < FLAT_DEG[0])).sum() * fpx_ha)), "flat_deg": FLAT_DEG[0]}
+    elif kind == "debris":
+        cascade = np.maximum(H_direct, edge) * slope_f  # scoured banks under steep slopes: landslides onto the valley road
+        cascade_info = {"type": "bank_undercutting", "steep_deg": STEEP_DEG,
+                        "steep_bank_ha": round(float(((dist <= hz["edge_m"]) & (slope >= STEEP_DEG)).sum() * fpx_ha))}
     else:
-        rain = next((m["value"] for m in man["metrics"] if m["id"] == "rain"), 0)
+        rain = next((m["value"] for m in man["metrics"] if m["id"] == "rain"), None)
+        if rain is None:
+            rain = rain_between(case, lat0)
+            sources.append("Open-Meteo ERA5 reanalysis rainfall")
         trigger = min(1.0, rain / RAIN_REF_MM)
         cascade = trigger * slope_f * np.clip((roads_km + 2 * rail_km) / INFRA_REF_KM, 0, 1)
         cascade_info = {"type": "rain_slope_failure", "rain_mm": rain, "steep_deg": STEEP_DEG}
@@ -427,7 +495,7 @@ def main():
     for _ in range(MC_RUNS):
         j = jitter({k: hz[k] for k in ("w_ref_only", "w_radar_only", "w_edge")})
         h, _ = hazard(min(1, j["w_ref_only"]), min(1, j["w_radar_only"]), j["w_edge"])
-        r = np.cbrt(h * combine(e_parts, jitter(EXPOSURE_W)) * combine(v_parts, jitter(VULNERABILITY_W)))
+        r = np.cbrt(h * combine(e_parts, jitter(exposure_w)) * combine(v_parts, jitter(VULNERABILITY_W)))
         c = classify(r)
         same += c == cls
         pop_high.append(float(pop[keep & (c >= 3)].sum()))
@@ -481,16 +549,17 @@ def main():
         "rail_high_km": round(float(rail_km[high].sum()), 1),
         "critical_high": int(critical[high].sum()),
         "components": {"hazard": mean(H), "exposure": mean(E), "vulnerability": mean(V)},
-        "drivers": {"exposure": {k: mean(v) for k, v in e_parts.items()}, "vulnerability": {k: mean(v) for k, v in v_parts.items()}},
+        "drivers": {"exposure": {k: mean(e_parts[k]) for k in exposure_w}, "vulnerability": {k: mean(v) for k, v in v_parts.items()}},
         "dependent_age_pct": round(100 * area_share, 1),
         "hotspots": [{k: t[k] for k in ("place", "lon", "lat", "risk", "class", "hazard", "exposure", "vulnerability", "population")} for t in top],
         "cascade": cascade_info,
         "stability": {"runs": MC_RUNS, "spread_pct": round(100 * MC_SPREAD),
                       "stable_high_pct": round(float(100 * (stability[high] >= 0.8).mean())) if high.any() else None,
                       "mean_pct": round(float(100 * stability[keep].mean()))},
-        "weights": {"hazard": {k: v for k, v in hz.items()}, "exposure": EXPOSURE_W, "vulnerability": VULNERABILITY_W,
+        "kind": kind,
+        "weights": {"hazard": {k: v for k, v in hz.items()}, "exposure": exposure_w, "vulnerability": VULNERABILITY_W,
                     "class_edges": CLASS_EDGES},
-        "sources": SOURCES,
+        "sources": sources + SOURCES,
         "files": {"geojson": "risk.geojson", "csv": "risk.csv"},
     }
     man["overlays"]["risk"] = "risk.geojson"

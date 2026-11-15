@@ -126,6 +126,46 @@ def mean_db(db, mask):
     return float(10 * np.log10(np.mean(10 ** (v / 10)))) if v.size else None
 
 
+def _rivers(cid, case):
+    """Ríos de OpenStreetMap (waterway=river) en el bbox, con copia en data/work/<caso>/rivers.geojson."""
+    import urllib.parse, urllib.request
+    cache = WORK / cid / "rivers.geojson"
+    if cache.exists():
+        return json.loads(cache.read_text())
+    x0, y0, x1, y1 = case["bbox"]
+    q = f'[out:json][timeout:120];way["waterway"="river"]({y0},{x0},{y1},{x1});out geom tags;'
+    req = urllib.request.Request("https://overpass-api.de/api/interpreter", data=urllib.parse.urlencode({"data": q}).encode(),
+                                 headers={"User-Agent": "nasa-space-apps-sar-pipeline"})
+    d = json.loads(urllib.request.urlopen(req, timeout=180).read())
+    gj = {"type": "FeatureCollection", "features": [
+        {"type": "Feature", "properties": {"name": e.get("tags", {}).get("name")},
+         "geometry": {"type": "LineString", "coordinates": [[g["lon"], g["lat"]] for g in e["geometry"]]}}
+        for e in d["elements"] if "geometry" in e]}
+    cache.write_text(json.dumps(gj))
+    return gj
+
+
+def river_mask(cid, case, shape, buffer_m):
+    from rasterio.features import rasterize
+    from shapely.geometry import LineString
+    from rasterio.transform import from_bounds
+    x0, y0, x1, y1 = case["bbox"]
+    h, w = shape
+    tr = from_bounds(x0, y0, x1, y1, w, h)
+    deg = buffer_m / 111_320 / np.cos(np.radians((y0 + y1) / 2))
+    lines = [LineString(f["geometry"]["coordinates"]).buffer(deg) for f in _rivers(cid, case)["features"]
+             if len(f["geometry"]["coordinates"]) > 1]
+    return rasterize(lines, out_shape=shape, transform=tr).astype(bool) if lines else np.zeros(shape, bool)
+
+
+def river_len_km(cid):
+    from pyproj import Geod
+    from shapely.geometry import LineString
+    g = Geod(ellps="WGS84")
+    feats = json.loads((WORK / cid / "rivers.geojson").read_text())["features"]
+    return sum(g.geometry_length(LineString(f["geometry"]["coordinates"])) for f in feats if len(f["geometry"]["coordinates"]) > 1) / 1000
+
+
 # ---------------------------------------------------------------- principal
 def main():
     ap = argparse.ArgumentParser()
@@ -162,15 +202,43 @@ def main():
     valid = np.isfinite(hh_a) & np.isfinite(hh_b)
 
     # ---- detección de cambio
-    if case["kind"] == "flood":
+    plain_flood = case["kind"] == "flood" and not case.get("change")
+    if plain_flood:
         sample = hh_a[valid]
         thr = float(threshold_otsu(sample[(sample > -35) & (sample < 5)]))
+        if case.get("water_db") is not None:  # umbral fijado a mano en el valle del histograma (Otsu sesgado por la clase grande)
+            thr = float(case["water_db"])
         water_after = valid & (hh_a < thr)
         water_before = valid & (hh_b < thr)
         mask = water_after & (d_hh < -3)
         delta, color = d_hh, (40, 150, 255)
         extra = {"otsu_threshold_db": round(thr, 2),
                  "permanent_water_km2": None}
+    elif case.get("change") == "debris":
+        # riada relámpago en valle encajado: el agua ya se fue; queda el cauce arrasado (sedimento, bloques, márgenes
+        # comidas). Se busca un cambio fuerte de HH o de HV (> umbral, media 3x3) SOLO en el fondo del valle
+        # (a menos de buffer_m de los ríos de OpenStreetMap): en las laderas la sombra y el layover meten ruido.
+        db = case["debris"]
+        s_hh_d, s_hv_d = smooth(d_hh, 3), smooth(d_hv, 3)
+        near = river_mask(cid, case, d_hh.shape, db["buffer_m"])
+        mask = valid & near & ((np.abs(s_hh_d) > db["min_db"]) | (np.abs(s_hv_d) > db["min_db"]))
+        delta, color = d_hh, (196, 140, 90)
+        extra = {"rule": f"|dHH| o |dHV| > {db['min_db']} dB (media 3x3) a menos de {db['buffer_m']} m de los ríos (OSM)",
+                 "river_km": round(river_len_km(cid), 1)}
+    elif case.get("change") == "lava":
+        # colada nueva: la roca rugosa recién emplazada devuelve más señal en HH Y en HV a la vez (> 2,5 dB).
+        # Solo cerca del cráter: lejos, lo que se aclara son neveros que se funden y laderas que se secan.
+        lv = case["lava"]
+        s_hh_d, s_hv_d = smooth(d_hh, 5), smooth(d_hv, 5)
+        h_, w_ = d_hh.shape
+        x0, y0, x1, y1 = case["bbox"]
+        lon = x0 + (np.arange(w_) + 0.5) * (x1 - x0) / w_
+        lat = y1 - (np.arange(h_) + 0.5) * (y1 - y0) / h_
+        LX, LY = np.meshgrid((lon - lv["crater"][0]) * 111.32 * np.cos(np.radians(lv["crater"][1])), (lat - lv["crater"][1]) * 110.57)
+        near = np.hypot(LX, LY) <= lv["radius_km"]
+        mask = valid & near & (s_hh_d > lv["min_db"]) & (s_hv_d > lv["min_db"])
+        delta, color = d_hh, (255, 196, 40)
+        extra = {"rule": f"dHH>{lv['min_db']} & dHV>{lv['min_db']} dB (media 5x5), a menos de {lv['radius_km']} km del cráter"}
     elif case["kind"] == "landslide":
         s_hv_d = smooth(d_hv, 9)
         mask = valid & (s_hv_d < -1.3) & (d_hv < -1.5)
@@ -183,11 +251,11 @@ def main():
         extra = {"rule": "dHV<-0.6 & dHH>-1.2 (media 15x15)"}
     mask = binary_opening(mask, disk(1))
     mask = binary_closing(mask, disk(2))
-    mask = remove_small_objects(mask, max_size=40 if case["kind"] == "flood" else (60 if case["kind"] == "landslide" else 500))
+    mask = remove_small_objects(mask, max_size=30 if case.get("change") in ("lava", "debris") else 40 if case["kind"] == "flood" else 60 if case["kind"] == "landslide" else 500)
 
     px_km2 = pixel_area_km2(case["bbox"], mask.shape)
     area_km2 = float(mask.sum() * px_km2)
-    if case["kind"] == "flood":
+    if plain_flood:
         extra["permanent_water_km2"] = round(float((water_before & water_after).sum() * px_km2), 1)
     print(f"[mask] {mask.sum()} px = {area_km2:.1f} km²")
 
@@ -224,7 +292,12 @@ def main():
     prev = json.loads(mpath.read_text()) if mpath.exists() else {}
     metrics = (
         [{"id": "area", "label": "Agua nueva detectada", "value": round(area_km2, 1), "unit": "km²"}]
-        if case["kind"] == "flood" else
+        if plain_flood else
+        [{"id": "area", "label": "Lava nueva o más brillante (radar)", "value": round(area_km2 * 100), "unit": "ha"},
+         {"id": "hhrise", "label": "Subida media de HH sobre la lava", "value": round(float(np.nanmean(d_hh[mask])), 1), "unit": "dB"}]
+        if case.get("change") == "lava" else
+        [{"id": "area_debris", "label": "Cauce con cambio fuerte de señal (radar)", "value": round(area_km2 * 100), "unit": "ha"}]
+        if case.get("change") == "debris" else
         [{"id": "area", "label": "Superficie deslizada / GLOF (radar)", "value": round(area_km2 * 100), "unit": "ha"},
          {"id": "hvdrop", "label": "Caída media de HV", "value": round(float(np.nanmean(d_hv[mask])), 1), "unit": "dB"}]
         if case["kind"] == "landslide" else
@@ -249,6 +322,7 @@ def main():
         "metrics": metrics + keep,
         "overlays": prev.get("overlays", {}) if not prev.get("mock") else {},
         "stats": extra,
+        "change": case.get("change"),  # regla especial (lava, debris) o None
     }
     # conservar lo que añaden otros pasos (04_context, 05_external: firms, daily, …)
     if not prev.get("mock"):
@@ -296,7 +370,8 @@ def main():
     ipath = WEB_DATA / "index.json"
     index = json.loads(ipath.read_text()) if ipath.exists() else []
     index = [i for i in index if i["id"] != cid] + [
-        {"id": cid, "title": case["title"], "kind": case["kind"], "center": manifest["center"], "event": case["event"]}]
+        {"id": cid, "title": case["title"], "kind": case["kind"], "center": manifest["center"], "event": case["event"],
+         "region": case.get("region", "es")}]
     ipath.write_text(json.dumps(index, indent=1, ensure_ascii=False))
     print(f"[ok] {len(frames)} fechas exportadas -> {out}")
 

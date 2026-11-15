@@ -1,5 +1,5 @@
 /* =========================================================
-   España desde el radar — sistema visual
+   NISEarth — sistema visual
    Tinta nocturna, papel cálido, dos señales: fuego y agua.
    ========================================================= */
 :root {
@@ -21,7 +21,7 @@
 
   --sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
   --mono: 'Geist Mono', ui-monospace, monospace;
-  --serif: 'Instrument Serif', 'Times New Roman', serif;
+  --display: 'Geist', system-ui, sans-serif; /* títulos: la misma letra que el texto, sin protagonismo */
 
   --r-lg: 20px;
   --r-md: 12px;
@@ -75,11 +75,12 @@ button { font: inherit; color: inherit; }
 }
 
 /* ---------- cabecera ---------- */
-#brand { position: fixed; top: 28px; left: 32px; max-width: 420px; pointer-events: none; z-index: 5; text-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 2px 18px rgba(0,0,0,0.85); transition: opacity 0.4s var(--ease), transform 0.6s var(--ease); }
-#brand h1 { margin: 0 0 14px; font: 400 64px/0.9 var(--serif); letter-spacing: -0.02em; text-wrap: balance; }
+#brand { position: fixed; top: 28px; left: 32px; max-width: 480px; pointer-events: none; z-index: 5; text-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 2px 18px rgba(0,0,0,0.85); transition: opacity 0.4s var(--ease), transform 0.6s var(--ease); }
+#brand h1 { margin: 0 0 14px; font: 600 56px/1 var(--display); letter-spacing: -0.035em; text-wrap: balance; }
 #brand h1 span { display: block; text-transform: lowercase; }
 #brand h1 span::first-letter { text-transform: uppercase; }
-#brand h1 .accent { font-style: italic; color: var(--signal); }
+#brand h1 .name { text-transform: none; } /* NISEarth: mayúsculas propias del nombre */
+#brand h1 .accent { font-weight: 400; color: var(--signal); }
 #brand h1 .accent::first-letter { text-transform: lowercase; }
 #brand p { margin: 0; max-width: 34ch; color: var(--text-2); font-size: 14.5px; line-height: 1.5; }
 #brand strong { color: var(--text); font-weight: 600; }
@@ -165,7 +166,7 @@ body.in-detail #cases { width: 280px; max-height: calc(100vh - 110px); }
   from { opacity: 0; transform: translateX(28px); filter: blur(8px); clip-path: inset(0 0 0 12% round 24px); }
   to { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0 round 24px); }
 }
-#panel h2 { margin: 0 0 12px; font: 400 34px/1.02 var(--serif); letter-spacing: -0.01em; text-wrap: balance; }
+#panel h2 { margin: 0 0 12px; font: 500 26px/1.15 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 12.5px; color: var(--muted); }
 .meta .mono { font-size: 11.5px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 99px; color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); font-weight: 500; }
@@ -246,6 +247,13 @@ input[type='range']:hover::-webkit-slider-thumb { box-shadow: 0 0 0 6px color-mi
 .who div::before { counter-increment: who; content: ''; grid-row: span 2; width: 6px; height: 6px; margin: 7px 0 0 2px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
 .who b { font-size: 14px; font-weight: 500; }
 .who span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+/* NISAR en el mundo: imagen oficial de NASA/JPL */
+.official .off-img { display: block; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); margin-bottom: 10px; }
+.official .off-img img { display: block; width: 100%; height: auto; }
+.official .off-claim { margin: 0 0 6px; font-size: 13.5px; line-height: 1.5; }
+.official .off-claim b { font-weight: 500; color: var(--accent); }
+.official .off-credit { margin: 8px 0 0; font: 400 11px/1.6 var(--mono); color: var(--muted); }
+.official .off-credit a { color: inherit; }
 .src { font: 400 11px/1.6 var(--mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; margin-top: 8px; }
 
 /* ---------- deslizador antes/después ---------- */
@@ -263,7 +271,7 @@ input[type='range']:hover::-webkit-slider-thumb { box-shadow: 0 0 0 6px color-mi
 body.in-detail #story { left: calc(50% - 54px); width: min(560px, calc(100vw - 780px)); }
 .story-card { padding: 22px 22px 16px; animation: story-in 0.5s var(--ease) both; }
 @keyframes story-in { from { opacity: 0; transform: translateY(10px); } }
-.story-card h3 { margin: 0 0 8px; font: 400 28px/1.1 var(--serif); letter-spacing: -0.01em; text-wrap: balance; }
+.story-card h3 { margin: 0 0 8px; font: 500 24px/1.18 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
 .story-card p { margin: 0 0 18px; color: var(--text-2); line-height: 1.6; text-wrap: pretty; }
 .story-nav { display: flex; gap: 8px; align-items: center; }
 .story-nav .steps { flex: 1; display: flex; gap: 6px; justify-content: center; }

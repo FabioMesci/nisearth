@@ -1,6 +1,6 @@
 {
  "id": "rasuwa",
- "title": "Derrumbe y GLOF de Rasuwa — Langtang (Nepal)",
+ "title": "Colapso del Langtang Lirung y riada de Rasuwa (Nepal)",
  "kind": "landslide",
  "event": "2026-08-26",
  "mock": false,
@@ -558,5 +558,6 @@
  "nisar_delta_in_mask": {
   "hh": -1.55,
   "hv": -3.37
- }
+ },
+ "region": "world"
 }

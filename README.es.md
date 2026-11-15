@@ -1,4 +1,6 @@
-# España desde el radar · Spain through radar
+# NISEarth · lo que vio el radar
+
+*De España al mundo con NISAR · From Spain to the world with NISAR*
 
 **NASA Space Apps Challenge 2026 · Dancing with the SARs** · [English version](README.md)
 
@@ -13,7 +15,7 @@ independientes (EFFIS, Copernicus EMS, NASA FIRMS, tasas de subsidencia publicad
 decimos y explicamos por qué. No queremos solo enseñar lo que puede hacer el satélite: también dónde están sus
 huecos, para que quien gestiona una emergencia sepa cuándo puede contar con él.
 
-## Los seis casos
+## Los seis casos en España
 
 | Caso | Técnica | Qué muestra el radar |
 |---|---|---|
@@ -26,6 +28,19 @@ huecos, para que quien gestiona una emergencia sepa cuándo puede contar con él
 | ⛰️ **Derrumbe y GLOF de Rasuwa — Langtang (Nepal), 26 ago 2026** | Cambio de retrodispersión (NISAR banda L + Sentinel-1 banda C) | En pleno monzón del Himalaya (5 semanas con nubes del 49–97 % en Sentinel-2 y 323,5 mm de lluvia en 22 días), la pasada 98 ascendente de NISAR cartografía **633 ha** de avalancha glaciar y garganta arrasada (GLOF, EMSR927) con **−3,4 dB** de caída media en HV, **0,6 km** de carretera afectados y **2.884 personas** expuestas en el corredor (<1 km). |
 | 〰️ **Doblete sísmico de Venezuela (Yaracuy · La Guaira), 24 jun 2026** | InSAR, 4 pasadas NISAR GUNW (2 asc. + 2 desc.) + USGS | El doblete de **Mw 7,2** (San Felipe, 22:04:31 UTC) y **Mw 7,5** (Catia La Mar, 22:05:03 UTC, prof. 10 km) fue captado apenas **12 horas después** por la pasada 162 ascendente de NISAR: desplazamientos en línea de visión de hasta **−37,9 cm** (asc.) y **+32,7 cm** (desc.), inversión de signo que demuestra desgarre dextral en las fallas de Morón y San Sebastián, y **102.325 ha** con deformación coherente. |
 
+## NISAR en el mundo
+
+El mismo pipeline aplicado a seis eventos fuera de España. Para cuatro de ellos NASA/JPL publicó su propia imagen NISAR; la web la muestra junto a la nuestra, con su crédito, para poder comparar (la nuestra se procesa de forma independiente con los mismos datos públicos de ASF).
+
+| Caso | Técnica | Qué muestra el radar | Qué dice NASA/JPL |
+|---|---|---|---|
+| 〰️ **Terremotos de Venezuela (M7,2 + M7,5, 24 jun 2026)** | InSAR, 3 pasadas (2 asc, 1 desc) | Hasta **−59 cm** en la línea de visión en la costa de La Guaira. Sin rampa ni ajuste de relieve (la deformación ocupa la escena); cero en el interior. | ~60 cm hacia el oeste junto al aeropuerto |
+| 🌋 **Volcán Krasheninnikov (Kamchatka)** | Cambio de retrodispersión, 11 fechas | Lóbulos nuevos y brillantes en el frente NE de la colada (13 jul → 23 sep); HH sobre ellos sube de −14 dB (jun) a −4,5 dB (18 ago) y se estabiliza. Parte de lo marcado son neveros que se funden. | Timelapse de 17 imágenes, dic 2025 – ago 2026 |
+| 💧 **Inundaciones del Limpopo (Mozambique, ene 2026)** | Cambio de retrodispersión, 4 fechas | **325 km²** de agua nueva entre el 5 y el 17 ene (umbral −14 dB en el valle del histograma); 5,4 km de vía férrea y 19 km de carreteras bajo el agua (OSM). | Antes/después, >600.000 desplazados |
+| ⬇️ **Subsidencia de Ciudad de México** | InSAR, 10 pares encadenados (oct–feb) | Unas 37.500 ha del antiguo lago se hunden; **−22 cm en 120 días** en Chalco. Rampa y relieve ajustados solo en los cerros (> 2.280 m). | > 2 cm/mes |
+| 🌊 **Riada de Rasuwa (Nepal, 26 ago 2026)** | Cambio de retrodispersión, 6 fechas | Provocada por el colapso de roca y hielo de la cara norte del Langtang Lirung (más de 1400 muertos). El agua ya no está en la siguiente pasada; **385 ha** del fondo del valle (a <300 m de los ríos de OSM) cambian más de 3 dB. Sin validar. | — (sin imagen de NASA) |
+| 🧊 **Colapso del Langtang Lirung — antes (Nepal)** | InSAR, 6 pares encadenados (27 may → 19 ago) | El hielo que se rompió no tiene coherencia y el GUNW lo descarta. En la ladera a 1,7 km: **+4,5 cm** (ruido ±2,8 cm), 2,4 cm en los últimos 24 días; otras 9 zonas se mueven más de 5 cm en la misma ventana. NISAR vio moverse la montaña, no qué parte iba a caer. | — (ICIMOD: hasta 30 cm; *Remote Sensing* 18:3727) |
+
 ## Qué hace la web
 
 Un globo 3D (globe.gl / three.js) lleva a un mapa detallado (MapLibre) de cada caso, con:
@@ -35,7 +50,7 @@ Un globo 3D (globe.gl / three.js) lleva a un mapa detallado (MapLibre) de cada c
 - máscaras de cambio, desplazamiento InSAR acumulado y coherencia;
 - vías y carreteras afectadas (OpenStreetMap), cobertura del suelo y población expuesta;
 - validación con EFFIS, Copernicus EMS y NASA FIRMS;
-- índice de riesgo por celda para el incendio y la inundación (peligro × exposición × vulnerabilidad, [método](docs/EVENTS_AND_RISK.md));
+- índice de riesgo por celda para el incendio, las inundaciones y las subsidencias (peligro × exposición × vulnerabilidad, [método](docs/EVENTS_AND_RISK.md));
 - panel «Vigilancia España»: fuegos activos hoy en la península (NASA FIRMS) y la próxima pasada de NISAR sobre cada uno;
 - guía de riesgos (incendio, inundación, terremoto, deslizamiento, volcán, subsidencia): cómo ve el radar cada uno;
 - modo historia guiado e interfaz completa en español e inglés.
@@ -129,6 +144,15 @@ for c in niebla dana; do
   && ../.venv/bin/python 07_risk.py $c
 done
 for c in granada lorca lapalma alora; do ../.venv/bin/python 08_insar.py all $c; done
+# NISAR around the world / NISAR en el mundo
+for c in venezuela cdmx langtang; do ../.venv/bin/python 08_insar.py all $c; done
+../.venv/bin/python 02_extract.py krasheninnikov --track 80 && ../.venv/bin/python 03_process.py krasheninnikov
+../.venv/bin/python 02_extract.py mozambique --track 114 && ../.venv/bin/python 03_process.py mozambique && ../.venv/bin/python 04_context.py mozambique
+../.venv/bin/python 02_extract.py rasuwa --track 98 && ../.venv/bin/python 03_process.py rasuwa && ../.venv/bin/python 04_context.py rasuwa \
+  && ../.venv/bin/python 06_exposure.py rasuwa && ../.venv/bin/python 05_external.py rasuwa
+for c in mozambique rasuwa cdmx; do ../.venv/bin/python 07_risk.py $c; done
+../.venv/bin/python 11_lorca_risk.py
+../.venv/bin/python 09_world.py                     # NASA/JPL image + "world" region (after processing)
 ../.venv/bin/python 05_external.py watch            # panel «Vigilancia España»: repetir justo antes de la demo
 ```
 (Álora usa además Sentinel-1: `s1_hyp3.py submit` y `s1_hyp3.py fetch` antes de `08_insar.py context alora`.)

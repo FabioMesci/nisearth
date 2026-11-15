@@ -79,6 +79,8 @@ def select_pairs(case, rows):
     out = []
     for t, a, b in pairs:
         parts = [r for r in rows if (r["track"], r["ref"], r["sec"]) == (t, a, b)]
+        # ASF puede publicar dos versiones del mismo par y frame (p. ej. ..._N_F_J_ y ..._F_F_J_): leer solo una
+        parts = list({r["frame"]: r for r in sorted(parts, key=lambda r: r["id"])}.values())
         if parts:
             out.append({"track": t, "dir": parts[0]["dir"], "ref": a, "sec": b, "parts": parts})
         else:
@@ -209,7 +211,7 @@ def km_grid(case):
     return X, Y, lon, lat
 
 
-def correct(unw, coh, cc, iono, dem, X, Y, excl, detrend=True):
+def correct(unw, coh, cc, iono, dem, X, Y, excl, detrend="ramp"):
     """Fase -> cm en la línea de visión, sin ionosfera, rampa orbital ni atmósfera proporcional a la altura.
     Signo: positivo = el suelo se acerca al satélite (sube), negativo = se aleja (se hunde)."""
     # la pantalla ionosférica del producto (split-spectrum) es ruidosa a escala de decenas de km: en estas escenas
@@ -223,8 +225,14 @@ def correct(unw, coh, cc, iono, dem, X, Y, excl, detrend=True):
         good &= cc == ids[np.argmax(n)]
     d = np.where(good, -ph * PHASE_TO_CM, np.nan)
     fit = good & ~excl & np.isfinite(dem)
-    if detrend and fit.sum() > 200:
-        if detrend == "x_dem":
+    if detrend == "offset":
+        # terremoto grande: la deformación ocupa casi toda la escena; una rampa o un término de relieve
+        # se comerían la señal real. Solo se fija el cero con la mediana del campo lejano (fuera de la zona excluida)
+        ref = fit if fit.sum() > 200 else good
+        if ref.any():
+            d = d - np.nanmedian(d[ref])
+    elif fit.sum() > 200:
+        if detrend == "x_dem":  # escena alargada E-O: rampa solo en X (en Y la falla costera ocupa todo)
             A = np.column_stack([np.ones(fit.sum()), X[fit], dem[fit] / 1000])
             coef, *_ = np.linalg.lstsq(A, d[fit], rcond=None)
             model = coef[0] + coef[1] * X + coef[2] * np.nan_to_num(dem) / 1000
@@ -295,6 +303,11 @@ def cmd_process(cid):
     work = WORK / cid
     pairs = json.loads((work / "gunw_pairs.json").read_text())
     pairs = [p for p in pairs if (work / f"gunw_{tag(p)}.tif").exists()]
+    if ins.get("until"):  # solo pares que terminan antes de esa fecha (p. ej. antes de un colapso)
+        pairs = [p for p in pairs if p["sec"] <= ins["until"]]
+    if ins["mode"] == "pairs":  # solo los pares del config, en su orden (se pueden descartar sin volver a extraer)
+        want = [tuple(x) for x in ins["pairs"]]
+        pairs = sorted([p for p in pairs if (p["track"], p["ref"], p["sec"]) in want], key=lambda p: want.index((p["track"], p["ref"], p["sec"])))
     tr, w, h = grid(case)
     X, Y, lon, lat = km_grid(case)
     dem = dem_on_grid(case, work / "dem.npz")
@@ -311,9 +324,18 @@ def cmd_process(cid):
         raw.append((p, unw, coh, cc, iono))
 
     def run(excl):
-        return [(p, *correct(unw, coh, cc, iono if ins.get("iono") else None, dem, X, Y, excl, ins.get("detrend", True)), coh) for p, unw, coh, cc, iono in raw]
+        return [(p, *correct(unw, coh, cc, iono if ins.get("iono") else None, dem, X, Y, excl, ins.get("detrend", "ramp")), coh) for p, unw, coh, cc, iono in raw]
 
-    if hot:
+    if ins.get("fit_above_m"):  # cuenca sedimentaria: la corrección se ajusta solo en los cerros (roca estable);
+        # el lecho plano y bajo es justo lo que se hunde y un término de relieve se lo comería
+        excl = ~(np.nan_to_num(dem) >= ins["fit_above_m"])
+        done = run(excl)
+    elif ins.get("ref_box"):  # zona de referencia explícita (campo lejano): todo lo demás queda excluido del ajuste
+        rx0, ry0, rx1, ry1 = ins["ref_box"]
+        LON, LAT = np.meshgrid(lon, lat)
+        excl = ~((LON >= rx0) & (LON <= rx1) & (LAT >= ry0) & (LAT <= ry1))
+        done = run(excl)
+    elif hot:
         hx, hy = kx(hot[0]), ky(hot[1])
         excl = (X - hx) ** 2 + (Y - hy) ** 2 <= ins["exclude_km"] ** 2
         if ins.get("hotspot2"):
@@ -352,9 +374,11 @@ def cmd_process(cid):
         frames_d = [np.where((valid >= need) & ~jump, s, np.nan) for s in stack]
     else:
         frames_d = [d for p, d, good, coh in done]
-        final = frames_d[-1].copy()
-        for (p, *_), d in zip(done[:-1], frames_d[:-1]):
-            if p["dir"] == done[-1][0]["dir"]:
+        # mapa principal: la pasada "main_track" si se indica (los pares van en orden cronológico), si no la última
+        mi = next((i for i, (p, *_) in enumerate(done) if p["track"] == ins.get("main_track")), len(done) - 1)
+        final = frames_d[mi].copy()
+        for i, ((p, *_), d) in enumerate(zip(done, frames_d)):
+            if i != mi and p["dir"] == done[mi][0]["dir"]:
                 ov = np.isfinite(final) & np.isfinite(d)
                 off = float(np.nanmedian(final[ov] - d[ov])) if ov.sum() > 50 else 0.0
                 final = np.where(np.isfinite(final), final, d + off)
@@ -452,6 +476,13 @@ def cmd_process(cid):
     else:
         vals = [v for v in series_d if np.isfinite(v)]
         metrics += [{"id": "insar_epi", "label": "Mayor desplazamiento cerca del epicentro (cualquier pasada)", "value": round(max(vals, key=abs) if vals else float('nan'), 1), "unit": "cm"}]
+        if ins.get("peak"):  # terremoto grande: el máximo robusto (percentil 0,5 / 99,5) de cualquier pasada en toda la escena
+            peaks = []
+            for (p, *_), d in zip(done, frames_d):
+                lo_, hi_ = np.nanpercentile(d, [0.5, 99.5])
+                peaks.append((lo_ if abs(lo_) > abs(hi_) else hi_, p))
+            pk, pp = max(peaks, key=lambda x: abs(x[0]))
+            metrics.append({"id": "insar_peak", "label": f"Mayor desplazamiento en tierra (pasada {pp['track']}, percentil 99,5)", "value": round(float(pk), 1), "unit": "cm"})
     if region is None:  # en zonas acotadas (colada, vía) la serie ya compara con el entorno; un área sería ruido
         metrics.append({"id": "insar_area", "label": "Superficie que se mueve más que el ruido", "value": round(float(moving.sum() * px_ha)), "unit": "ha"})
     metrics += [
@@ -476,6 +507,7 @@ def cmd_process(cid):
             "mode": ins["mode"], "product": "NISAR L2 GUNW", "wavelength_cm": round(WAVELENGTH_M * 100, 1),
             "vmax_cm": vmax, "fringe_cm": cyc, "hotspot": [round(hot[0], 4), round(hot[1], 4)],
             "noise_cm": round(noise, 2), "rate_cm_yr": round(rate, 1) if np.isfinite(rate) else None, "series": "region" if region is not None else "point", "threshold_cm": round(thr, 2), "days": days,
+            "detrend": ins.get("detrend", "ramp"),
             "start": first.isoformat(), "end": last.isoformat(),
             "pairs": [{"track": p["track"], "dir": p["dir"], "ref": p["ref"], "sec": p["sec"]} for p, *_ in done],
         },
@@ -496,7 +528,7 @@ def cmd_process(cid):
     idx_path = WEB_DATA / "index.json"
     idx = json.loads(idx_path.read_text())
     idx = [c for c in idx if c["id"] != cid] + [{"id": cid, "title": case["title"], "kind": case["kind"],
-                                                  "center": manifest["center"], "event": case["event"]}]
+                                                  "center": manifest["center"], "event": case["event"], "region": case.get("region", "es")}]
     idx_path.write_text(json.dumps(idx, ensure_ascii=False, indent=1))
 
 

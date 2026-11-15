@@ -33,10 +33,19 @@
   ]
  ],
  "pair": {
-  "before": "2026-06-29",
-  "after": "2026-06-25"
+  "before": "2026-06-25",
+  "after": "2026-07-04"
  },
  "frames": [
+  {
+   "date": "2026-06-25",
+   "ref": "2026-06-13",
+   "track": 162,
+   "dir": "A",
+   "hh": "d_162_20260613_20260625.webp",
+   "hv": "f_162_20260613_20260625.webp",
+   "rgb": "c_162_20260613_20260625.webp"
+  },
   {
    "date": "2026-06-29",
    "ref": "2026-06-17",
@@ -63,15 +72,6 @@
    "hh": "d_126_20260622_20260704.webp",
    "hv": "f_126_20260622_20260704.webp",
    "rgb": "c_126_20260622_20260704.webp"
-  },
-  {
-   "date": "2026-06-25",
-   "ref": "2026-06-13",
-   "track": 162,
-   "dir": "A",
-   "hh": "d_162_20260613_20260625.webp",
-   "hv": "f_162_20260613_20260625.webp",
-   "rgb": "c_162_20260613_20260625.webp"
   }
  ],
  "layers": {
@@ -80,22 +80,22 @@
  },
  "series": {
   "dates": [
+   "2026-06-25",
    "2026-06-29",
    "2026-06-30",
-   "2026-07-04",
-   "2026-06-25"
+   "2026-07-04"
   ],
   "hh": [
+   -32.25,
    -23.68,
    -37.89,
-   32.67,
-   -32.25
+   32.67
   ],
   "hv": [
+   0.31,
    0.27,
    0.22,
-   0.32,
-   0.31
+   0.32
   ]
  },
  "metrics": [
@@ -148,9 +148,16 @@
   "series": "point",
   "threshold_cm": 15.53,
   "days": 21,
+  "detrend": "x_dem",
   "start": "2026-06-13",
   "end": "2026-07-04",
   "pairs": [
+   {
+    "track": 162,
+    "dir": "A",
+    "ref": "2026-06-13",
+    "sec": "2026-06-25"
+   },
    {
     "track": 54,
     "dir": "D",
@@ -168,14 +175,17 @@
     "dir": "D",
     "ref": "2026-06-22",
     "sec": "2026-07-04"
-   },
-   {
-    "track": 162,
-    "dir": "A",
-    "ref": "2026-06-13",
-    "sec": "2026-06-25"
    }
   ]
  },
- "refLabel": "Sismicidad: USGS (earthquake.usgs.gov)"
+ "refLabel": "Sismicidad: USGS (earthquake.usgs.gov)",
+ "region": "world",
+ "official": {
+  "url": "https://science.nasa.gov/earth/earth-observatory/where-venezuelas-earthquakes-shifted-the-ground/",
+  "credit": "NASA Earth Observatory/Lauren Dauphin; datos: Eric Fielding, equipo científico NISAR (JPL)",
+  "date": "2026-07-10",
+  "claim": "Hasta ~60 cm de desplazamiento hacia el oeste junto al aeropuerto de Maiquetía",
+  "file": "official.webp",
+  "source_image": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/iotd/2026/where-venezuela’s-earthquakes-shifted-the-ground/venezuela_nisar_20260630.jpg"
+ }
 }

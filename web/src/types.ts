@@ -6,6 +6,18 @@ export interface CaseIndexItem {
   kind: Kind
   center: [number, number]
   event: string
+  /** es = caso español; world = NISAR en el mundo (eventos difundidos por NASA/JPL) */
+  region?: 'es' | 'world'
+}
+
+/** Imagen oficial de NASA/JPL del mismo evento, para comparar con nuestro procesado (pipeline/09_world.py) */
+export interface Official {
+  url: string
+  file?: string
+  source_image?: string
+  credit: string
+  date: string
+  claim: string
 }
 
 export interface Frame {
@@ -53,6 +65,10 @@ export interface Manifest {
   /** Sentinel-1 (banda C): hh/hv contienen VV/VH */
   s1?: { pair: { before: string; after: string }; frames: Frame[]; change: string; delta_in_mask: { vv: number; vh: number } }
   nisar_delta_in_mask?: { hh: number; hv: number }
+  region?: 'es' | 'world'
+  official?: Official
+  /** Regla de cambio especial del pipeline (03_process.py): lava nueva o cauce arrasado */
+  change?: 'lava' | 'debris' | null
   stats?: Record<string, unknown>
   /** Cobertura del suelo bajo la máscara (ESA WorldCover) */
   landcover?: { source: string; inside: LandRow[]; outside_ref?: LandRow[] }
@@ -72,6 +88,8 @@ export interface InsarInfo {
   /** point = disco alrededor del punto; region = zona (colada, vía) menos un anillo de 1 km */
   series?: 'point' | 'region'
   threshold_cm: number
+  /** ramp = rampa + relieve estimados en la escena; offset = solo el cero (terremotos grandes) */
+  detrend?: 'ramp' | 'offset'
   days: number
   start: string
   end: string
@@ -94,7 +112,11 @@ export interface RiskSummary {
   components: { hazard: number; exposure: number; vulnerability: number }
   drivers: { exposure: Record<string, number>; vulnerability: Record<string, number> }
   hotspots: { place: string; lon: number; lat: number; risk: number; class: string; population: number }[]
-  cascade?: { type: 'post_fire_runoff' | 'rain_slope_failure'; cells: number; roads_km: number; rail_km: number; burned_steep_ha?: number; rain_mm?: number }
+  cascade?: {
+    type: 'post_fire_runoff' | 'rain_slope_failure' | 'bank_undercutting' | 'subsidence_flooding'
+    cells: number; roads_km: number; rail_km: number
+    burned_steep_ha?: number; rain_mm?: number; steep_bank_ha?: number; sinking_flat_ha?: number
+  }
   stability: { runs: number; spread_pct: number; stable_high_pct: number | null; mean_pct: number }
   sources: string[]
   files: { geojson: string; csv: string }

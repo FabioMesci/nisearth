@@ -67,7 +67,7 @@ export class Panel {
             <button data-v="hv" title="${t('titleHV')}">HV</button>
             ${m.frames[0]?.rgb ? `<button data-v="rgb" title="${t('titleRGB')}">RGB</button>` : ''}
           </div>
-          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.kind === 'flood' ? t('maskWater') : m.kind === 'landslide' ? t('maskSlide') : t('maskBurn')}</span></label>
+          <label class="toggle"><input type="checkbox" id="chk-mask" ${v.showMask ? 'checked' : ''} /> <span>${m.insar ? t('maskMove') : m.change === 'debris' ? t('maskDebris') : m.kind === 'flood' ? t('maskWater') : m.kind === 'landslide' ? t('maskSlide') : m.kind === 'volcano' ? t('maskLava') : t('maskBurn')}</span></label>
         </div>
         <div class="row toggles">
           ${m.overlays.rail || m.overlays.roads ? `<label class="toggle"><input type="checkbox" id="chk-infra" ${v.showInfra ? 'checked' : ''} /> <span>${m.insar ? t('railOsm') : t('infra')}</span></label>` : ''}
@@ -95,6 +95,8 @@ export class Panel {
 
       ${m.landcover ? landcoverCard(m) : ''}
 
+      ${m.official ? officialCard(m) : ''}
+
       ${m.id === 'lorca' ? lorcaHtml(m) : `<section class="sec">
         <div class="label">${m.insar ? t('chartInsar')(m.insar.mode === 'pairs') : t('chart')}</div>
         <div class="chart-box"><canvas id="chart"></canvas></div>
@@ -117,7 +119,7 @@ export class Panel {
       </section>
 
       <footer class="src">
-        ${m.id === 'lorca' ? (lang === 'es' ? 'Fuentes y limitaciones en la comparación anterior.' : 'Sources and limitations are listed in the comparison above.') : m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
+        ${m.id === 'lorca' ? (lang === 'es' ? 'Fuentes y limitaciones en la comparación anterior.' : 'Sources and limitations are listed in the comparison above.') : m.insar ? t('sourceInsar')(m.insar.pairs.length, fmtDate(m.insar.start), fmtDate(m.insar.end), !!m.s1, m.refLabel ?? '', m.insar.detrend === 'offset') : t('source')(m.frames[0]?.track ?? 0, fmtDate(m.pair.before), fmtDate(m.pair.after), !!m.s1, m.overlays.ems ? `Copernicus EMS ${m.stats?.ems_code ?? ''}`.trim() : m.overlays.effis ? 'EFFIS' : '')}${m.daily ? ` · ${m.daily.kind === 'rain' ? t('srcRain') : t('srcFirms')}` : ''}
       </footer>
     `
     this.view.onLayerError = () => {
@@ -404,9 +406,14 @@ function riskCard(m: Manifest) {
   const seen = new Set<string>()
   const hot = r.hotspots.filter((h) => !seen.has(h.place) && seen.add(h.place)).slice(0, 3)
   const idx = (name: string) => r.classes.findIndex((c) => c.cls === name)
-  const cascade = r.cascade?.type === 'post_fire_runoff'
-    ? t('riskCascadeFire')(fmt(r.cascade?.burned_steep_ha ?? 0), (r.cascade?.roads_km ?? 0).toLocaleString(locale()))
-    : t('riskCascadeFlood')(fmt(r.cascade?.rain_mm ?? 0), (r.cascade?.roads_km ?? 0).toLocaleString(locale()), (r.cascade?.rail_km ?? 0).toLocaleString(locale()))
+  const c = r.cascade
+  const km = (v: number) => v.toLocaleString(locale())
+  const cascade = !c ? ''
+    : c.type === 'post_fire_runoff' ? t('riskCascadeFire')(fmt(c.burned_steep_ha ?? 0), km(c.roads_km))
+    : c.type === 'bank_undercutting' ? t('riskCascadeDebris')(fmt(c.steep_bank_ha ?? 0), km(c.roads_km))
+    : c.type === 'subsidence_flooding' ? t('riskCascadeSubsidence')(fmt(c.sinking_flat_ha ?? 0), km(c.roads_km), km(c.rail_km))
+    : c.cells === 0 ? t('riskCascadeFlat')(fmt(c.rain_mm ?? 0))
+    : t('riskCascadeFlood')(fmt(c.rain_mm ?? 0), km(c.roads_km), km(c.rail_km))
   return `<section class="sec risk">
     <div class="label">${t('riskTitle')}</div>
     ${r.scenario === 'snczi_t100_limited' ? `<p class="hint">${lang === 'es' ? 'Escenario fluvial T100 del SNCZI: peligrosidad modelada, no inundación observada. El índice clasifica celdas para exploración; no predice daños ni es comparable directamente con Valencia. Sin color no significa ausencia de riesgo. Versión reducida: usa población, suelo construido y cultivos como exposición y solo susceptibilidad física de cobertura como vulnerabilidad. No incluye edad, vías ni servicios. Los pesos son supuestos.' : 'SNCZI T100 river scenario: modelled hazard, not an observed flood. This screening index ranks cells; it does not predict damage and is not directly comparable with Valencia. No colour does not mean no risk. Limited version: exposure uses population, built land and cropland; vulnerability uses only physical land-cover susceptibility. Age, roads and services are omitted. Weights are assumed.'}</p>` : ''}
@@ -492,4 +499,17 @@ function passesSvg(p: NonNullable<(typeof CONTENT)[string]['passes']>) {
     ${p.list.map((q) => `<circle cx="${x(q.date)}" cy="${rowY[q.sensor]}" r="3.6" class="${q.sensor === 'NISAR' ? 'nisar' : 's1'}"><title>${q.sensor} · ${q.date.replace('T', ' ')} UTC</title></circle>`).join('')}
     ${days.filter((_, i) => i % 3 === 1).map((d) => `<text x="${x(d)}" y="${H - 6}" text-anchor="middle" class="tick">${fmtDay(d)}</text>`).join('')}
   </svg>`
+}
+
+/** NISAR en el mundo: la imagen que publicó NASA/JPL del mismo evento, con su crédito */
+function officialCard(m: Manifest) {
+  const o = m.official!
+  const img = o.file ? `/data/${m.id}/${o.file}` : ''
+  return `<section class="sec official">
+    <div class="label">${t('official')}</div>
+    ${img ? `<a class="off-img" href="${o.url}" target="_blank" rel="noopener"><img src="${img}" alt="${t('official')}" loading="lazy" /></a>` : ''}
+    <p class="off-claim"><b>${t('officialSays')}:</b> ${CONTENT[m.id]?.officialClaim ?? o.claim}</p>
+    <p class="hint">${t('officialNote')(fmtDate(o.date))}</p>
+    <p class="off-credit">${t('officialCredit')}: ${o.credit} · <a href="${o.url}" target="_blank" rel="noopener">${t('officialLink')} ↗</a></p>
+  </section>`
 }

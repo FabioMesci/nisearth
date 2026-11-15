@@ -1,0 +1,313 @@
+{
+ "id": "mozambique",
+ "title": "Inundaciones del Limpopo (Mozambique)",
+ "kind": "flood",
+ "event": "2026-01-15",
+ "mock": false,
+ "bbox": [
+  32.75,
+  -25.1,
+  33.3,
+  -24.4
+ ],
+ "center": [
+  33.025,
+  -24.75
+ ],
+ "coordinates": [
+  [
+   32.75,
+   -24.4
+  ],
+  [
+   33.3,
+   -24.4
+  ],
+  [
+   33.3,
+   -25.1
+  ],
+  [
+   32.75,
+   -25.1
+  ]
+ ],
+ "pair": {
+  "before": "2026-01-05",
+  "after": "2026-01-17"
+ },
+ "frames": [
+  {
+   "date": "2025-12-12",
+   "track": 114,
+   "hh": "hh_20251212.webp",
+   "hv": "hv_20251212.webp",
+   "rgb": "rgb_20251212.webp"
+  },
+  {
+   "date": "2025-12-24",
+   "track": 114,
+   "hh": "hh_20251224.webp",
+   "hv": "hv_20251224.webp",
+   "rgb": "rgb_20251224.webp"
+  },
+  {
+   "date": "2026-01-05",
+   "track": 114,
+   "hh": "hh_20260105.webp",
+   "hv": "hv_20260105.webp",
+   "rgb": "rgb_20260105.webp"
+  },
+  {
+   "date": "2026-01-17",
+   "track": 114,
+   "hh": "hh_20260117.webp",
+   "hv": "hv_20260117.webp",
+   "rgb": "rgb_20260117.webp"
+  }
+ ],
+ "layers": {
+  "mask": "mask.png",
+  "change": "change.webp"
+ },
+ "series": {
+  "dates": [
+   "2025-12-12",
+   "2025-12-24",
+   "2026-01-05",
+   "2026-01-17"
+  ],
+  "hh": [
+   -11.22,
+   -9.6,
+   -10.78,
+   -16.69
+  ],
+  "hv": [
+   -19.54,
+   -18.22,
+   -19.12,
+   -23.31
+  ]
+ },
+ "metrics": [
+  {
+   "id": "area",
+   "label": "Agua nueva detectada",
+   "value": 325.0,
+   "unit": "km²"
+  },
+  {
+   "id": "rail",
+   "label": "Vía férrea en zona inundada",
+   "value": 5.4,
+   "unit": "km"
+  },
+  {
+   "id": "roads",
+   "label": "Carreteras en zona inundada",
+   "value": 19.0,
+   "unit": "km"
+  }
+ ],
+ "overlays": {
+  "rail": "rail_affected.geojson",
+  "roads": "roads_affected.geojson",
+  "risk": "risk.geojson"
+ },
+ "stats": {
+  "otsu_threshold_db": -14.0,
+  "permanent_water_km2": 472.5,
+  "rail_lines": []
+ },
+ "region": "world",
+ "official": {
+  "url": "https://svs.gsfc.nasa.gov/5661",
+  "credit": "NASA SVS: Zoey N. Armstrong (Navteca); Alexandra Christensen y Bruce Chapman (JPL); Andrew Wang (JPL)",
+  "date": "2026-08-06",
+  "claim": "Más de 600 000 desplazados; el radar ve el agua bajo las nubes que tapaban a Sentinel-2",
+  "file": "official.webp",
+  "source_image": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005661/Post_Chokwe.png"
+ },
+ "risk": {
+  "generated": "2026-11-15",
+  "model": "risk = (hazard x exposure x vulnerability)^(1/3), INFORM-style geometric mean, 0-1 per cell",
+  "cell_m": [
+   505,
+   553
+  ],
+  "cells": 3443,
+  "classes": [
+   {
+    "cls": "very_low",
+    "cells": 1813,
+    "area_ha": 50664,
+    "population": 10327
+   },
+   {
+    "cls": "low",
+    "cells": 1181,
+    "area_ha": 33003,
+    "population": 36030
+   },
+   {
+    "cls": "medium",
+    "cells": 425,
+    "area_ha": 11877,
+    "population": 17070
+   },
+   {
+    "cls": "high",
+    "cells": 24,
+    "area_ha": 671,
+    "population": 1365
+   },
+   {
+    "cls": "very_high",
+    "cells": 0,
+    "area_ha": 0,
+    "population": 0
+   }
+  ],
+  "pop_high": 1365,
+  "pop_high_range": [
+   289,
+   2724
+  ],
+  "pop_expected": 8842,
+  "roads_high_km": 2.4,
+  "rail_high_km": 2.1,
+  "critical_high": 0,
+  "components": {
+   "hazard": 0.73,
+   "exposure": 0.22,
+   "vulnerability": 0.54
+  },
+  "drivers": {
+   "exposure": {
+    "population": 0.27,
+    "built": 0.06,
+    "infrastructure": 0.07,
+    "critical": 0.01,
+    "land": 0.59
+   },
+   "vulnerability": {
+    "physical": 0.55,
+    "social": 0.38,
+    "coping": 0.68
+   }
+  },
+  "dependent_age_pct": 18.9,
+  "hotspots": [
+   {
+    "place": "Macarretane (Aldeia da Barragem)",
+    "lon": 32.8675,
+    "lat": -24.4125,
+    "risk": 0.632,
+    "class": "high",
+    "hazard": 0.878,
+    "exposure": 0.534,
+    "vulnerability": 0.537,
+    "population": 96.3
+   },
+   {
+    "place": "Macarretane (Aldeia da Barragem)",
+    "lon": 32.8725,
+    "lat": -24.4175,
+    "risk": 0.559,
+    "class": "high",
+    "hazard": 0.741,
+    "exposure": 0.423,
+    "vulnerability": 0.557,
+    "population": 144.7
+   },
+   {
+    "place": "Soresuanine",
+    "lon": 33.0525,
+    "lat": -24.5725,
+    "risk": 0.559,
+    "class": "high",
+    "hazard": 0.917,
+    "exposure": 0.352,
+    "vulnerability": 0.542,
+    "population": 37.0
+   },
+   {
+    "place": "Hokwe",
+    "lon": 33.1825,
+    "lat": -24.6375,
+    "risk": 0.543,
+    "class": "high",
+    "hazard": 0.736,
+    "exposure": 0.37,
+    "vulnerability": 0.588,
+    "population": 76.6
+   },
+   {
+    "place": "Chókwè",
+    "lon": 33.0075,
+    "lat": -24.5175,
+    "risk": 0.538,
+    "class": "high",
+    "hazard": 0.939,
+    "exposure": 0.334,
+    "vulnerability": 0.496,
+    "population": 10.6
+   }
+  ],
+  "cascade": {
+   "type": "rain_slope_failure",
+   "rain_mm": 342.6,
+   "steep_deg": 15,
+   "cells": 0,
+   "roads_km": 0.0,
+   "rail_km": 0.0
+  },
+  "stability": {
+   "runs": 300,
+   "spread_pct": 25,
+   "stable_high_pct": 29,
+   "mean_pct": 94
+  },
+  "kind": "flood",
+  "weights": {
+   "hazard": {
+    "w_ref_only": 1.0,
+    "w_radar_only": 1.0,
+    "edge_m": 250,
+    "w_edge": 0.25,
+    "intensity_floor": 1.0
+   },
+   "exposure": {
+    "population": 0.4,
+    "built": 0.15,
+    "infrastructure": 0.15,
+    "critical": 0.15,
+    "land": 0.15
+   },
+   "vulnerability": {
+    "physical": 0.4,
+    "social": 0.3,
+    "coping": 0.3
+   },
+   "class_edges": [
+    0.2,
+    0.35,
+    0.5,
+    0.65
+   ]
+  },
+  "sources": [
+   "NISAR L2 GCOV change mask (this pipeline)",
+   "Open-Meteo ERA5 reanalysis rainfall",
+   "WorldPop 2020 population (100 m) and age structure (1 km)",
+   "ESA WorldCover 2021 (10 m)",
+   "OpenStreetMap roads, railways, hospitals, schools, fire stations (ODbL)",
+   "Copernicus DEM GLO-30"
+  ],
+  "files": {
+   "geojson": "risk.geojson",
+   "csv": "risk.csv"
+  }
+ }
+}
